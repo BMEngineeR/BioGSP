@@ -1,0 +1,578 @@
+---
+title: "BioGSP Tutorial: Spatial Analysis with Toy CODEX Data"
+author: "BioGSP Package"
+date: "`r Sys.Date()`"
+output:
+  html_document:
+    toc: true
+    toc_float: true
+    code_folding: show
+    theme: flatly
+    highlight: tango
+vignette: >
+  %\VignetteIndexEntry{BioGSP Tutorial: Spatial Analysis with Toy CODEX Data}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE, warning = FALSE, message = FALSE, 
+                      fig.width = 10, fig.height = 8)
+```
+
+# Introduction
+
+This tutorial demonstrates the **BioGSP (Biological Graph Signal Processing)** package for analyzing spatial patterns in multiplexed imaging data. We'll use the built-in toy CODEX dataset to showcase the package's capabilities including:
+
+- **Multiple kernel family options**: Mexican hat, Meyer, and heat kernel families
+- **Spatial pattern decomposition**: Multi-scale analysis of cell type distributions
+- **Graph construction and analysis**: Eigenvalue analysis and graph properties
+- **Cross-cell type correlation**: Advanced correlation measures
+- **Comprehensive visualization**: Filter banks, decompositions, and spatial patterns
+
+# Load Required Libraries
+
+```{r libraries}
+# Load required libraries
+library(BioGSP)
+library(ggplot2)
+library(dplyr)
+library(tidyr)
+library(patchwork)
+library(knitr)
+
+# Verify BioGSP package version
+cat("BioGSP Package version:", as.character(packageVersion("BioGSP")), "\n")
+```
+
+# Load and Explore the Toy Dataset
+
+```{r load_data}
+# Load the built-in toy CODEX dataset
+data(codex_toy_data)
+
+# Examine the dataset structure
+str(codex_toy_data)
+head(codex_toy_data)
+
+# Summary of cell types
+cell_summary <- codex_toy_data %>%
+  group_by(Annotation5) %>%
+  summarise(
+    Count = n(),
+    Mean_X = round(mean(X_cent), 2),
+    Mean_Y = round(mean(Y_cent), 2),
+    SD_X = round(sd(X_cent), 2),
+    SD_Y = round(sd(Y_cent), 2)
+  ) %>%
+  arrange(desc(Count))
+
+kable(cell_summary, caption = "Summary of Cell Types in Toy CODEX Data")
+
+# Focus on BCL6- B Cell and CD4 T for detailed analysis
+target_cells <- c("BCL6- B Cell", "CD4 T")
+cat("\nTarget cell types for SGWT analysis:\n")
+cat("BCL6- B Cell:", sum(codex_toy_data$Annotation5 == "BCL6- B Cell"), "\n")
+cat("CD4 T cells:", sum(codex_toy_data$Annotation5 == "CD4 T"), "\n")
+
+# ROI summary
+cat("\nROI summary:\n")
+roi_summary <- table(codex_toy_data$ROI_num)
+print(roi_summary)
+
+cat("\nCell types by ROI:\n")
+cross_tab <- table(codex_toy_data$ROI_num, codex_toy_data$Annotation5)
+print(cross_tab[, c("BCL6- B Cell", "CD4 T", "CD8 T", "DC", "M1")])
+```
+
+# Visualize Spatial Distribution
+
+```{r spatial_visualization}
+# Color mapping for visualization
+fill_colors <- c("#e07329", "#16964a", "#2958a8", "#dd2246", "#703594", 
+                 "#d0bd2a", "#69bd48", "#2297b1", "#b9e4f3", "#ae5c71", "#ab2170")
+color_mapping <- data.frame(
+  Annotation5 = c("BCL6- B Cell", "BCL6+ B Cell", "CD4 T", "CD4 Treg", "CD8 T", "DC", "Endothelial", "M1", "M2", "Myeloid", "Other"),
+  Color = fill_colors
+)
+color_mapping_vector <- setNames(color_mapping$Color, color_mapping$Annotation5)
+
+# Plot overall spatial distribution
+p_overview <- ggplot(codex_toy_data, aes(x = X_cent, y = Y_cent, color = Annotation5)) +
+  geom_point(size = 0.8, alpha = 0.7) +
+  scale_color_manual(values = color_mapping_vector) +
+  labs(title = "Toy CODEX Spatial Cell Distribution",
+       x = "X Coordinate", y = "Y Coordinate") +
+  theme_minimal() +
+  scale_y_reverse() +
+  guides(color = guide_legend(override.aes = list(size = 2)))
+
+print(p_overview)
+
+# Show distribution by ROI
+p_by_roi <- ggplot(codex_toy_data, aes(x = X_cent, y = Y_cent, color = Annotation5)) +
+  geom_point(size = 0.8, alpha = 0.7) +
+  facet_wrap(~ROI_num, scales = "free") +
+  scale_color_manual(values = color_mapping_vector) +
+  labs(title = "Spatial Distribution by ROI",
+       x = "X Coordinate", y = "Y Coordinate") +
+  theme_minimal() +
+  scale_y_reverse() +
+  theme(legend.position = "bottom")
+
+print(p_by_roi)
+
+# Highlight target cell types
+target_data <- codex_toy_data %>% filter(Annotation5 %in% target_cells)
+p_target <- ggplot(codex_toy_data, aes(x = X_cent, y = Y_cent)) +
+  geom_point(color = "lightgray", size = 0.3, alpha = 0.3) +
+  geom_point(data = target_data, aes(color = Annotation5), size = 1.2) +
+  facet_wrap(~ROI_num, scales = "free") +
+  scale_color_manual(values = color_mapping_vector[target_cells]) +
+  labs(title = "BCL6- B Cell and CD4 T Cell Distribution by ROI",
+       x = "X Coordinate", y = "Y Coordinate") +
+  theme_minimal() +
+  scale_y_reverse()
+
+print(p_target)
+```
+
+# Kernel Family Comparison
+
+```{r kernel_families}
+cat("Demonstrating different kernel family options available in SGWT...\n")
+
+# Compare different kernel families
+kernel_comparison <- compare_kernel_families(x_range = c(0, 3), 
+                                            scale_param = 1, 
+                                            plot_results = TRUE)
+
+# Show available kernel family types
+kernel_types <- c("mexican_hat", "meyer", "heat")
+cat("\nAvailable kernel family types:\n")
+for (i in seq_along(kernel_types)) {
+  cat(i, ". ", kernel_types[i], "\n", sep = "")
+}
+
+# Show what each kernel family provides
+cat("\nEach kernel family provides:\n")
+cat("- mexican_hat: Gaussian scaling + LoG-style wavelet\n")
+cat("- meyer: Smooth cosine low-pass + band-pass transitions\n") 
+cat("- heat: Exponential decay scaling + derivative-like wavelet\n")
+
+# Display first few rows of comparison
+cat("\nKernel values at different eigenvalues:\n")
+print(head(kernel_comparison, 8))
+```
+
+# Create Binned Data for SGWT Analysis
+
+```{r create_bins}
+# Function to create binned data for SGWT analysis
+create_binned_data <- function(cell_data, cell_type, x_bins = 30, y_bins = 30) {
+  # Filter for specific cell type
+  filtered_data <- cell_data %>% filter(Annotation5 == cell_type)
+  
+  if (nrow(filtered_data) == 0) {
+    stop(paste("No cells found for cell type:", cell_type))
+  }
+  
+  # Create bins
+  filtered_data <- filtered_data %>%
+    mutate(
+      x_bin = cut(X_cent, breaks = x_bins, labels = FALSE),
+      y_bin = cut(Y_cent, breaks = y_bins, labels = FALSE)
+    )
+  
+  # Count cells in each bin
+  bin_counts <- filtered_data %>%
+    group_by(x_bin, y_bin) %>%
+    summarise(cell_count = n(), .groups = 'drop')
+  
+  # Create complete grid
+  complete_grid <- expand.grid(x_bin = 1:x_bins, y_bin = 1:y_bins)
+  
+  # Merge with counts (fill missing with 0)
+  binned_data <- complete_grid %>%
+    left_join(bin_counts, by = c("x_bin", "y_bin")) %>%
+    mutate(cell_count = ifelse(is.na(cell_count), 0, cell_count))
+  
+  # Calculate proportions
+  binned_data$cell_proportion <- binned_data$cell_count / max(binned_data$cell_count)
+  
+  return(binned_data)
+}
+
+# Create binned data for both cell types in ROI_1
+# Filter for ROI_1 for focused analysis
+roi1_data <- codex_toy_data %>% filter(ROI_num == "ROI_1")
+
+bcl6nb_binned <- create_binned_data(roi1_data, "BCL6- B Cell")
+cd4t_binned <- create_binned_data(roi1_data, "CD4 T")
+
+cat("Binned data created successfully!\n")
+cat("BCL6- B Cell bins with cells:", sum(bcl6nb_binned$cell_count > 0), "out of 900\n")
+cat("CD4 T bins with cells:", sum(cd4t_binned$cell_count > 0), "out of 900\n")
+
+# Visualize binned data
+plot_binned_data <- function(binned_data, cell_type, color_val) {
+  ggplot(binned_data, aes(x = x_bin, y = y_bin, fill = cell_proportion)) +
+    geom_tile() +
+    scale_fill_gradient2(low = "white", high = color_val, name = "Proportion") +
+    labs(title = paste(cell_type, "Cell Distribution (30x30 bins)"),
+         x = "X Bin", y = "Y Bin") +
+    theme_minimal() +
+    scale_y_reverse() +
+    coord_equal()
+}
+
+p_bcl6nb_bins <- plot_binned_data(bcl6nb_binned, "BCL6- B Cell", color_mapping_vector["BCL6- B Cell"])
+p_cd4t_bins <- plot_binned_data(cd4t_binned, "CD4 T", color_mapping_vector["CD4 T"])
+
+# Show side by side
+bins_combined <- p_bcl6nb_bins | p_cd4t_bins
+print(bins_combined)
+```
+
+# SGWT Analysis
+
+## Prepare Data for SGWT
+
+```{r prepare_sgwt}
+# Prepare data for SGWT analysis
+prepare_sgwt_data <- function(binned_data) {
+  sgwt_data <- binned_data %>%
+    mutate(
+      x = x_bin,
+      y = y_bin,
+      signal = cell_proportion
+    ) %>%
+    select(x, y, signal)
+  
+  return(sgwt_data)
+}
+
+# Prepare data for both cell types
+bcl6nb_sgwt_data <- prepare_sgwt_data(bcl6nb_binned)
+cd4t_sgwt_data <- prepare_sgwt_data(cd4t_binned)
+
+cat("SGWT data prepared:\n")
+cat("BCL6nB data points:", nrow(bcl6nb_sgwt_data), "\n")
+cat("CD4T data points:", nrow(cd4t_sgwt_data), "\n")
+cat("Signal range BCL6nB:", round(range(bcl6nb_sgwt_data$signal), 4), "\n")
+cat("Signal range CD4T:", round(range(cd4t_sgwt_data$signal), 4), "\n")
+```
+
+## Apply SGWT Analysis
+
+```{r sgwt_analysis}
+cat("Applying SGWT to BCL6nB cell distribution...\n")
+
+# Apply SGWT to BCL6nB data
+sgwt_bcl6nb <- SGWT(data.in = bcl6nb_sgwt_data,
+                    signal = "signal",
+                    k = 15,  # Number of nearest neighbors
+                    J = 3,   # Number of scales
+                    scaling_factor = 2,
+                    kernel_type = "mexican_hat",  # Unified kernel family
+                    laplacian_type = "normalized",
+                    k_fold = 2,
+                    return_all = TRUE)
+
+cat("SGWT analysis completed for BCL6nB\n")
+cat("Reconstruction RMSE:", round(sgwt_bcl6nb$reconstruction_error, 6), "\n")
+
+# Apply SGWT to CD4T data
+cat("\nApplying SGWT to CD4T cell distribution...\n")
+sgwt_cd4t <- SGWT(data.in = cd4t_sgwt_data,
+                  signal = "signal",
+                  k = 15,
+                  J = 3,
+                  scaling_factor = 2,
+                  kernel_type = "mexican_hat",
+                  laplacian_type = "normalized",
+                  k_fold = 2,
+                  return_all = TRUE)
+
+cat("SGWT analysis completed for CD4T\n")
+cat("Reconstruction RMSE:", round(sgwt_cd4t$reconstruction_error, 6), "\n")
+
+# Energy analysis
+energy_bcl6nb <- sgwt_energy_analysis(sgwt_bcl6nb)
+energy_cd4t <- sgwt_energy_analysis(sgwt_cd4t)
+
+# Combine energy data for comparison
+energy_bcl6nb$cell_type <- "BCL6nB"
+energy_cd4t$cell_type <- "CD4T"
+energy_combined <- rbind(energy_bcl6nb, energy_cd4t)
+
+# Plot energy distribution
+p_energy <- ggplot(energy_combined, aes(x = scale, y = energy_ratio, fill = cell_type)) +
+  geom_bar(stat = "identity", position = "dodge") +
+  scale_fill_manual(values = c("BCL6nB" = color_mapping_vector["BCL6nB"],
+                               "CD4T" = color_mapping_vector["CD4T"])) +
+  labs(title = "Energy Distribution Across SGWT Scales",
+       x = "Scale", y = "Energy Ratio", fill = "Cell Type") +
+  theme_minimal()
+
+print(p_energy)
+```
+
+## Compare Different Kernel Families
+
+```{r kernel_comparison}
+cat("Testing different kernel families on BCL6nB data...\n")
+
+# Extract components for testing
+eigenvalues <- sgwt_bcl6nb$graph_info$eigenvalues
+eigenvectors <- sgwt_bcl6nb$graph_info$eigenvectors
+signal_vector <- bcl6nb_sgwt_data$signal
+
+# Test different kernel families
+kernel_types_test <- c("mexican_hat", "meyer", "heat")
+kernel_results <- list()
+
+for (kernel_type in kernel_types_test) {
+  cat("Testing", kernel_type, "kernel family...\n")
+  
+  result <- sgwt_forward(signal = signal_vector,
+                        eigenvectors = eigenvectors,
+                        eigenvalues = eigenvalues,
+                        scales = sgwt_bcl6nb$parameters$scales,
+                        kernel_type = kernel_type)
+  
+  reconstructed <- sgwt_inverse(result)
+  rmse <- sqrt(mean((signal_vector - reconstructed)^2))
+  
+  kernel_results[[kernel_type]] <- list(
+    result = result,
+    reconstructed = reconstructed,
+    rmse = rmse
+  )
+  
+  cat("RMSE with", kernel_type, "kernel:", round(rmse, 6), "\n")
+}
+
+# Create comparison table
+kernel_comparison_table <- data.frame(
+  Kernel_Family = names(kernel_results),
+  RMSE = sapply(kernel_results, function(x) round(x$rmse, 6)),
+  Description = c("Gaussian scaling + LoG wavelet", 
+                  "Smooth cosine transitions", 
+                  "Exponential decay + derivative"),
+  stringsAsFactors = FALSE
+)
+
+kable(kernel_comparison_table, 
+      caption = "Reconstruction Error Comparison Across Different Kernel Families")
+```
+
+## SGWT Decomposition Visualization
+
+```{r decomposition_viz}
+# Function to visualize SGWT components
+plot_sgwt_components <- function(sgwt_result, data_in, cell_type, color_val) {
+  coefficients <- sgwt_result$decomposition$coefficients
+  plot_data <- data_in
+  
+  plots <- list()
+  
+  # Original signal
+  plot_data$original <- sgwt_result$original_signal
+  p_orig <- ggplot(plot_data, aes(x = x, y = y, fill = original)) +
+    geom_tile() +
+    scale_fill_gradient2(low = "white", high = color_val) +
+    labs(title = paste(cell_type, "- Original")) +
+    theme_void() + scale_y_reverse() + coord_equal() +
+    theme(legend.position = "none")
+  plots[["original"]] <- p_orig
+  
+  # Scaling function
+  plot_data$scaling <- Re(as.vector(coefficients[[1]]))
+  p_scaling <- ggplot(plot_data, aes(x = x, y = y, fill = scaling)) +
+    geom_tile() +
+    scale_fill_gradient2(low = "blue", mid = "white", high = "red") +
+    labs(title = "Scaling (Low-freq)") +
+    theme_void() + scale_y_reverse() + coord_equal() +
+    theme(legend.position = "none")
+  plots[["scaling"]] <- p_scaling
+  
+  # Wavelet coefficients
+  for (i in 1:min(3, length(coefficients) - 1)) {
+    coeff_name <- paste0("wavelet_", i)
+    plot_data[[coeff_name]] <- Re(as.vector(coefficients[[i + 1]]))
+    
+    p_wavelet <- ggplot(plot_data, aes_string(x = "x", y = "y", fill = coeff_name)) +
+      geom_tile() +
+      scale_fill_gradient2(low = "blue", mid = "white", high = "red") +
+      labs(title = paste("Wavelet", i)) +
+      theme_void() + scale_y_reverse() + coord_equal() +
+      theme(legend.position = "none")
+    
+    plots[[coeff_name]] <- p_wavelet
+  }
+  
+  # Reconstructed signal
+  plot_data$reconstructed <- sgwt_result$reconstructed_signal
+  p_recon <- ggplot(plot_data, aes(x = x, y = y, fill = reconstructed)) +
+    geom_tile() +
+    scale_fill_gradient2(low = "white", high = color_val) +
+    labs(title = "Reconstructed") +
+    theme_void() + scale_y_reverse() + coord_equal() +
+    theme(legend.position = "none")
+  plots[["reconstructed"]] <- p_recon
+  
+  return(plots)
+}
+
+# Plot BCL6nB decomposition
+bcl6nb_plots <- plot_sgwt_components(sgwt_bcl6nb, bcl6nb_sgwt_data, "BCL6nB", 
+                                     color_mapping_vector["BCL6nB"])
+bcl6nb_combined <- wrap_plots(bcl6nb_plots, ncol = 3)
+print(bcl6nb_combined)
+
+# Plot CD4T decomposition
+cd4t_plots <- plot_sgwt_components(sgwt_cd4t, cd4t_sgwt_data, "CD4T",
+                                   color_mapping_vector["CD4T"])
+cd4t_combined <- wrap_plots(cd4t_plots, ncol = 3)
+print(cd4t_combined)
+```
+
+## Cross-Cell Type Correlation Analysis
+
+```{r correlation_analysis}
+cat("Performing cross-correlation analysis between BCL6nB and CD4T...\n")
+
+# Calculate Graph Cross-Correlation (GCC)
+gcc_result <- Cal_GCC(
+  data.in = data.frame(
+    BCL6nB = bcl6nb_sgwt_data$signal,
+    CD4T = cd4t_sgwt_data$signal
+  ),
+  knee = c(length(eigenvalues) %/% 4),
+  signal1 = "BCL6nB",
+  signal2 = "CD4T",
+  eigenvector = eigenvectors
+)
+
+# Cosine similarity and Pearson correlation for comparison
+cosine_sim <- cosine_similarity(bcl6nb_sgwt_data$signal, cd4t_sgwt_data$signal)
+pearson_cor <- cor(bcl6nb_sgwt_data$signal, cd4t_sgwt_data$signal)
+
+cat("Graph Cross-Correlation between BCL6nB and CD4T:", round(gcc_result, 4), "\n")
+cat("Cosine similarity between BCL6nB and CD4T:", round(cosine_sim, 4), "\n")
+cat("Pearson correlation between BCL6nB and CD4T:", round(pearson_cor, 4), "\n")
+
+# Create comparison table
+correlation_comparison <- data.frame(
+  Method = c("Graph Cross-Correlation (GCC)", "Cosine Similarity", "Pearson Correlation"),
+  Value = c(round(gcc_result, 4), round(cosine_sim, 4), round(pearson_cor, 4)),
+  Description = c("Frequency-domain correlation using graph structure",
+                  "Geometric similarity measure",
+                  "Linear correlation coefficient")
+)
+
+kable(correlation_comparison, 
+      caption = "Cross-Cell Type Correlation Analysis: BCL6nB vs CD4T")
+```
+
+# Cross-ROI Analysis
+
+```{r cross_roi_analysis}
+cat("=== Demonstrating Cross-ROI Analysis ===\n")
+
+# Compare BCL6- B Cell patterns across different ROIs
+roi_comparison <- list()
+for (roi in c("ROI_1", "ROI_2", "ROI_3")) {
+  roi_data <- codex_toy_data %>% filter(ROI_num == roi)
+  roi_bcl6nb <- roi_data %>% filter(Annotation5 == "BCL6- B Cell")
+  
+  cat("ROI", roi, "- BCL6- B Cell:", nrow(roi_bcl6nb), "\n")
+  cat("  X range:", round(range(roi_bcl6nb$X_cent), 2), "\n")
+  cat("  Y range:", round(range(roi_bcl6nb$Y_cent), 2), "\n")
+  
+  # Quick binning for comparison
+  if (nrow(roi_bcl6nb) > 20) {  # Only if sufficient cells
+    binned <- create_binned_data(roi_data, "BCL6- B Cell", x_bins = 15, y_bins = 15)
+    sgwt_data <- prepare_sgwt_data(binned)
+    
+    # Quick SGWT analysis
+    result <- SGWT(data.in = sgwt_data,
+                   signal = "signal",
+                   k = min(8, nrow(sgwt_data) - 1),
+                   J = 2,  # Fewer scales for quick analysis
+                   kernel_type = "mexican_hat",
+                   k_fold = 2,
+                   return_all = TRUE)
+    
+    roi_comparison[[roi]] <- list(
+      cells = nrow(roi_bcl6nb),
+      rmse = result$reconstruction_error,
+      active_bins = sum(binned$cell_count > 0)
+    )
+    
+    cat("  SGWT RMSE:", round(result$reconstruction_error, 4), "\n")
+    cat("  Active bins:", sum(binned$cell_count > 0), "out of 225\n\n")
+  }
+}
+
+# Create comparison table
+if (length(roi_comparison) > 0) {
+  comparison_df <- data.frame(
+    ROI = names(roi_comparison),
+    BCL6_B_Cells = sapply(roi_comparison, function(x) x$cells),
+    Active_Bins = sapply(roi_comparison, function(x) x$active_bins),
+    SGWT_RMSE = round(sapply(roi_comparison, function(x) x$rmse), 4)
+  )
+  
+  kable(comparison_df, caption = "Cross-ROI BCL6- B Cell Analysis Comparison")
+}
+
+cat("Cross-ROI analysis demonstrates how spatial patterns vary across regions!\n")
+```
+
+# Summary
+
+```{r summary}
+cat("=== SGWT Analysis Summary ===\n\n")
+
+cat("Dataset: Multi-ROI Toy CODEX spatial data\n")
+cat("- Total cells analyzed:", nrow(codex_toy_data), "\n")
+cat("- Number of ROIs:", length(unique(codex_toy_data$ROI_num)), "\n")
+cat("- ROI_1 focused analysis (30x30 grid):", 900, "bins\n")
+cat("- BCL6nB active bins (ROI_1):", sum(bcl6nb_binned$cell_count > 0), "\n")
+cat("- CD4T active bins (ROI_1):", sum(cd4t_binned$cell_count > 0), "\n")
+
+cat("\nSGWT Analysis Results:\n")
+cat("- BCL6nB reconstruction RMSE:", round(sgwt_bcl6nb$reconstruction_error, 6), "\n")
+cat("- CD4T reconstruction RMSE:", round(sgwt_cd4t$reconstruction_error, 6), "\n")
+cat("- Number of scales:", length(sgwt_bcl6nb$parameters$scales), "\n")
+cat("- Kernel type:", sgwt_bcl6nb$parameters$kernel_type, "\n")
+
+cat("\nCross-Correlation Results:\n")
+cat("- Graph Cross-Correlation:", round(gcc_result, 4), "\n")
+cat("- Cosine Similarity:", round(cosine_sim, 4), "\n")
+cat("- Pearson Correlation:", round(pearson_cor, 4), "\n")
+
+if (abs(gcc_result) > 0.3) {
+  cat("\n✓ Moderate to strong spatial correlation detected between cell types\n")
+} else {
+  cat("\n✓ Weak spatial correlation between cell types\n")
+}
+
+cat("\n✓ Tutorial completed successfully using the BioGSP package!\n")
+```
+
+# Conclusion
+
+This tutorial demonstrated the key capabilities of the BioGSP package:
+
+1. **Data Integration**: Using built-in toy CODEX data for reproducible analysis
+2. **Kernel Families**: Comparing Mexican hat, Meyer, and heat kernel families  
+3. **Spatial Analysis**: Multi-scale decomposition of spatial cell patterns
+4. **Graph Analysis**: Construction and validation of spatial graphs
+5. **Correlation Analysis**: Advanced measures for cross-cell type relationships
+
+The BioGSP package provides a comprehensive framework for spatial analysis of multiplexed imaging data, enabling researchers to uncover multi-scale spatial patterns and relationships in complex tissue environments.
+
+For more information, see `?codex_toy_data` for dataset details and explore other BioGSP functions using `help(package = "BioGSP")`.
