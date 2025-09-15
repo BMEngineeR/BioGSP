@@ -6,6 +6,10 @@
 #' and cell type annotations for multiple immune cell populations arranged 
 #' in realistic spatial clusters.
 #'
+#' @docType data
+#' @name codex_toy_data
+#' @usage data(codex_toy_data)
+#'
 #' @format A data frame with 18604 rows and 5 columns:
 #' \describe{
 #'   \item{cellLabel}{Character. Unique identifier for each cell}
@@ -123,4 +127,4 @@
 #' }
 #'
 #' @keywords datasets spatial CODEX SGWT
-"codex_toy_data"
+codex_toy_data <- NULL

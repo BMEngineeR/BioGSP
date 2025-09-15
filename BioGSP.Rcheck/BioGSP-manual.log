@@ -1,4 +1,4 @@
-This is pdfTeX, Version 3.14159265-2.6-1.40.19 (TeX Live 2018) (preloaded format=pdflatex 2024.11.11)  25 AUG 2025 14:05
+This is pdfTeX, Version 3.14159265-2.6-1.40.19 (TeX Live 2018) (preloaded format=pdflatex 2024.11.11)  15 SEP 2025 13:38
 entering extended mode
  restricted \write18 enabled.
  %&-line parsing enabled.
@@ -769,7 +769,7 @@ Now handling font encoding PD1 ...
 
 
 Writing index file Rd2.idx
-(/bmbl_data/Rtmp/RtmpF0Qu0w/Rd2pdf2693b9e6e6a43/Rd2.aux)
+(/bmbl_data/Rtmp/RtmpKEgKqN/Rd2pdf3c31d65bd26fac/Rd2.aux)
 \openout1 = `Rd2.aux'.
 
 LaTeX Font Info:    Checking defaults for OML/cmm/m/it on input line 8.
@@ -826,8 +826,8 @@ LaTeX Info: Redefining \ref on input line 8.
 LaTeX Info: Redefining \pageref on input line 8.
 LaTeX Info: Redefining \nameref on input line 8.
 
-(/bmbl_data/Rtmp/RtmpF0Qu0w/Rd2pdf2693b9e6e6a43/Rd2.out)
-(/bmbl_data/Rtmp/RtmpF0Qu0w/Rd2pdf2693b9e6e6a43/Rd2.out)
+(/bmbl_data/Rtmp/RtmpKEgKqN/Rd2pdf3c31d65bd26fac/Rd2.out)
+(/bmbl_data/Rtmp/RtmpKEgKqN/Rd2pdf3c31d65bd26fac/Rd2.out)
 \@outlinefile=\write4
 \openout4 = `Rd2.out'.
 
@@ -850,7 +850,7 @@ File: ts1ptm.fd 2001/06/04 font definitions for TS1/ptm.
 LaTeX Font Info:    Font shape `T1/ptm/bx/n' in size <14.4> not available
 (Font)              Font shape `T1/ptm/b/n' tried instead on input line 39.
 
-(/bmbl_data/Rtmp/RtmpF0Qu0w/Rd2pdf2693b9e6e6a43/Rd2.toc
+(/bmbl_data/Rtmp/RtmpKEgKqN/Rd2pdf3c31d65bd26fac/Rd2.toc
 LaTeX Font Info:    Try loading font information for U+msa on input line 1.
 
 (/usr/share/texlive/texmf-dist/tex/latex/amsfonts/umsa.fd
@@ -967,16 +967,16 @@ Overfull \hbox (7.55559pt too wide) in paragraph at lines 1018--1019
 param), wavelet = func-tion(x, scale_param)) 
  []
 
-[19] [20] (/bmbl_data/Rtmp/RtmpF0Qu0w/Rd2pdf2693b9e6e6a43/Rd2.ind [21]
+[19] [20] (/bmbl_data/Rtmp/RtmpKEgKqN/Rd2pdf3c31d65bd26fac/Rd2.ind [21]
 LaTeX Font Info:    Font shape `T1/pcr/m/it' in size <10> not available
 (Font)              Font shape `T1/pcr/m/sl' tried instead on input line 23.
- [22
+
+[22
 
 ])
 Package atveryend Info: Empty hook `BeforeClearDocument' on input line 1116.
 Package atveryend Info: Empty hook `AfterLastShipout' on input line 1116.
-
-(/bmbl_data/Rtmp/RtmpF0Qu0w/Rd2pdf2693b9e6e6a43/Rd2.aux)
+ (/bmbl_data/Rtmp/RtmpKEgKqN/Rd2pdf3c31d65bd26fac/Rd2.aux)
 Package atveryend Info: Executing hook `AtVeryEndDocument' on input line 1116.
 Package atveryend Info: Executing hook `AtEndAfterFileList' on input line 1116.
 
@@ -986,7 +986,7 @@ Package atveryend Info: Empty hook `AtVeryVeryEnd' on input line 1116.
  ) 
 Here is how much of TeX's memory you used:
  7414 strings out of 494917
- 102922 string characters out of 6180698
+ 102935 string characters out of 6180698
  177489 words of memory out of 5000000
  10402 multiletter control sequences out of 15000+600000
  39163 words of font info for 62 fonts, out of 8000000 for 9000
@@ -999,7 +999,7 @@ type1/urw/courier/ucrro8a.pfb></usr/share/texlive/texmf-dist/fonts/type1/urw/ti
 mes/utmb8a.pfb></usr/share/texlive/texmf-dist/fonts/type1/urw/times/utmr8a.pfb>
 </usr/share/texlive/texmf-dist/fonts/type1/urw/times/utmr8a.pfb></usr/share/tex
 live/texmf-dist/fonts/type1/urw/times/utmri8a.pfb>
-Output written on Rd2.pdf (22 pages, 131352 bytes).
+Output written on Rd2.pdf (22 pages, 131367 bytes).
 PDF statistics:
  490 PDF objects out of 1000 (max. 8388607)
  454 compressed objects within 5 object streams

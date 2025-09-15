@@ -16,8 +16,8 @@ RoxygenNote: 7.2.3
 Imports: Matrix, igraph, RANN, RSpectra, ggplot2, patchwork, ggpubr,
         viridis, methods
 Suggests: spdep, spatialEco, sp, gasper, egg, knitr, rmarkdown,
-        testthat (>= 2.1.0), remotes
+        testthat (>= 2.1.0), remotes, dplyr, tidyr
 VignetteBuilder: knitr
 Depends: R (>= 3.5.0)
 NeedsCompilation: no
-Packaged: 2025-08-25 18:02:27 UTC; cha224
+Packaged: 2025-09-15 17:30:39 UTC; cha224

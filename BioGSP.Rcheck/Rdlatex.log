@@ -1,14 +1,14 @@
 Hmm ... looks like a package
 Converting parsed Rd's to LaTeX ..
 Creating pdf output from LaTeX ...
-tar: Rd2.idx: time stamp 2025-08-25 14:05:13 is 2.647056397 s in the future
-tar: Rd2.aux: time stamp 2025-08-25 14:05:13 is 2.639402044 s in the future
-tar: Rd2.out: time stamp 2025-08-25 14:05:13 is 2.632113874 s in the future
-tar: Rd2.toc: time stamp 2025-08-25 14:05:13 is 2.624982466 s in the future
-tar: Rd2.idx: time stamp 2025-08-25 14:05:14 is 3.096935566 s in the future
-tar: Rd2.aux: time stamp 2025-08-25 14:05:14 is 3.084942161 s in the future
-tar: Rd2.out: time stamp 2025-08-25 14:05:14 is 3.069994088 s in the future
-tar: Rd2.toc: time stamp 2025-08-25 14:05:14 is 3.055324884 s in the future
+tar: Rd2.idx: time stamp 2025-09-15 13:38:33 is 2.596219554 s in the future
+tar: Rd2.aux: time stamp 2025-09-15 13:38:33 is 2.589115447 s in the future
+tar: Rd2.out: time stamp 2025-09-15 13:38:33 is 2.582598084 s in the future
+tar: Rd2.toc: time stamp 2025-09-15 13:38:33 is 2.575562034 s in the future
+tar: Rd2.idx: time stamp 2025-09-15 13:38:34 is 3.050733677 s in the future
+tar: Rd2.aux: time stamp 2025-09-15 13:38:34 is 3.038991651 s in the future
+tar: Rd2.out: time stamp 2025-09-15 13:38:34 is 3.026751868 s in the future
+tar: Rd2.toc: time stamp 2025-09-15 13:38:34 is 3.013980994 s in the future
 This is pdfTeX, Version 3.14159265-2.6-1.40.19 (TeX Live 2018) (preloaded format=pdflatex)
  restricted \write18 enabled.
 entering extended mode
@@ -139,7 +139,7 @@ Overfull \hbox (7.55559pt too wide) in paragraph at lines 1018--1019
 param), wavelet = func-tion(x, scale_param)) 
 [18] [19]
 No file Rd2.ind.
-[20] (/bmbl_data/Rtmp/RtmpF0Qu0w/Rd2pdf2693b9e6e6a43/Rd2.aux)
+[20] (/bmbl_data/Rtmp/RtmpKEgKqN/Rd2pdf3c31d65bd26fac/Rd2.aux)
 
 Package rerunfilecheck Warning: File `Rd2.out' has changed.
 (rerunfilecheck)                Rerun to get outlines right
@@ -152,7 +152,7 @@ courier/ucrr8a.pfb></usr/share/texlive/texmf-dist/fonts/type1/urw/times/utmb8a.
 pfb></usr/share/texlive/texmf-dist/fonts/type1/urw/times/utmr8a.pfb></usr/share
 /texlive/texmf-dist/fonts/type1/urw/times/utmr8a.pfb></usr/share/texlive/texmf-
 dist/fonts/type1/urw/times/utmri8a.pfb>
-Output written on Rd2.pdf (20 pages, 110791 bytes).
+Output written on Rd2.pdf (20 pages, 110806 bytes).
 Transcript written on Rd2.log.
 This is pdfTeX, Version 3.14159265-2.6-1.40.19 (TeX Live 2018) (preloaded format=pdflatex)
  restricted \write18 enabled.
@@ -210,18 +210,18 @@ Package hyperref Message: Driver (autodetected): hpdftex.
 (/usr/share/texlive/texmf-dist/tex/latex/base/omsenc.dfu)
 (/usr/share/texlive/texmf-dist/tex/latex/base/ts1enc.dfu)))
 Writing index file Rd2.idx
-(/bmbl_data/Rtmp/RtmpF0Qu0w/Rd2pdf2693b9e6e6a43/Rd2.aux)
+(/bmbl_data/Rtmp/RtmpKEgKqN/Rd2pdf3c31d65bd26fac/Rd2.aux)
 (/usr/share/texlive/texmf-dist/tex/latex/base/ts1cmr.fd)
 (/usr/share/texlive/texmf-dist/tex/latex/psnfss/t1ptm.fd)
 (/usr/share/texlive/texmf-dist/tex/context/base/mkii/supp-pdf.mkii
 [Loading MPS to PDF converter (version 2006.09.02).]
 ) (/usr/share/texlive/texmf-dist/tex/latex/hyperref/nameref.sty
 (/usr/share/texlive/texmf-dist/tex/generic/oberdiek/gettitlestring.sty))
-(/bmbl_data/Rtmp/RtmpF0Qu0w/Rd2pdf2693b9e6e6a43/Rd2.out)
-(/bmbl_data/Rtmp/RtmpF0Qu0w/Rd2pdf2693b9e6e6a43/Rd2.out)
+(/bmbl_data/Rtmp/RtmpKEgKqN/Rd2pdf3c31d65bd26fac/Rd2.out)
+(/bmbl_data/Rtmp/RtmpKEgKqN/Rd2pdf3c31d65bd26fac/Rd2.out)
 (/usr/share/texlive/texmf-dist/tex/latex/psnfss/t1pcr.fd)
 (/usr/share/texlive/texmf-dist/tex/latex/psnfss/ts1ptm.fd)
-(/bmbl_data/Rtmp/RtmpF0Qu0w/Rd2pdf2693b9e6e6a43/Rd2.toc
+(/bmbl_data/Rtmp/RtmpKEgKqN/Rd2pdf3c31d65bd26fac/Rd2.toc
 (/usr/share/texlive/texmf-dist/tex/latex/amsfonts/umsa.fd)
 (/usr/share/texlive/texmf-dist/tex/latex/amsfonts/umsb.fd)
 (/usr/share/texlive/texmf-dist/tex/latex/jknapltx/ursfs.fd) [1{/usr/share/texli
@@ -287,14 +287,14 @@ Overfull \hbox (7.55559pt too wide) in paragraph at lines 1018--1019
 param), wavelet = func-tion(x, scale_param)) 
 [19] [20]
 No file Rd2.ind.
-[21] (/bmbl_data/Rtmp/RtmpF0Qu0w/Rd2pdf2693b9e6e6a43/Rd2.aux) )
+[21] (/bmbl_data/Rtmp/RtmpKEgKqN/Rd2pdf3c31d65bd26fac/Rd2.aux) )
 (see the transcript file for additional information){/usr/share/texlive/texmf-d
 ist/fonts/enc/dvips/base/8r.enc}</usr/share/texlive/texmf-dist/fonts/type1/urw/
 courier/ucrr8a.pfb></usr/share/texlive/texmf-dist/fonts/type1/urw/times/utmb8a.
 pfb></usr/share/texlive/texmf-dist/fonts/type1/urw/times/utmr8a.pfb></usr/share
 /texlive/texmf-dist/fonts/type1/urw/times/utmr8a.pfb></usr/share/texlive/texmf-
 dist/fonts/type1/urw/times/utmri8a.pfb>
-Output written on Rd2.pdf (21 pages, 113738 bytes).
+Output written on Rd2.pdf (21 pages, 113755 bytes).
 Transcript written on Rd2.log.
 This is makeindex, version 2.15 [TeX Live 2018] (kpathsea + Thai support).
 Scanning input file Rd2.idx....done (42 entries accepted, 0 rejected).
@@ -358,18 +358,18 @@ Package hyperref Message: Driver (autodetected): hpdftex.
 (/usr/share/texlive/texmf-dist/tex/latex/base/omsenc.dfu)
 (/usr/share/texlive/texmf-dist/tex/latex/base/ts1enc.dfu)))
 Writing index file Rd2.idx
-(/bmbl_data/Rtmp/RtmpF0Qu0w/Rd2pdf2693b9e6e6a43/Rd2.aux)
+(/bmbl_data/Rtmp/RtmpKEgKqN/Rd2pdf3c31d65bd26fac/Rd2.aux)
 (/usr/share/texlive/texmf-dist/tex/latex/base/ts1cmr.fd)
 (/usr/share/texlive/texmf-dist/tex/latex/psnfss/t1ptm.fd)
 (/usr/share/texlive/texmf-dist/tex/context/base/mkii/supp-pdf.mkii
 [Loading MPS to PDF converter (version 2006.09.02).]
 ) (/usr/share/texlive/texmf-dist/tex/latex/hyperref/nameref.sty
 (/usr/share/texlive/texmf-dist/tex/generic/oberdiek/gettitlestring.sty))
-(/bmbl_data/Rtmp/RtmpF0Qu0w/Rd2pdf2693b9e6e6a43/Rd2.out)
-(/bmbl_data/Rtmp/RtmpF0Qu0w/Rd2pdf2693b9e6e6a43/Rd2.out)
+(/bmbl_data/Rtmp/RtmpKEgKqN/Rd2pdf3c31d65bd26fac/Rd2.out)
+(/bmbl_data/Rtmp/RtmpKEgKqN/Rd2pdf3c31d65bd26fac/Rd2.out)
 (/usr/share/texlive/texmf-dist/tex/latex/psnfss/t1pcr.fd)
 (/usr/share/texlive/texmf-dist/tex/latex/psnfss/ts1ptm.fd)
-(/bmbl_data/Rtmp/RtmpF0Qu0w/Rd2pdf2693b9e6e6a43/Rd2.toc
+(/bmbl_data/Rtmp/RtmpKEgKqN/Rd2pdf3c31d65bd26fac/Rd2.toc
 (/usr/share/texlive/texmf-dist/tex/latex/amsfonts/umsa.fd)
 (/usr/share/texlive/texmf-dist/tex/latex/amsfonts/umsb.fd)
 (/usr/share/texlive/texmf-dist/tex/latex/jknapltx/ursfs.fd) [1{/usr/share/texli
@@ -433,8 +433,8 @@ Overfull \hbox (101.58032pt too wide) in paragraph at lines 992--992
 Overfull \hbox (7.55559pt too wide) in paragraph at lines 1018--1019
 []\T1/ptm/m/n/10 A list with two func-tions: list(scaling = func-tion(x, scale_
 param), wavelet = func-tion(x, scale_param)) 
-[19] [20] (/bmbl_data/Rtmp/RtmpF0Qu0w/Rd2pdf2693b9e6e6a43/Rd2.ind [21] [22])
-(/bmbl_data/Rtmp/RtmpF0Qu0w/Rd2pdf2693b9e6e6a43/Rd2.aux)
+[19] [20] (/bmbl_data/Rtmp/RtmpKEgKqN/Rd2pdf3c31d65bd26fac/Rd2.ind [21]
+[22]) (/bmbl_data/Rtmp/RtmpKEgKqN/Rd2pdf3c31d65bd26fac/Rd2.aux)
 
 Package rerunfilecheck Warning: File `Rd2.out' has changed.
 (rerunfilecheck)                Rerun to get outlines right
@@ -449,7 +449,7 @@ r/ucrr8a.pfb></usr/share/texlive/texmf-dist/fonts/type1/urw/courier/ucrro8a.pfb
 xlive/texmf-dist/fonts/type1/urw/times/utmr8a.pfb></usr/share/texlive/texmf-dis
 t/fonts/type1/urw/times/utmr8a.pfb></usr/share/texlive/texmf-dist/fonts/type1/u
 rw/times/utmri8a.pfb>
-Output written on Rd2.pdf (22 pages, 131280 bytes).
+Output written on Rd2.pdf (22 pages, 131297 bytes).
 Transcript written on Rd2.log.
 This is makeindex, version 2.15 [TeX Live 2018] (kpathsea + Thai support).
 Scanning input file Rd2.idx....done (42 entries accepted, 0 rejected).
@@ -513,18 +513,18 @@ Package hyperref Message: Driver (autodetected): hpdftex.
 (/usr/share/texlive/texmf-dist/tex/latex/base/omsenc.dfu)
 (/usr/share/texlive/texmf-dist/tex/latex/base/ts1enc.dfu)))
 Writing index file Rd2.idx
-(/bmbl_data/Rtmp/RtmpF0Qu0w/Rd2pdf2693b9e6e6a43/Rd2.aux)
+(/bmbl_data/Rtmp/RtmpKEgKqN/Rd2pdf3c31d65bd26fac/Rd2.aux)
 (/usr/share/texlive/texmf-dist/tex/latex/base/ts1cmr.fd)
 (/usr/share/texlive/texmf-dist/tex/latex/psnfss/t1ptm.fd)
 (/usr/share/texlive/texmf-dist/tex/context/base/mkii/supp-pdf.mkii
 [Loading MPS to PDF converter (version 2006.09.02).]
 ) (/usr/share/texlive/texmf-dist/tex/latex/hyperref/nameref.sty
 (/usr/share/texlive/texmf-dist/tex/generic/oberdiek/gettitlestring.sty))
-(/bmbl_data/Rtmp/RtmpF0Qu0w/Rd2pdf2693b9e6e6a43/Rd2.out)
-(/bmbl_data/Rtmp/RtmpF0Qu0w/Rd2pdf2693b9e6e6a43/Rd2.out)
+(/bmbl_data/Rtmp/RtmpKEgKqN/Rd2pdf3c31d65bd26fac/Rd2.out)
+(/bmbl_data/Rtmp/RtmpKEgKqN/Rd2pdf3c31d65bd26fac/Rd2.out)
 (/usr/share/texlive/texmf-dist/tex/latex/psnfss/t1pcr.fd)
 (/usr/share/texlive/texmf-dist/tex/latex/psnfss/ts1ptm.fd)
-(/bmbl_data/Rtmp/RtmpF0Qu0w/Rd2pdf2693b9e6e6a43/Rd2.toc
+(/bmbl_data/Rtmp/RtmpKEgKqN/Rd2pdf3c31d65bd26fac/Rd2.toc
 (/usr/share/texlive/texmf-dist/tex/latex/amsfonts/umsa.fd)
 (/usr/share/texlive/texmf-dist/tex/latex/amsfonts/umsb.fd)
 (/usr/share/texlive/texmf-dist/tex/latex/jknapltx/ursfs.fd) [1{/usr/share/texli
@@ -588,8 +588,8 @@ Overfull \hbox (101.58032pt too wide) in paragraph at lines 992--992
 Overfull \hbox (7.55559pt too wide) in paragraph at lines 1018--1019
 []\T1/ptm/m/n/10 A list with two func-tions: list(scaling = func-tion(x, scale_
 param), wavelet = func-tion(x, scale_param)) 
-[19] [20] (/bmbl_data/Rtmp/RtmpF0Qu0w/Rd2pdf2693b9e6e6a43/Rd2.ind [21] [22])
-(/bmbl_data/Rtmp/RtmpF0Qu0w/Rd2pdf2693b9e6e6a43/Rd2.aux) )
+[19] [20] (/bmbl_data/Rtmp/RtmpKEgKqN/Rd2pdf3c31d65bd26fac/Rd2.ind [21]
+[22]) (/bmbl_data/Rtmp/RtmpKEgKqN/Rd2pdf3c31d65bd26fac/Rd2.aux) )
 (see the transcript file for additional information){/usr/share/texlive/texmf-d
 ist/fonts/enc/dvips/base/8r.enc}</usr/share/texlive/texmf-dist/fonts/type1/publ
 ic/amsfonts/cm/cmsy10.pfb></usr/share/texlive/texmf-dist/fonts/type1/urw/courie
@@ -598,8 +598,8 @@ r/ucrr8a.pfb></usr/share/texlive/texmf-dist/fonts/type1/urw/courier/ucrro8a.pfb
 xlive/texmf-dist/fonts/type1/urw/times/utmr8a.pfb></usr/share/texlive/texmf-dis
 t/fonts/type1/urw/times/utmr8a.pfb></usr/share/texlive/texmf-dist/fonts/type1/u
 rw/times/utmri8a.pfb>
-Output written on Rd2.pdf (22 pages, 131352 bytes).
+Output written on Rd2.pdf (22 pages, 131367 bytes).
 Transcript written on Rd2.log.
 Saving output to ‘BioGSP-manual.pdf’ ...
 Done
-You may want to clean up by 'rm -Rf /bmbl_data/Rtmp/RtmpF0Qu0w/Rd2pdf2693b9e6e6a43'
+You may want to clean up by 'rm -Rf /bmbl_data/Rtmp/RtmpKEgKqN/Rd2pdf3c31d65bd26fac'
