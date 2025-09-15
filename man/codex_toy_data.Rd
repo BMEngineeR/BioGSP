@@ -19,7 +19,7 @@ Generated synthetically using clustered normal distributions with
 realistic parameters based on real CODEX data characteristics.
 }
 \usage{
-codex_toy_data
+data(codex_toy_data)
 }
 \description{
 A synthetic dataset mimicking CODEX multiplexed imaging data 

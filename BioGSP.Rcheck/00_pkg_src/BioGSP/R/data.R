@@ -1,14 +1,13 @@
 #' Toy CODEX Spatial Cell Type Data
 #'
+#' @name codex_toy_data
+#' @docType data
+#'
 #' @description A synthetic dataset mimicking CODEX multiplexed imaging data 
 #' for demonstrating Spectral Graph Wavelet Transform (SGWT) analysis on 
 #' spatial cell type distributions. The dataset contains spatial coordinates 
 #' and cell type annotations for multiple immune cell populations arranged 
 #' in realistic spatial clusters.
-#'
-#' @docType data
-#' @name codex_toy_data
-#' @usage data(codex_toy_data)
 #'
 #' @format A data frame with 18604 rows and 5 columns:
 #' \describe{
@@ -61,6 +60,8 @@
 #'
 #' @source Generated synthetically using clustered normal distributions with 
 #' realistic parameters based on real CODEX data characteristics.
+#'
+#' @usage data(codex_toy_data)
 #'
 #' @examples
 #' # Load the toy dataset
@@ -127,4 +128,4 @@
 #' }
 #'
 #' @keywords datasets spatial CODEX SGWT
-codex_toy_data <- NULL
+NULL

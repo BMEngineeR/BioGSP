@@ -29,13 +29,10 @@ Suggests:
     sp,
     gasper,
     egg,
-    knitr,
-    rmarkdown,
     testthat (>= 2.1.0),
     remotes,
     dplyr,
     tidyr
-VignetteBuilder: knitr
 Depends: 
     R (>= 3.5.0)
  

@@ -18,3 +18,9 @@
 ^\.DS_Store$
 ^BioGSP.*\.tar\.gz$
 ^BioGSP\.Rcheck$
+^.*\.Rcheck$
+^doc$
+^Meta$
+^node_modules$
+^package\.json$
+^package-lock\.json$
