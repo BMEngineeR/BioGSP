@@ -64,7 +64,7 @@ FastDecompositionLap <- function(laplacianMat = NULL, k_fold = 1.5, which = "LM"
   res_decom <- RSpectra::eigs_sym(laplacianMat, k = k_fold * sqrt(ncol(laplacianMat)), which = which, sigma = sigma, opts = opts,
                         lower = lower)
   return(list(evalues = rev(res_decom$values),
-              evectors = res_decom$vectors[, ncol(res_decom$vectors):1]))
+              evectors = res_decom$vectors[, rev(seq_len(ncol(res_decom$vectors)))]))
 }
 
 #' Graph Fourier Transform
@@ -92,10 +92,11 @@ gft <- function(signal, U) {
 
 #' Calculate cosine similarity between two vectors
 #'
-#' @description Calculate cosine similarity between two numeric vectors
+#' @description Calculate cosine similarity between two numeric vectors with numerical stability
 #'
 #' @param x First vector
 #' @param y Second vector
+#' @param eps Small numeric for numerical stability when norms are near zero (default 1e-12)
 #'
 #' @return Cosine similarity value (between -1 and 1)
 #' @export
@@ -104,7 +105,9 @@ gft <- function(signal, U) {
 #' x <- c(1, 2, 3)
 #' y <- c(2, 3, 4)
 #' similarity <- cosine_similarity(x, y)
-cosine_similarity <- function(x, y) {
+#' # With custom eps for numerical stability
+#' similarity2 <- cosine_similarity(x, y, eps = 1e-10)
+cosine_similarity <- function(x, y, eps = 1e-12) {
   # Convert to numeric vectors
   x <- as.numeric(x)
   y <- as.numeric(y)
@@ -114,20 +117,24 @@ cosine_similarity <- function(x, y) {
     stop("Vectors must have the same length")
   }
 
-  # Calculate dot product
-  dot_product <- sum(x * y)
-
   # Calculate magnitudes
   magnitude_x <- sqrt(sum(x^2))
   magnitude_y <- sqrt(sum(y^2))
 
-  # Handle zero magnitude case
-  if (magnitude_x == 0 || magnitude_y == 0) {
+  # Handle zero magnitude cases with numerical stability
+  if (magnitude_x < eps && magnitude_y < eps) {
+    return(0)
+  }
+  if (magnitude_x < eps || magnitude_y < eps) {
     return(0)
   }
 
-  # Calculate cosine similarity
-  cosine_sim <- dot_product / (magnitude_x * magnitude_y)
+  # Calculate dot product and cosine similarity
+  dot_product <- sum(x * y)
+  cosine_sim <- dot_product / max(magnitude_x * magnitude_y, eps)
+  
+  # Clamp to [-1, 1] range for numerical stability
+  cosine_sim <- max(-1, min(1, cosine_sim))
 
   return(cosine_sim)
 }
@@ -137,7 +144,9 @@ cosine_similarity <- function(x, y) {
 #' @description Calculate eigenvalues and eigenvectors of a spatial graph with automatic
 #' detection of the low-frequency cutoff using knee detection
 #'
-#' @param data.in Data frame with x and y coordinates
+#' @param data.in Data frame with spatial coordinates
+#' @param x_col Character string specifying the column name for X coordinates (default: "x")
+#' @param y_col Character string specifying the column name for Y coordinates (default: "y")
 #' @param k Number of nearest neighbors (default: 25)
 #' @param k_fold Eigendecomposition parameter (default: 15)
 #' @param sensitivity Sensitivity parameter for knee detection (default: 2)
@@ -151,17 +160,26 @@ cosine_similarity <- function(x, y) {
 #' # Create spatial data
 #' data <- data.frame(x = runif(100), y = runif(100))
 #' result <- Cal_Eigen(data, k = 10)
+#' 
+#' # With custom column names
+#' data2 <- data.frame(X = runif(100), Y = runif(100))
+#' result2 <- Cal_Eigen(data2, x_col = "X", y_col = "Y", k = 10)
 #' }
-Cal_Eigen <- function(data.in = NULL, k = 25, k_fold = 15, sensitivity = 2){
+Cal_Eigen <- function(data.in = NULL, x_col = "x", y_col = "y", k = 25, k_fold = 15, sensitivity = 2){
   data.in <- data.in
   k_fold <- k_fold # how many eigen values and vectors need from low frequency
   sensitivity <- sensitivity
   k <- k  # Number of nearest neighbors
-  nn <- RANN::nn2(data.in[, c("x", "y")], k = k + 1)  # Include the point itself in neighbors
+  # Validate column names
+  if (!all(c(x_col, y_col) %in% colnames(data.in))) {
+    stop(paste("Data must contain columns:", x_col, "and", y_col, "for spatial coordinates"))
+  }
+  
+  nn <- RANN::nn2(data.in[, c(x_col, y_col)], k = k + 1)  # Include the point itself in neighbors
 
-  adj_list <- lapply(1:nrow(data.in), function(i) setdiff(nn$nn.idx[i, ], i))  # Remove self-loops
+  adj_list <- lapply(seq_len(nrow(data.in)), function(i) setdiff(nn$nn.idx[i, ], i))  # Remove self-loops
   # Convert adjacency list to edge list
-  edges <- do.call(rbind, lapply(1:length(adj_list), function(i) cbind(i, adj_list[[i]])))
+  edges <- do.call(rbind, lapply(seq_along(adj_list), function(i) cbind(i, adj_list[[i]])))
   edges <- unique(t(apply(edges, 1, sort)))  # Remove duplicate edges
   # Create the graph
   g <- igraph::graph_from_edgelist(edges, directed = FALSE)
@@ -228,9 +246,13 @@ find_knee_point <- function(y, sensitivity = 1) {
   return(which.max(distances))
 }
 
-#' Calculate Graph Cross-Correlation (GCC)
+#' Calculate Graph Cross-Correlation (GCC) - DEPRECATED
 #'
-#' @description Calculate Graph Cross-Correlation between two signals using Graph Fourier Transform
+#' @description \strong{DEPRECATED:} This function is deprecated. Use \code{\link{sgwt_similarity}} instead 
+#' for more comprehensive signal similarity analysis with energy normalization and advanced features.
+#' 
+#' Calculate Graph Cross-Correlation between two signals using Graph Fourier Transform.
+#' This is a simplified approach that only considers low-frequency GFT components.
 #'
 #' @param data.in Data frame containing the signals
 #' @param knee Knee point for frequency cutoff
@@ -243,10 +265,18 @@ find_knee_point <- function(y, sensitivity = 1) {
 #'
 #' @examples
 #' \dontrun{
-#' # Assuming you have data with two signals and eigenvectors
+#' # DEPRECATED - use sgwt_similarity instead
 #' # gcc_value <- Cal_GCC(data, knee = 10, signal1 = "sig1", signal2 = "sig2", eigenvector = U)
+#' 
+#' # NEW RECOMMENDED APPROACH:
+#' # sgwt1 <- SGWT(data, signal = "signal1", k = 25, J = 4)
+#' # sgwt2 <- SGWT(data, signal = "signal2", k = 25, J = 4)  
+#' # similarity <- sgwt_similarity(sgwt1, sgwt2)
 #' }
 Cal_GCC <- function(data.in = NULL, knee = NULL, signal1 = NULL, signal2 = NULL, eigenvector = NULL){
+  .Deprecated("sgwt_similarity", package = "BioGSP", 
+              msg = "Cal_GCC is deprecated. Use sgwt_similarity() for more comprehensive signal similarity analysis.")
+  
   data.in <- as.data.frame(data.in)
   knee <- knee
   eigenvector <- eigenvector
@@ -256,6 +286,83 @@ Cal_GCC <- function(data.in = NULL, knee = NULL, signal1 = NULL, signal2 = NULL,
   gft_signal2 <- gft(as.numeric(data.in[, signal2]), eigenvector)
   cosine_sim <- cosine_similarity(gft_signal1[2:knee[1]], gft_signal2[2:knee[1]])
   return(cosine_sim)
+}
+
+#' Comprehensive Signal Similarity Analysis
+#'
+#' @description Compute similarity between two signals using either raw signals (via SGWT) 
+#' or pre-computed SGWT decompositions. This function provides a unified interface for 
+#' signal similarity analysis with energy normalization and advanced features.
+#'
+#' @param signal1 Either a character string (column name in data.in), numeric vector, or SGWT result object
+#' @param signal2 Either a character string (column name in data.in), numeric vector, or SGWT result object  
+#' @param data.in Data frame containing signals (required if signal1/signal2 are column names)
+#' @param x_col Column name for X coordinates (default: "x")
+#' @param y_col Column name for Y coordinates (default: "y") 
+#' @param k Number of nearest neighbors for graph construction (default: 25)
+#' @param J Number of wavelet scales (default: 4)
+#' @param kernel_type Wavelet kernel type (default: "mexican_hat")
+#' @param eps Numerical stability parameter (default: 1e-12)
+#' @param low_only If TRUE, use only low-frequency similarity (default: FALSE)
+#' @param return_parts If TRUE, return detailed components; if FALSE, return scalar similarity (default: FALSE)
+#' @param ... Additional arguments passed to SGWT()
+#'
+#' @return Similarity score (scalar) or detailed similarity analysis (list) depending on return_parts
+#' @export
+#'
+#' @examples
+#' \dontrun{
+#' # Method 1: Direct signals in data frame
+#' data <- data.frame(x = runif(100), y = runif(100), 
+#'                   signal1 = rnorm(100), signal2 = rnorm(100))
+#' sim1 <- sgwt_similarity("signal1", "signal2", data.in = data)
+#' 
+#' # Method 2: Pre-computed SGWT results
+#' sgwt1 <- SGWT(data, signal = "signal1", k = 25, J = 4)
+#' sgwt2 <- SGWT(data, signal = "signal2", k = 25, J = 4)
+#' sim2 <- sgwt_similarity(sgwt1, sgwt2)
+#' 
+#' # Method 3: Mixed - one SGWT result, one raw signal
+#' sim3 <- sgwt_similarity(sgwt1, "signal2", data.in = data)
+#' }
+sgwt_similarity <- function(signal1, signal2, data.in = NULL, 
+                           x_col = "x", y_col = "y", k = 25, J = 4, 
+                           kernel_type = "mexican_hat", eps = 1e-12, 
+                           low_only = FALSE, return_parts = FALSE, ...) {
+  
+  # Helper function to process input signals
+  .process_signal <- function(signal, data.in, x_col, y_col, k, J, kernel_type, ...) {
+    if (is.character(signal) && length(signal) == 1) {
+      # Signal is a column name - need to compute SGWT
+      if (is.null(data.in)) {
+        stop("data.in must be provided when signal is specified as column name")
+      }
+      return(SGWT(data.in = data.in, x_col = x_col, y_col = y_col, 
+                  signal = signal, k = k, J = J, kernel_type = kernel_type, 
+                  return_all = TRUE, ...))
+    } else if (is.numeric(signal)) {
+      # Signal is a numeric vector - need data.in for spatial coordinates
+      if (is.null(data.in)) {
+        stop("data.in must be provided when signal is a numeric vector")
+      }
+      temp_data <- data.in
+      temp_data$temp_signal <- signal
+      return(SGWT(data.in = temp_data, x_col = x_col, y_col = y_col,
+                  signal = "temp_signal", k = k, J = J, kernel_type = kernel_type,
+                  return_all = TRUE, ...))
+    } else {
+      # Assume it's already an SGWT result
+      return(signal)
+    }
+  }
+  
+  # Process both signals
+  sgwt1 <- .process_signal(signal1, data.in, x_col, y_col, k, J, kernel_type, ...)
+  sgwt2 <- .process_signal(signal2, data.in, x_col, y_col, k, J, kernel_type, ...)
+  
+  # Use the comprehensive weighted similarity function
+  return(sgwt_weighted_similarity(sgwt1, sgwt2, eps = eps, 
+                                 low_only = low_only, return_parts = return_parts))
 }
 
 #' Install and load packages
@@ -314,4 +421,169 @@ install_and_load <- function(packages) {
 #' hello_sgwt()
 hello_sgwt <- function() {
   return("Hello from SGWT package! Ready for Spectral Graph Wavelet Transform analysis.")
+}
+
+# Private helper function: Extract decomposition from SGWT result
+.get_decomp <- function(x) {
+  if (!is.null(x$decomposition)) x$decomposition else x
+}
+
+# Private helper function: Return matrix n×J of wavelet coefficients ordered by scale index
+.wavelet_matrix <- function(decomp) {
+  nm <- names(decomp$coefficients)
+  idx <- grep("^wavelet_scale_", nm)
+  if (length(idx) == 0L) stop("No wavelet coefficients found (expected names starting with 'wavelet_scale_').")
+  # Order by numeric suffix
+  ord <- order(as.integer(sub("^wavelet_scale_", "", nm[idx])))
+  mats <- lapply(nm[idx][ord], function(k) as.numeric(decomp$coefficients[[k]]))
+  W <- do.call(cbind, mats) # n × J (column = scale)
+  # Replace non-finite with 0
+  W[!is.finite(W)] <- 0
+  return(W)
+}
+
+
+#' Energy-normalized weighted similarity between two SGWT results
+#'
+#' @description Compute low-frequency cosine similarity (scaling), non-low cosine similarity
+#' (flattened wavelet coefficients), and an overall energy-normalized weighted score.
+#' If `low_only = TRUE`, compute only the low-frequency cosine and set `S = c_low`.
+#'
+#' @param sgwt_a SGWT output for signal A. Either the full list returned by SGWT (with `$decomposition`)
+#'   or a decomposition list as returned by `sgwt_forward()`.
+#' @param sgwt_b SGWT output for signal B. Same format as `sgwt_a`.
+#' @param eps Small numeric for numerical stability when norms are near zero (default 1e-12).
+#' @param validate Logical; if TRUE, check consistency of dimensions, scale count/order, and kernel family.
+#' @param return_parts Logical; if TRUE (default), return a list with components; if FALSE, return only the scalar S.
+#' @param low_only Logical; if TRUE, compute **low-frequency-only** similarity (skip non-low and set `S = c_low`).
+#'
+#' @return If `return_parts=TRUE`, a list with:
+#'   * `c_low`     — cosine on scaling coefficients
+#'   * `c_nonlow`  — cosine on flattened wavelet coefficients (**NA if `low_only = TRUE`**)
+#'   * `w_low`     — macro weight for the low-frequency part (in [0,1])
+#'   * `w_NL`      — 1 - w_low (non-low weight)
+#'   * `S`         — final weighted similarity in [-1,1]
+#'   * `E_low_a`, `E_NL_a`, `E_low_b`, `E_NL_b` — energy diagnostics per signal (**E_NL_* = NA if `low_only`**)
+#'   * `n`, `J`    — length of signal and number of wavelet scales (**J = NA if `low_only`**)
+#' If `return_parts=FALSE`, returns the scalar `S`.
+#' @export
+#' @examples
+#' \dontrun{
+#' # Assume two SGWT results sgwt_res1 and sgwt_res2 from SGWT(..., return_all=TRUE)
+#' sim <- sgwt_weighted_similarity(sgwt_res1, sgwt_res2)
+#' sim_low <- sgwt_weighted_similarity(sgwt_res1, sgwt_res2, low_only = TRUE)
+#' str(sim)
+#' }
+sgwt_weighted_similarity <- function(sgwt_a, sgwt_b, eps = 1e-12, validate = TRUE, return_parts = TRUE, low_only = FALSE) {
+  
+  # 1. Accept both wrapper or decomposition
+  A <- .get_decomp(sgwt_a)
+  B <- .get_decomp(sgwt_b)
+  
+  # 2. Extract scaling vectors
+  y_low_a <- as.numeric(A$coefficients$scaling)
+  y_low_b <- as.numeric(B$coefficients$scaling)
+  
+  # Replace non-finite entries with 0 and warn
+  if (any(!is.finite(y_low_a))) {
+    warning("Non-finite values found in scaling coefficients of sgwt_a, replacing with 0")
+    y_low_a[!is.finite(y_low_a)] <- 0
+  }
+  if (any(!is.finite(y_low_b))) {
+    warning("Non-finite values found in scaling coefficients of sgwt_b, replacing with 0")
+    y_low_b[!is.finite(y_low_b)] <- 0
+  }
+  
+  # Energies
+  E_low_a <- sum(y_low_a^2)
+  E_low_b <- sum(y_low_b^2)
+  
+  # 3. Compute low-frequency cosine similarity
+  c_low <- cosine_similarity(y_low_a, y_low_b, eps)
+  
+  # Short-circuit for low-only
+  if (isTRUE(low_only)) {
+    return(if (isTRUE(return_parts)) list(
+      c_low = c_low, c_nonlow = NA_real_, w_low = 1.0, w_NL = 0.0, S = c_low,
+      E_low_a = E_low_a, E_NL_a = NA_real_, E_low_b = E_low_b, E_NL_b = NA_real_,
+      n = length(y_low_a), J = NA_integer_
+    ) else c_low)
+  }
+  
+  # 4. Collect wavelet coefficients
+  W_a <- .wavelet_matrix(A)
+  W_b <- .wavelet_matrix(B)
+  
+  # Flatten column-major
+  v_a <- as.vector(W_a)
+  v_b <- as.vector(W_b)
+  
+  # Energies
+  E_NL_a <- sum(v_a^2)
+  E_NL_b <- sum(v_b^2)
+  
+  # Number of scales and signal length
+  J <- ncol(W_a)
+  n <- nrow(W_a)
+  
+  # 5. Compute non-low cosine similarity
+  c_nonlow <- cosine_similarity(v_a, v_b, eps)
+  
+  # 6. Macro weights (energy normalization)
+  w_low_a <- E_low_a / (E_low_a + E_NL_a + eps)
+  w_low_b <- E_low_b / (E_low_b + E_NL_b + eps)
+  w_low <- pmax(0, pmin(1, 0.5 * (w_low_a + w_low_b)))
+  w_NL <- 1 - w_low
+  S <- w_low * c_low + w_NL * c_nonlow
+  
+  # 7. Validation when validate=TRUE
+  if (isTRUE(validate)) {
+    # Check scaling coefficient lengths match
+    if (length(y_low_a) != length(y_low_b)) {
+      stop("Scaling coefficients must have the same length between sgwt_a and sgwt_b")
+    }
+    
+    # Check wavelet matrix dimensions match
+    if (nrow(W_a) != nrow(W_b)) {
+      stop("Signal lengths must match between sgwt_a and sgwt_b")
+    }
+    if (ncol(W_a) != ncol(W_b)) {
+      stop("Number of wavelet scales must match between sgwt_a and sgwt_b")
+    }
+    
+    # Extract and compare scales if present
+    scales_a <- A$scales
+    scales_b <- B$scales
+    if (!is.null(scales_a) && !is.null(scales_b)) {
+      if (length(scales_a) != length(scales_b) || !all.equal(scales_a, scales_b)) {
+        warning("Scales differ between sgwt_a and sgwt_b")
+      }
+    } else if (!is.null(scales_a) || !is.null(scales_b)) {
+      warning("Scales present in only one of sgwt_a or sgwt_b")
+    }
+    
+    # Check that each has ≥1 wavelet scale
+    if (J < 1) {
+      stop("Each SGWT decomposition must have at least 1 wavelet scale")
+    }
+  }
+  
+  # 8. Return structured list or scalar S per return_parts
+  if (isTRUE(return_parts)) {
+    return(list(
+      c_low = c_low,
+      c_nonlow = c_nonlow,
+      w_low = w_low,
+      w_NL = w_NL,
+      S = S,
+      E_low_a = E_low_a,
+      E_NL_a = E_NL_a,
+      E_low_b = E_low_b,
+      E_NL_b = E_NL_b,
+      n = n,
+      J = J
+    ))
+  } else {
+    return(S)
+  }
 }

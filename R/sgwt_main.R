@@ -5,7 +5,8 @@
 #' spatial signals using graph wavelets.
 #'
 #' @param data.in Data frame containing spatial coordinates and signal data.
-#'   Must contain columns 'x' and 'y' for spatial coordinates.
+#' @param x_col Character string specifying the column name for X coordinates (default: "x")
+#' @param y_col Character string specifying the column name for Y coordinates (default: "y")
 #' @param signal Character string specifying the column name of the signal to analyze,
 #'   or a numeric vector of signal values.
 #' @param k Number of nearest neighbors for graph construction (default: 25)
@@ -44,6 +45,10 @@
 #'
 #' # Apply SGWT
 #' result <- SGWT(data.in = demo_data, signal = "signal", k = 8, J = 4)
+#' 
+#' # With custom column names
+#' demo_data2 <- data.frame(X = x_coords, Y = y_coords, signal_1 = signal_data)
+#' result2 <- SGWT(data.in = demo_data2, x_col = "X", y_col = "Y", signal = "signal_1", k = 8, J = 4)
 #'
 #' # View reconstruction error
 #' print(result$reconstruction_error)
@@ -53,7 +58,7 @@
 #' Hammond, D. K., Vandergheynst, P., & Gribonval, R. (2011).
 #' Wavelets on graphs via spectral graph theory.
 #' Applied and Computational Harmonic Analysis, 30(2), 129-150.
-SGWT <- function(data.in = NULL, signal = NULL, k = 25,
+SGWT <- function(data.in = NULL, x_col = "x", y_col = "y", signal = NULL, k = 25,
                  scales = NULL, J = 5, scaling_factor = 2,
                  kernel_type = "mexican_hat",
                  laplacian_type = "normalized",
@@ -64,18 +69,19 @@ SGWT <- function(data.in = NULL, signal = NULL, k = 25,
     stop("Both data.in and signal must be provided")
   }
 
-  # Build graph from spatial coordinates
-  if (all(c("x", "y") %in% colnames(data.in))) {
-    cat("Building graph from spatial coordinates...\n")
-    nn <- RANN::nn2(data.in[, c("x", "y")], k = k + 1)
-    adj_list <- lapply(seq_len(nrow(data.in)), function(i) setdiff(nn$nn.idx[i, ], i))
-    edges <- do.call(rbind, lapply(seq_along(adj_list), function(i) cbind(i, adj_list[[i]])))
-    edges <- unique(t(apply(edges, 1, sort)))
-    g <- igraph::graph_from_edgelist(edges, directed = FALSE)
-    A <- igraph::as_adjacency_matrix(g, sparse = TRUE)
-  } else {
-    stop("Data must contain 'x' and 'y' columns for spatial coordinates")
+  # Validate column names
+  if (!all(c(x_col, y_col) %in% colnames(data.in))) {
+    stop(paste("Data must contain columns:", x_col, "and", y_col, "for spatial coordinates"))
   }
+
+  # Build graph from spatial coordinates
+  cat("Building graph from spatial coordinates...\n")
+  nn <- RANN::nn2(data.in[, c(x_col, y_col)], k = k + 1)
+  adj_list <- lapply(seq_len(nrow(data.in)), function(i) setdiff(nn$nn.idx[i, ], i))
+  edges <- do.call(rbind, lapply(seq_along(adj_list), function(i) cbind(i, adj_list[[i]])))
+  edges <- unique(t(apply(edges, 1, sort)))
+  g <- igraph::graph_from_edgelist(edges, directed = FALSE)
+  A <- igraph::as_adjacency_matrix(g, sparse = TRUE)
 
   # Compute Laplacian and eigendecomposition
   cat("Computing Laplacian and eigendecomposition...\n")

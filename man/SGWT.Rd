@@ -6,6 +6,8 @@
 \usage{
 SGWT(
   data.in = NULL,
+  x_col = "x",
+  y_col = "y",
   signal = NULL,
   k = 25,
   scales = NULL,
@@ -18,8 +20,11 @@ SGWT(
 )
 }
 \arguments{
-\item{data.in}{Data frame containing spatial coordinates and signal data.
-Must contain columns 'x' and 'y' for spatial coordinates.}
+\item{data.in}{Data frame containing spatial coordinates and signal data.}
+
+\item{x_col}{Character string specifying the column name for X coordinates (default: "x")}
+
+\item{y_col}{Character string specifying the column name for Y coordinates (default: "y")}
 
 \item{signal}{Character string specifying the column name of the signal to analyze,
 or a numeric vector of signal values.}
@@ -71,6 +76,10 @@ demo_data <- data.frame(x = x_coords, y = y_coords, signal = signal_data)
 
 # Apply SGWT
 result <- SGWT(data.in = demo_data, signal = "signal", k = 8, J = 4)
+
+# With custom column names
+demo_data2 <- data.frame(X = x_coords, Y = y_coords, signal_1 = signal_data)
+result2 <- SGWT(data.in = demo_data2, x_col = "X", y_col = "Y", signal = "signal_1", k = 8, J = 4)
 
 # View reconstruction error
 print(result$reconstruction_error)

@@ -5,6 +5,8 @@
 #'
 #' @param sgwt_result SGWT result object from SGWT() function
 #' @param data.in Original data frame with spatial coordinates
+#' @param x_col Character string specifying the column name for X coordinates (default: "x")
+#' @param y_col Character string specifying the column name for Y coordinates (default: "y")
 #' @param plot_scales Which wavelet scales to plot (default: first 4)
 #' @param ncol Number of columns in the plot layout (default: 3)
 #'
@@ -16,8 +18,12 @@
 #' # Assuming you have SGWT results
 #' plots <- plot_sgwt_decomposition(sgwt_result, data.in)
 #' print(plots)
+#' 
+#' # With custom column names
+#' plots2 <- plot_sgwt_decomposition(sgwt_result, data.in, x_col = "X", y_col = "Y")
+#' print(plots2)
 #' }
-plot_sgwt_decomposition <- function(sgwt_result, data.in, plot_scales = NULL, ncol = 3) {
+plot_sgwt_decomposition <- function(sgwt_result, data.in, x_col = "x", y_col = "y", plot_scales = NULL, ncol = 3) {
   if (is.null(plot_scales)) {
     plot_scales <- 1:min(4, length(sgwt_result$decomposition$coefficients) - 1)
   }
@@ -31,20 +37,22 @@ plot_sgwt_decomposition <- function(sgwt_result, data.in, plot_scales = NULL, nc
   
   # Plot original signal
   plot_data$original <- sgwt_result$original_signal
-  p_orig <- ggplot2::ggplot(plot_data, ggplot2::aes(x = x, y = y, color = original)) +
-    ggplot2::geom_point(size = 1) +
-    ggplot2::scale_color_viridis_c() +
+  p_orig <- ggplot2::ggplot(plot_data, ggplot2::aes_string(x = x_col, y = y_col, fill = "original")) +
+    ggplot2::geom_tile() +
+    ggplot2::scale_fill_viridis_c() +
     ggplot2::labs(title = "Original Signal") +
+    ggplot2::coord_fixed() +  # Add this for equal aspect ratio
     ggplot2::theme_void() +
     ggplot2::theme(legend.position = "none")
   plot_list[["original"]] <- p_orig
   
   # Plot scaling function coefficients
   plot_data$scaling <- as.vector(Re(coefficients[[1]]))
-  p_scaling <- ggplot2::ggplot(plot_data, ggplot2::aes(x = x, y = y, color = scaling)) +
-    ggplot2::geom_point(size = 1) +
-    ggplot2::scale_color_viridis_c() +
+  p_scaling <- ggplot2::ggplot(plot_data, ggplot2::aes_string(x = x_col, y = y_col, fill = "scaling")) +
+    ggplot2::geom_tile() +
+    ggplot2::scale_fill_viridis_c() +
     ggplot2::labs(title = "Scaling Function") +
+    ggplot2::coord_fixed() +
     ggplot2::theme_void() +
     ggplot2::theme(legend.position = "none")
   plot_list[["scaling"]] <- p_scaling
@@ -55,10 +63,11 @@ plot_sgwt_decomposition <- function(sgwt_result, data.in, plot_scales = NULL, nc
       coeff_name <- paste0("wavelet_", i)
       plot_data[[coeff_name]] <- as.vector(Re(coefficients[[i + 1]]))
       
-      p_wavelet <- ggplot2::ggplot(plot_data, ggplot2::aes_string(x = "x", y = "y", color = coeff_name)) +
-        ggplot2::geom_point(size = 1) +
-        ggplot2::scale_color_viridis_c() +
+      p_wavelet <- ggplot2::ggplot(plot_data, ggplot2::aes_string(x = x_col, y = y_col, fill = coeff_name)) +
+        ggplot2::geom_tile() +
+        ggplot2::scale_fill_viridis_c() +
         ggplot2::labs(title = paste("Wavelet Scale", i)) +
+        ggplot2::coord_fixed() +
         ggplot2::theme_void() +
         ggplot2::theme(legend.position = "none")
       
@@ -68,10 +77,11 @@ plot_sgwt_decomposition <- function(sgwt_result, data.in, plot_scales = NULL, nc
   
   # Plot reconstructed signal
   plot_data$reconstructed <- sgwt_result$reconstructed_signal
-  p_recon <- ggplot2::ggplot(plot_data, ggplot2::aes(x = x, y = y, color = reconstructed)) +
-    ggplot2::geom_point(size = 1) +
-    ggplot2::scale_color_viridis_c() +
+  p_recon <- ggplot2::ggplot(plot_data, ggplot2::aes_string(x = x_col, y = y_col, fill = "reconstructed")) +
+    ggplot2::geom_tile() +
+    ggplot2::scale_fill_viridis_c() +
     ggplot2::labs(title = "Reconstructed Signal") +
+    ggplot2::coord_fixed() +
     ggplot2::theme_void() +
     ggplot2::theme(legend.position = "none")
   plot_list[["reconstructed"]] <- p_recon
@@ -107,7 +117,7 @@ sgwt_energy_analysis <- function(sgwt_result) {
   energy_ratios <- energies / total_energy
   
   # Create results data frame
-  scale_names <- c("scaling", paste0("scale_", 1:length(scales)))
+  scale_names <- c("scaling", paste0("scale_", seq_along(scales)))
   
   energy_df <- data.frame(
     scale = scale_names,
@@ -228,7 +238,7 @@ visualize_sgwt_kernels <- function(eigenvalues, scales = NULL, J = 4, scaling_fa
   plot_data <- data.frame(
     eigenvalue = rep(lambda_smooth, length(filters_smooth)),
     filter_value = unlist(filters_smooth),
-    filter_type = rep(c("Scaling Function", paste("Wavelet Scale", 1:length(scales))), 
+    filter_type = rep(c("Scaling Function", paste("Wavelet Scale", seq_along(scales))), 
                      each = length(lambda_smooth)),
     scale_param = rep(c(scales[1], scales), each = length(lambda_smooth))
   )

@@ -79,6 +79,10 @@ base::assign(".ptime", proc.time(), pos = "CheckExEnv")
 ##D # Create spatial data
 ##D data <- data.frame(x = runif(100), y = runif(100))
 ##D result <- Cal_Eigen(data, k = 10)
+##D 
+##D # With custom column names
+##D data2 <- data.frame(X = runif(100), Y = runif(100))
+##D result2 <- Cal_Eigen(data2, x_col = "X", y_col = "Y", k = 10)
 ## End(Not run)
 
 
@@ -93,14 +97,19 @@ flush(stderr()); flush(stdout())
 
 base::assign(".ptime", proc.time(), pos = "CheckExEnv")
 ### Name: Cal_GCC
-### Title: Calculate Graph Cross-Correlation (GCC)
+### Title: Calculate Graph Cross-Correlation (GCC) - DEPRECATED
 ### Aliases: Cal_GCC
 
 ### ** Examples
 
 ## Not run: 
-##D # Assuming you have data with two signals and eigenvectors
+##D # DEPRECATED - use sgwt_similarity instead
 ##D # gcc_value <- Cal_GCC(data, knee = 10, signal1 = "sig1", signal2 = "sig2", eigenvector = U)
+##D 
+##D # NEW RECOMMENDED APPROACH:
+##D # sgwt1 <- SGWT(data, signal = "signal1", k = 25, J = 4)
+##D # sgwt2 <- SGWT(data, signal = "signal2", k = 25, J = 4)  
+##D # similarity <- sgwt_similarity(sgwt1, sgwt2)
 ## End(Not run)
 
 
@@ -155,6 +164,10 @@ base::assign(".ptime", proc.time(), pos = "CheckExEnv")
 ##D 
 ##D # Apply SGWT
 ##D result <- SGWT(data.in = demo_data, signal = "signal", k = 8, J = 4)
+##D 
+##D # With custom column names
+##D demo_data2 <- data.frame(X = x_coords, Y = y_coords, signal_1 = signal_data)
+##D result2 <- SGWT(data.in = demo_data2, x_col = "X", y_col = "Y", signal = "signal_1", k = 8, J = 4)
 ##D 
 ##D # View reconstruction error
 ##D print(result$reconstruction_error)
@@ -328,6 +341,8 @@ base::assign(".ptime", proc.time(), pos = "CheckExEnv")
 x <- c(1, 2, 3)
 y <- c(2, 3, 4)
 similarity <- cosine_similarity(x, y)
+# With custom eps for numerical stability
+similarity2 <- cosine_similarity(x, y, eps = 1e-10)
 
 
 
@@ -455,6 +470,10 @@ base::assign(".ptime", proc.time(), pos = "CheckExEnv")
 ##D # Assuming you have SGWT results
 ##D plots <- plot_sgwt_decomposition(sgwt_result, data.in)
 ##D print(plots)
+##D 
+##D # With custom column names
+##D plots2 <- plot_sgwt_decomposition(sgwt_result, data.in, x_col = "X", y_col = "Y")
+##D print(plots2)
 ## End(Not run)
 
 
@@ -549,6 +568,166 @@ base::assign(".ptime", proc.time(), pos = "CheckExEnv")
 
 base::assign(".dptime", (proc.time() - get(".ptime", pos = "CheckExEnv")), pos = "CheckExEnv")
 base::cat("sgwt_inverse", base::get(".format_ptime", pos = 'CheckExEnv')(get(".dptime", pos = "CheckExEnv")), "\n", file=base::get(".ExTimings", pos = 'CheckExEnv'), append=TRUE, sep="\t")
+cleanEx()
+nameEx("sgwt_similarity")
+### * sgwt_similarity
+
+flush(stderr()); flush(stdout())
+
+base::assign(".ptime", proc.time(), pos = "CheckExEnv")
+### Name: sgwt_similarity
+### Title: Comprehensive Signal Similarity Analysis
+### Aliases: sgwt_similarity
+
+### ** Examples
+
+## Not run: 
+##D # Method 1: Direct signals in data frame
+##D data <- data.frame(x = runif(100), y = runif(100), 
+##D                   signal1 = rnorm(100), signal2 = rnorm(100))
+##D sim1 <- sgwt_similarity("signal1", "signal2", data.in = data)
+##D 
+##D # Method 2: Pre-computed SGWT results
+##D sgwt1 <- SGWT(data, signal = "signal1", k = 25, J = 4)
+##D sgwt2 <- SGWT(data, signal = "signal2", k = 25, J = 4)
+##D sim2 <- sgwt_similarity(sgwt1, sgwt2)
+##D 
+##D # Method 3: Mixed - one SGWT result, one raw signal
+##D sim3 <- sgwt_similarity(sgwt1, "signal2", data.in = data)
+## End(Not run)
+
+
+
+base::assign(".dptime", (proc.time() - get(".ptime", pos = "CheckExEnv")), pos = "CheckExEnv")
+base::cat("sgwt_similarity", base::get(".format_ptime", pos = 'CheckExEnv')(get(".dptime", pos = "CheckExEnv")), "\n", file=base::get(".ExTimings", pos = 'CheckExEnv'), append=TRUE, sep="\t")
+cleanEx()
+nameEx("sgwt_weighted_similarity")
+### * sgwt_weighted_similarity
+
+flush(stderr()); flush(stdout())
+
+base::assign(".ptime", proc.time(), pos = "CheckExEnv")
+### Name: sgwt_weighted_similarity
+### Title: Energy-normalized weighted similarity between two SGWT results
+### Aliases: sgwt_weighted_similarity
+
+### ** Examples
+
+## Not run: 
+##D # Assume two SGWT results sgwt_res1 and sgwt_res2 from SGWT(..., return_all=TRUE)
+##D sim <- sgwt_weighted_similarity(sgwt_res1, sgwt_res2)
+##D sim_low <- sgwt_weighted_similarity(sgwt_res1, sgwt_res2, low_only = TRUE)
+##D str(sim)
+## End(Not run)
+
+
+
+base::assign(".dptime", (proc.time() - get(".ptime", pos = "CheckExEnv")), pos = "CheckExEnv")
+base::cat("sgwt_weighted_similarity", base::get(".format_ptime", pos = 'CheckExEnv')(get(".dptime", pos = "CheckExEnv")), "\n", file=base::get(".ExTimings", pos = 'CheckExEnv'), append=TRUE, sep="\t")
+cleanEx()
+nameEx("simulate_multiscale")
+### * simulate_multiscale
+
+flush(stderr()); flush(stdout())
+
+base::assign(".ptime", proc.time(), pos = "CheckExEnv")
+### Name: simulate_multiscale
+### Title: Simulate Multiple Center Patterns
+### Aliases: simulate_multiscale
+
+### ** Examples
+
+## Not run: 
+##D # Generate multi-center patterns with default parameters
+##D patterns <- simulate_multiscale()
+##D 
+##D # Custom parameters
+##D Ra_seq <- seq(from = 10, to = 3, length.out = 6)
+##D Rb_seq <- seq(from = 20, to = 3, length.out = 6)
+##D patterns <- simulate_multiscale(Ra_seq = Ra_seq, Rb_seq = Rb_seq, n_centers = 3)
+## End(Not run)
+
+
+
+base::assign(".dptime", (proc.time() - get(".ptime", pos = "CheckExEnv")), pos = "CheckExEnv")
+base::cat("simulate_multiscale", base::get(".format_ptime", pos = 'CheckExEnv')(get(".dptime", pos = "CheckExEnv")), "\n", file=base::get(".ExTimings", pos = 'CheckExEnv'), append=TRUE, sep="\t")
+cleanEx()
+nameEx("simulate_ringpattern")
+### * simulate_ringpattern
+
+flush(stderr()); flush(stdout())
+
+base::assign(".ptime", proc.time(), pos = "CheckExEnv")
+### Name: simulate_ringpattern
+### Title: Simulate Concentric Ring Patterns
+### Aliases: simulate_ringpattern
+
+### ** Examples
+
+## Not run: 
+##D # Generate concentric ring patterns with default parameters
+##D patterns <- simulate_ringpattern()
+##D 
+##D # Custom parameters
+##D radius_seq <- seq(2.5, 20, by = 2.5)
+##D patterns <- simulate_ringpattern(radius_seq = radius_seq, n_movements = 5)
+## End(Not run)
+
+
+
+base::assign(".dptime", (proc.time() - get(".ptime", pos = "CheckExEnv")), pos = "CheckExEnv")
+base::cat("simulate_ringpattern", base::get(".format_ptime", pos = 'CheckExEnv')(get(".dptime", pos = "CheckExEnv")), "\n", file=base::get(".ExTimings", pos = 'CheckExEnv'), append=TRUE, sep="\t")
+cleanEx()
+nameEx("visualize_multiscale")
+### * visualize_multiscale
+
+flush(stderr()); flush(stdout())
+
+base::assign(".ptime", proc.time(), pos = "CheckExEnv")
+### Name: visualize_multiscale
+### Title: Visualize Multiple Center Simulation Results
+### Aliases: visualize_multiscale
+
+### ** Examples
+
+## Not run: 
+##D # Generate and visualize patterns
+##D Ra_seq <- seq(from = 10, to = 3, length.out = 6)
+##D Rb_seq <- seq(from = 20, to = 3, length.out = 6)
+##D sim_data <- simulate_multiscale(Ra_seq = Ra_seq, Rb_seq = Rb_seq, n_centers = 3)
+##D plot_grid <- visualize_multiscale(sim_data, Ra_seq, Rb_seq)
+##D print(plot_grid)
+## End(Not run)
+
+
+
+base::assign(".dptime", (proc.time() - get(".ptime", pos = "CheckExEnv")), pos = "CheckExEnv")
+base::cat("visualize_multiscale", base::get(".format_ptime", pos = 'CheckExEnv')(get(".dptime", pos = "CheckExEnv")), "\n", file=base::get(".ExTimings", pos = 'CheckExEnv'), append=TRUE, sep="\t")
+cleanEx()
+nameEx("visualize_ringpattern")
+### * visualize_ringpattern
+
+flush(stderr()); flush(stdout())
+
+base::assign(".ptime", proc.time(), pos = "CheckExEnv")
+### Name: visualize_ringpattern
+### Title: Visualize Concentric Ring Simulation Results
+### Aliases: visualize_ringpattern
+
+### ** Examples
+
+## Not run: 
+##D # Generate and visualize patterns
+##D radius_seq <- seq(2.5, 20, by = 2.5)
+##D sim_data <- simulate_ringpattern(radius_seq = radius_seq)
+##D plot_grid <- visualize_ringpattern(sim_data, radius_seq)
+##D print(plot_grid)
+## End(Not run)
+
+
+
+base::assign(".dptime", (proc.time() - get(".ptime", pos = "CheckExEnv")), pos = "CheckExEnv")
+base::cat("visualize_ringpattern", base::get(".format_ptime", pos = 'CheckExEnv')(get(".dptime", pos = "CheckExEnv")), "\n", file=base::get(".ExTimings", pos = 'CheckExEnv'), append=TRUE, sep="\t")
 cleanEx()
 nameEx("visualize_sgwt_kernels")
 ### * visualize_sgwt_kernels

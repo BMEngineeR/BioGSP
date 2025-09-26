@@ -21,5 +21,11 @@ sgwt_energy_analysis	sgwt_energy_analysis
 sgwt_forward	sgwt_forward
 sgwt_get_kernels	sgwt_get_kernels
 sgwt_inverse	sgwt_inverse
+sgwt_similarity	sgwt_similarity
+sgwt_weighted_similarity	sgwt_weighted_similarity
+simulate_multiscale	simulate_multiscale
+simulate_ringpattern	simulate_ringpattern
+visualize_multiscale	visualize_multiscale
+visualize_ringpattern	visualize_ringpattern
 visualize_sgwt_kernels	visualize_sgwt_kernels
 _PACKAGE	BioGSP-package

@@ -2,7 +2,8 @@ BioGSP-package          BioGSP: Biological Graph Signal Processing for
                         Spatial Data Analysis
 Cal_Eigen               Calculate eigenvalues and eigenvectors with
                         knee detection
-Cal_GCC                 Calculate Graph Cross-Correlation (GCC)
+Cal_GCC                 Calculate Graph Cross-Correlation (GCC) -
+                        DEPRECATED
 FastDecompositionLap    Fast eigendecomposition of Laplacian matrix
 SGWT                    Spectral Graph Wavelet Transform (SGWT)
 cal_laplacian           Calculate Graph Laplacian Matrix
@@ -25,5 +26,13 @@ sgwt_forward            Forward SGWT transform
 sgwt_get_kernels        Get a unified kernel family (low-pass and
                         band-pass) by kernel_type
 sgwt_inverse            Inverse SGWT transform
+sgwt_similarity         Comprehensive Signal Similarity Analysis
+sgwt_weighted_similarity
+                        Energy-normalized weighted similarity between
+                        two SGWT results
+simulate_multiscale     Simulate Multiple Center Patterns
+simulate_ringpattern    Simulate Concentric Ring Patterns
+visualize_multiscale    Visualize Multiple Center Simulation Results
+visualize_ringpattern   Visualize Concentric Ring Simulation Results
 visualize_sgwt_kernels
                         Visualize SGWT kernels and scaling functions

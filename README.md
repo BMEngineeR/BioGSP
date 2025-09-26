@@ -4,6 +4,172 @@
 
 The BioGSP package provides a comprehensive implementation of Graph Signal Processing (GSP) methods including Spectral Graph Wavelet Transform (SGWT) for analyzing spatial patterns in biological data. This implementation is based on Hammond, Vandergheynst, and Gribonval (2011) "Wavelets on Graphs via Spectral Graph Theory" and provides tools for multi-scale analysis of spatial signals, including forward and inverse transforms, energy analysis, and visualization functions tailored for biological applications.
 
+## SGWT Object Structure
+
+When you run `SGWT()`, it returns a list containing all the components of the spectral graph wavelet transform analysis. Here's the detailed structure and meaning of each component based on the actual implementation:
+
+### Main SGWT Result Object
+
+```r
+sgwt_result <- SGWT(data.in = your_data, signal = "signal", k = 25, J = 4)
+
+# Structure (when return_all = TRUE, which is default):
+sgwt_result$
+├── decomposition        # SGWT decomposition results from sgwt_forward()
+├── reconstructed_signal # Reconstructed signal from inverse transform
+├── reconstruction_error # RMSE between original and reconstructed signal
+├── original_signal     # Original input signal values
+├── graph_info          # Graph construction information
+├── data               # Original input data frame
+└── parameters         # Analysis parameters used
+```
+
+### Detailed Component Descriptions
+
+#### 1. **`decomposition`** (List)
+- **Type**: List containing the core SGWT decomposition results
+- **Content**: Output from `sgwt_forward()` function
+- **Components**:
+  ```r
+  decomposition$
+  ├── coefficients      # List of coefficient vectors for each scale
+  │   ├── scaling       # Scaling function coefficients (low-pass/approximation)
+  │   ├── wavelet_scale_1 # Wavelet coefficients at scale 1 (finest scale)
+  │   ├── wavelet_scale_2 # Wavelet coefficients at scale 2
+  │   └── ...           # Additional scales up to J
+  ├── filters           # List of filter values in spectral domain
+  ├── scales           # Vector of scale parameters used
+  ├── eigenvalues      # Eigenvalues of the graph Laplacian
+  └── eigenvectors     # Eigenvectors of the graph Laplacian
+  ```
+- **Meaning**: The actual multi-scale wavelet decomposition of your spatial signal
+- **Interpretation**: 
+  - `coefficients$scaling`: Smooth, low-frequency approximation of the signal
+  - `coefficients$wavelet_scale_*`: Detail coefficients at different spatial scales
+  - Higher scale numbers → coarser spatial details
+  - Lower scale numbers → finer spatial details
+
+#### 2. **`reconstructed_signal`** (Vector)
+- **Type**: Numeric vector of length N (where N = number of spatial points)
+- **Content**: Signal reconstructed from the SGWT decomposition using inverse transform
+- **Meaning**: Result of `sgwt_inverse()` applied to the decomposition
+- **Quality Check**: Should closely match `original_signal` (check `reconstruction_error`)
+- **Interpretation**: Validates the perfect reconstruction property of the transform
+
+#### 3. **`reconstruction_error`** (Scalar)
+- **Type**: Single numeric value
+- **Content**: Root Mean Square Error between original and reconstructed signal
+- **Formula**: `sqrt(mean((original_signal - reconstructed_signal)^2))`
+- **Interpretation**: 
+  - Values close to 0 indicate perfect reconstruction
+  - Higher values may indicate numerical issues or implementation problems
+- **Usage**: Quality control metric for the transform
+
+#### 4. **`original_signal`** (Vector)
+- **Type**: Numeric vector of length N
+- **Content**: The original signal values that were analyzed
+- **Meaning**: Copy of the input signal for reference and validation
+- **Interpretation**: Baseline for comparison with reconstructed signal
+
+#### 5. **`graph_info`** (List)
+- **Components**:
+  ```r
+  graph_info$
+  ├── adjacency_matrix    # Sparse adjacency matrix of the spatial graph
+  ├── laplacian_matrix    # Graph Laplacian matrix (normalized/unnormalized)
+  ├── eigenvalues         # Eigenvalues of the Laplacian
+  └── eigenvectors        # Eigenvectors of the Laplacian
+  ```
+- **Meaning**: Complete spectral information about the spatial graph structure
+- **Interpretation**: Contains all graph-theoretic information needed for analysis and visualization
+
+#### 6. **`data`** (Data Frame)
+- **Type**: Data frame (copy of original input)
+- **Content**: Original input data with spatial coordinates and signal
+- **Meaning**: Preserves the original input for reference and further analysis
+- **Usage**: Needed for visualization functions and further processing
+
+#### 7. **`parameters`** (List)
+- **Components**:
+  ```r
+  parameters$
+  ├── k                   # Number of nearest neighbors used
+  ├── scales             # Vector of scales used in the transform
+  ├── J                  # Number of wavelet scales
+  ├── kernel_type        # Wavelet kernel type used
+  └── laplacian_type     # Type of Laplacian normalization
+  ```
+- **Meaning**: All parameters used in the analysis for reproducibility
+- **Interpretation**: Enables exact reproduction of results and parameter tracking
+
+### Usage Examples
+
+```r
+# Access the core decomposition
+decomp <- sgwt_result$decomposition
+
+# Access specific coefficient components
+scaling_coeffs <- decomp$coefficients$scaling          # Low-frequency approximation
+wavelet_1 <- decomp$coefficients$wavelet_scale_1       # Finest scale details
+wavelet_2 <- decomp$coefficients$wavelet_scale_2       # Medium scale details
+# ... additional scales as wavelet_scale_3, wavelet_scale_4, etc.
+
+# Access filter information
+filters <- decomp$filters                              # Spectral domain filters
+scales_used <- decomp$scales                           # Scale parameters
+eigenvals <- decomp$eigenvalues                        # Graph eigenvalues
+eigenvecs <- decomp$eigenvectors                       # Graph eigenvectors
+
+# Check reconstruction quality
+error <- sgwt_result$reconstruction_error
+print(paste("Reconstruction RMSE:", round(error, 10)))
+
+# Get graph properties
+eigenvalues <- sgwt_result$graph_info$eigenvalues
+eigenvectors <- sgwt_result$graph_info$eigenvectors
+adjacency <- sgwt_result$graph_info$adjacency_matrix
+
+# Access parameters
+scales_used <- sgwt_result$parameters$scales
+k_neighbors <- sgwt_result$parameters$k
+kernel_type <- sgwt_result$parameters$kernel_type
+
+# Compare original vs reconstructed
+original <- sgwt_result$original_signal
+reconstructed <- sgwt_result$reconstructed_signal
+plot(original, reconstructed)
+abline(0, 1, col = "red")  # Perfect reconstruction line
+
+# Analyze energy at each scale
+scaling_energy <- sum(scaling_coeffs^2)
+wavelet_energies <- sapply(seq_along(scales_used), function(i) {
+  coeff_name <- paste0("wavelet_scale_", i)
+  sum(decomp$coefficients[[coeff_name]]^2)
+})
+print("Energy distribution:")
+print(c(scaling = scaling_energy, wavelet_energies))
+```
+
+### Working with the Decomposition
+
+```r
+# The decomposition contains the actual wavelet analysis results
+# Use helper functions to analyze the decomposition:
+energy_analysis <- sgwt_energy_analysis(sgwt_result)
+
+# Visualize the results
+plots <- plot_sgwt_decomposition(sgwt_result, sgwt_result$data)
+```
+
+### Simplified Output Option
+
+```r
+# If you only need the decomposition (return_all = FALSE):
+decomp_only <- SGWT(data.in = your_data, signal = "signal", 
+                    k = 25, J = 4, return_all = FALSE)
+# Returns only the sgwt_forward() result
+```
+
 ## Features
 
 - **Multi-scale Analysis**: Decompose spatial signals into different frequency components
@@ -25,16 +191,11 @@ The Spectral Graph Cross-Correlation (SGCC) pipeline enables comparison of two g
 graph TD
     A[Input: Graph + Two Graph Signals] --> B[Cell Graph to Spot Graph Conversion]
     B --> C[Graph Fourier Transform - GFT]
-    C --> D[Feature Extraction using Wavelet Kernel]
-    D --> E{Branch Decision}
-    E -->|k-bandlimited signals| F[Haar Mother Wavelet + Scaling Function]
-    E -->|General signals| G[Other Kernels - Heat/Mexican Hat + Filter Bank]
-    F --> H[Output: 1×N Vector]
-    G --> I[Output: J+1×N Matrix]
-    H --> J[Weighted Similarity Computation]
-    I --> J
-    J --> K[Energy Normalization]
-    K --> L[SGCC Score]
+    C --> D[Wavelet Filtering: Scaling Function + Wavelet Functions]
+    D --> E[Multiple Components: Scaling + Wavelet Coefficients]
+    E --> F[Weighted Similarity Computation]
+    F --> G[Energy Normalization]
+    G --> H[SGCC Score]
 ```
 
 ### Detailed Workflow Steps
@@ -56,25 +217,17 @@ The pipeline starts with:
 - Transforms spatial signals into the frequency domain using graph Laplacian eigendecomposition
 - Enables frequency-based analysis of spatial patterns
 
-#### 4. **Feature Extraction using Wavelet Kernel Function**
-- Graph wavelet kernels are applied to extract multi-scale features from the spectral representation
-- Captures both local and global signal characteristics
-- Provides multi-resolution analysis of spatial patterns
+#### 4. **Wavelet Filtering: Scaling Function + Wavelet Functions**
+- Applies wavelet filter bank to the spectral-domain signals
+- Uses scaling function for low-frequency (approximation) components
+- Uses multiple wavelet functions at different scales for detail components
+- Generates multi-scale decomposition in the spectral domain
 
-#### 5. **Branch Decision**
-The pipeline branches based on signal characteristics:
-
-**Branch A: k-bandlimited Signals**
-- **Condition**: If the graph signals are k-bandlimited
-- **Method**: Haar mother wavelet with scaling function
-- **Output**: 1×N vector (simple Haar case)
-- **Use Case**: Signals with limited frequency content
-
-**Branch B: General Signals**
-- **Condition**: Non-bandlimited or complex signals
-- **Method**: Other kernels (heat kernel or Mexican hat wavelet) with scaling + filter bank
-- **Output**: (J+1)×N matrix (filter bank case)
-- **Use Case**: Complex spatial patterns requiring multiple scales
+#### 5. **Multiple Components: Scaling + Wavelet Coefficients**
+- **Output**: Decomposed signal components at multiple scales
+- **Scaling coefficients**: Low-frequency approximation of the signal
+- **Wavelet coefficients**: Detail coefficients at different spatial scales (scale 1, scale 2, ..., scale J)
+- Each component captures different frequency characteristics of the spatial signal
 
 #### 6. **Weighted Similarity Computation**
 - Extracted multi-scale features are compared by computing similarity scores
@@ -197,13 +350,10 @@ knee_point <- eigen_result[[1]]
 eigenvectors <- eigen_result[[2]]
 
 # Step 2: Calculate SGCC score between the two signals
-sgcc_score <- Cal_GCC(
-  data.in = comparison_data,
-  knee = knee_point,
-  signal1 = "signal1",
-  signal2 = "signal2", 
-  eigenvector = eigenvectors
-)
+# Using the new comprehensive similarity function
+sgcc_score <- sgwt_similarity("signal1", "signal2", 
+                             data.in = comparison_data, 
+                             k = 25, J = 4)
 
 print(paste("SGCC Score:", round(sgcc_score, 4)))
 
@@ -234,7 +384,9 @@ print(cbind(Signal1 = energy1$energy_ratio, Signal2 = energy2$energy_ratio))
 - `FastDecompositionLap()`: Fast eigendecomposition
 - `gft()`: Graph Fourier Transform
 - `Cal_Eigen()`: Eigenvalue analysis with knee detection
-- `Cal_GCC()`: Graph Cross-Correlation
+- `sgwt_similarity()`: Comprehensive signal similarity analysis
+- `sgwt_weighted_similarity()`: Energy-normalized weighted similarity between SGWT results
+- `Cal_GCC()`: Graph Cross-Correlation (deprecated - use `sgwt_similarity()` instead)
 - `cosine_similarity()`: Custom cosine similarity implementation
 
 ### Visualization Functions
@@ -301,11 +453,13 @@ ggplot(energy_df, aes(x = scale, y = energy_ratio)) +
 eigen_result <- Cal_Eigen(your_data, k = 25, k_fold = 15)
 
 # Calculate cross-correlation between two signals
-gcc_value <- Cal_GCC(data.in = your_data,
-                     knee = eigen_result[[1]],
-                     signal1 = "signal1",
-                     signal2 = "signal2", 
-                     eigenvector = eigen_result[[2]])
+# NEW RECOMMENDED APPROACH:
+similarity_score <- sgwt_similarity("signal1", "signal2", data.in = your_data, k = 25, J = 4)
+
+# OR with pre-computed SGWT results:
+# sgwt1 <- SGWT(your_data, signal = "signal1", k = 25, J = 4)
+# sgwt2 <- SGWT(your_data, signal = "signal2", k = 25, J = 4)
+# similarity_score <- sgwt_similarity(sgwt1, sgwt2)
 ```
 
 ### Custom Cosine Similarity
@@ -388,6 +542,12 @@ This package implements its own cosine similarity function to reduce dependencie
 - Uses sparse matrix operations where possible
 - Implements fast eigendecomposition for large matrices
 - Optimized graph construction using k-nearest neighbors
+
+### Recent Improvements
+- **Unified Similarity Analysis**: New `sgwt_similarity()` function provides comprehensive signal similarity analysis with support for multiple input types (raw signals, SGWT results, mixed inputs)
+- **Enhanced Numerical Stability**: Improved `cosine_similarity()` function with epsilon-based numerical stability and value clamping
+- **Energy-Normalized Weighting**: Advanced `sgwt_weighted_similarity()` function computes energy-normalized weighted similarity between SGWT decompositions
+- **Deprecation Management**: `Cal_GCC()` function deprecated in favor of more comprehensive similarity analysis methods
 
 ## References
 

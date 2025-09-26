@@ -4,10 +4,21 @@
 \alias{Cal_Eigen}
 \title{Calculate eigenvalues and eigenvectors with knee detection}
 \usage{
-Cal_Eigen(data.in = NULL, k = 25, k_fold = 15, sensitivity = 2)
+Cal_Eigen(
+  data.in = NULL,
+  x_col = "x",
+  y_col = "y",
+  k = 25,
+  k_fold = 15,
+  sensitivity = 2
+)
 }
 \arguments{
-\item{data.in}{Data frame with x and y coordinates}
+\item{data.in}{Data frame with spatial coordinates}
+
+\item{x_col}{Character string specifying the column name for X coordinates (default: "x")}
+
+\item{y_col}{Character string specifying the column name for Y coordinates (default: "y")}
 
 \item{k}{Number of nearest neighbors (default: 25)}
 
@@ -27,5 +38,9 @@ detection of the low-frequency cutoff using knee detection
 # Create spatial data
 data <- data.frame(x = runif(100), y = runif(100))
 result <- Cal_Eigen(data, k = 10)
+
+# With custom column names
+data2 <- data.frame(X = runif(100), Y = runif(100))
+result2 <- Cal_Eigen(data2, x_col = "X", y_col = "Y", k = 10)
 }
 }

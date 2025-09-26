@@ -4,21 +4,25 @@
 \alias{cosine_similarity}
 \title{Calculate cosine similarity between two vectors}
 \usage{
-cosine_similarity(x, y)
+cosine_similarity(x, y, eps = 1e-12)
 }
 \arguments{
 \item{x}{First vector}
 
 \item{y}{Second vector}
+
+\item{eps}{Small numeric for numerical stability when norms are near zero (default 1e-12)}
 }
 \value{
 Cosine similarity value (between -1 and 1)
 }
 \description{
-Calculate cosine similarity between two numeric vectors
+Calculate cosine similarity between two numeric vectors with numerical stability
 }
 \examples{
 x <- c(1, 2, 3)
 y <- c(2, 3, 4)
 similarity <- cosine_similarity(x, y)
+# With custom eps for numerical stability
+similarity2 <- cosine_similarity(x, y, eps = 1e-10)
 }

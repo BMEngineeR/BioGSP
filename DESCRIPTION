@@ -32,7 +32,8 @@ Suggests:
     testthat (>= 2.1.0),
     remotes,
     dplyr,
-    tidyr
+    tidyr,
+    knitr,
+    rmarkdown
 Depends: 
     R (>= 3.5.0)
- 

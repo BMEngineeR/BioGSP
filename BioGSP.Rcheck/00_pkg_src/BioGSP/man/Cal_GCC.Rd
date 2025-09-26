@@ -2,7 +2,7 @@
 % Please edit documentation in R/utilities.R
 \name{Cal_GCC}
 \alias{Cal_GCC}
-\title{Calculate Graph Cross-Correlation (GCC)}
+\title{Calculate Graph Cross-Correlation (GCC) - DEPRECATED}
 \usage{
 Cal_GCC(
   data.in = NULL,
@@ -27,11 +27,20 @@ Cal_GCC(
 Cosine similarity value
 }
 \description{
-Calculate Graph Cross-Correlation between two signals using Graph Fourier Transform
+\strong{DEPRECATED:} This function is deprecated. Use \code{\link{sgwt_similarity}} instead 
+for more comprehensive signal similarity analysis with energy normalization and advanced features.
+
+Calculate Graph Cross-Correlation between two signals using Graph Fourier Transform.
+This is a simplified approach that only considers low-frequency GFT components.
 }
 \examples{
 \dontrun{
-# Assuming you have data with two signals and eigenvectors
+# DEPRECATED - use sgwt_similarity instead
 # gcc_value <- Cal_GCC(data, knee = 10, signal1 = "sig1", signal2 = "sig2", eigenvector = U)
+
+# NEW RECOMMENDED APPROACH:
+# sgwt1 <- SGWT(data, signal = "signal1", k = 25, J = 4)
+# sgwt2 <- SGWT(data, signal = "signal2", k = 25, J = 4)  
+# similarity <- sgwt_similarity(sgwt1, sgwt2)
 }
 }
