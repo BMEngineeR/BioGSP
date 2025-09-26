@@ -195,3 +195,4 @@ cat("- SGWT analysis with custom column names (X, Y, signal_1, signal_2)\n")
 cat("- Energy distribution analysis\n")
 cat("- Graph Cross-Correlation analysis\n")
 cat("- Multiple kernel type comparison\n")
+

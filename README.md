@@ -249,16 +249,26 @@ The pipeline starts with:
 
 ## Installation
 
-### From Source
+The package will automatically install all required dependencies. If you encounter any dependency issues, you can manually install them first:
 
 ```r
-# Install required dependencies first
+# Manual dependency installation (if needed)
 install.packages(c("Matrix", "igraph", "RANN", "RSpectra", "kneedle", 
                    "ggplot2", "patchwork", "ggpubr", "viridis"))
-
-# Install the package from source
-devtools::install_local("path/to/BioGSP")
 ```
+
+You can install BioGSP directly from GitHub:
+
+```r
+# Install devtools if you haven't already
+if (!requireNamespace("devtools", quietly = TRUE)) {
+  install.packages("devtools")
+}
+
+# Install BioGSP from GitHub
+devtools::install_github("BMEngineeR/BioGSP")
+```
+
 
 ### Dependencies
 

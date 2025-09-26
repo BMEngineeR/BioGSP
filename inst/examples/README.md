@@ -46,3 +46,4 @@ For more detailed tutorials, see the vignettes:
    - Energy distribution analysis across scales
    - Graph Cross-Correlation between signals
    - Comprehensive visualization capabilities
+
