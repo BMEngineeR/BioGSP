@@ -72,7 +72,7 @@ demo_data <- data.frame(
 )
 
 # Run SGWT analysis
-result <- SGWT(data.in = demo_data, signal = "signal", k = 8, J = 4)
+result <- SGWT(data.in = demo_data, signal = "signal", k = 8, J = 4, k_fold = 8)
 
 # Check quality
 print(paste("Reconstruction error:", round(result$reconstruction_error, 6)))
@@ -91,25 +91,25 @@ demo_data$signal2 <- cos(0.3 * demo_data$y) + rnorm(100, 0, 0.1)
 # Calculate similarity between signals
 similarity <- sgwt_similarity("signal", "signal2", 
                              data.in = demo_data, 
-                             k = 8, J = 4)
+                             k = 8, J = 4, k_fold = 8)
 print(paste("SGCC Score:", round(similarity, 4)))
 ```
 
 ## Use Cases
 
-### 🧬 Biological Applications
+### Biological Applications
 - **Spatial Transcriptomics**: Compare gene expression patterns across tissue regions
 - **Single-cell Analysis**: Analyze spatial organization of cell types
 - **Cancer Research**: Identify spatial heterogeneity in tumors
 - **Developmental Biology**: Track pattern formation during development
 
-### 🔬 Research Applications
+### Research Applications
 - **Neuroscience**: Brain connectivity and neural signal analysis
 - **Environmental Science**: Spatial patterns in ecological data
 - **Medical Imaging**: Multi-scale analysis of medical images
 - **Social Networks**: Analyze signals on network data
 
-### 📊 Data Analysis Tasks
+### Data Analysis Tasks
 - **Pattern Discovery**: Find recurring spatial motifs
 - **Quality Control**: Assess spatial consistency in experiments
 - **Batch Effect Detection**: Compare datasets for systematic differences
@@ -135,14 +135,16 @@ print(paste("SGCC Score:", round(similarity, 4)))
 
 **Common Issues:**
 - **"Graph construction failed"**: Try reducing `k` (number of neighbors)
-- **"Eigendecomposition error"**: Your data might have too few points
+- **"Eigendecomposition error"**: Adjust `k_fold` parameter (try `k_fold = 5-8` for small datasets)
+- **"k must satisfy 0 < k < nrow(A)"**: Use smaller `k_fold` (for N points, use `k_fold < N/sqrt(N)`)
 - **"Reconstruction error high"**: Normal for noisy data, check if < 0.01
 
 **Getting Started:**
 1. Prepare data with x, y coordinates and signal values
-2. Start with `k=8-15` neighbors and `J=3-5` scales
-3. Check reconstruction error to validate results
-4. Use energy analysis to understand your data's scale distribution
+2. Start with `k=8-15` neighbors, `J=3-5` scales, and `k_fold=5-8`
+3. For small datasets (<200 points), use smaller `k_fold` values
+4. Check reconstruction error to validate results
+5. Use energy analysis to understand your data's scale distribution
 
 ## References
 
