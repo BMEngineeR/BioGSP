@@ -126,10 +126,10 @@ print(paste("SGCC Score:", round(similarity, 4)))
 
 ## Learn More
 
-- 📖 **Detailed Documentation**: See [developer_README.md](developer_README.md) for comprehensive function documentation
-- 🎓 **Mathematical Theory**: Learn about the underlying graph signal processing concepts
-- 💻 **Advanced Examples**: Explore complex analysis workflows
-- 🔧 **API Reference**: Complete function specifications and parameters
+- **Detailed Documentation**: See [developer_README.md](developer_README.md) for comprehensive function documentation
+- **Mathematical Theory**: Learn about the underlying graph signal processing concepts
+- **Advanced Examples**: Explore complex analysis workflows
+- **API Reference**: Complete function specifications and parameters
 
 ## Quick Help
 
@@ -152,9 +152,9 @@ print(paste("SGCC Score:", round(similarity, 4)))
 
 ## Support
 
-- 📝 **Issues**: [GitHub Issues](https://github.com/BMEngineeR/BioGSP/issues)
-- 💬 **Questions**: Open a GitHub issue for help
-- 🤝 **Contributing**: Pull requests welcome!
+- **Issues**: [GitHub Issues](https://github.com/BMEngineeR/BioGSP/issues)
+- **Questions**: Open a GitHub issue for help
+- **Contributing**: Pull requests welcome!
 
 ---
 

@@ -600,6 +600,342 @@ try({
 cat("Weighted similarity function implementation and testing complete!\n")
 ```
 
+# Part 5: Pattern Similarity Heatmap Analysis
+
+## Generate Multiple Pattern Variations
+
+Let's create a comprehensive similarity analysis using multiple simulation patterns with gradient parameters to demonstrate the weighted similarity function across different pattern variations.
+
+```{r pattern-heatmap-setup}
+# Create a grid of simulation parameters
+cat("Generating multiple pattern variations for similarity heatmap...\n")
+
+# Define parameter ranges for comprehensive analysis
+n_patterns <- 10  # 10x10 grid of patterns
+radius_range <- seq(3, 15, length.out = n_patterns)  # Inner radius gradient
+outer_range <- seq(5, 20, length.out = n_patterns)   # Outer radius gradient
+
+# Generate pattern library
+pattern_library <- list()
+pattern_params <- data.frame()
+
+set.seed(42)  # For reproducible results
+
+for (i in 1:n_patterns) {
+  for (j in 1:n_patterns) {
+    # Create unique pattern with specific inner and outer radii
+    inner_radius <- radius_range[i]
+    outer_radius <- outer_range[j]
+    
+    # Skip if outer radius is not larger than inner radius
+    if (outer_radius <= inner_radius + 1) {
+      outer_radius <- inner_radius + 2
+    }
+    
+    # Generate single pattern data
+    pattern_data <- simulate_multiscale(
+      grid_size = 40,  # Smaller grid for faster computation
+      n_centers = 1,   # Single center for cleaner patterns
+      Ra_seq = inner_radius,
+      Rb_seq = outer_radius,
+      seed = 42 + i*n_patterns + j
+    )
+    
+    # Extract the generated pattern
+    pattern_key <- names(pattern_data)[1]
+    current_pattern <- pattern_data[[pattern_key]]
+    
+    # Store pattern with descriptive name
+    pattern_name <- paste0("pattern_", i, "_", j)
+    pattern_library[[pattern_name]] <- current_pattern
+    
+    # Store parameters for reference
+    pattern_params <- rbind(pattern_params, data.frame(
+      pattern_id = pattern_name,
+      row_idx = i,
+      col_idx = j,
+      inner_radius = inner_radius,
+      outer_radius = outer_radius,
+      stringsAsFactors = FALSE
+    ))
+  }
+}
+
+cat(sprintf("Generated %d patterns with varying inner (%.1f-%.1f) and outer (%.1f-%.1f) radii\n", 
+            length(pattern_library), 
+            min(radius_range), max(radius_range),
+            min(outer_range), max(outer_range)))
+```
+
+## Visualize Sample Patterns
+
+```{r sample-patterns-viz, fig.width=12, fig.height=8}
+# Visualize a sample of patterns to show the variation
+sample_indices <- c(1, 3, 5, 7, 9)  # Every other pattern from first row
+sample_plots <- list()
+
+for (idx in sample_indices) {
+  pattern_name <- paste0("pattern_1_", idx)
+  pattern_data <- pattern_library[[pattern_name]]
+  params <- pattern_params[pattern_params$pattern_id == pattern_name, ]
+  
+  p <- ggplot(pattern_data, aes(X, Y, fill = factor(signal_1))) +
+    geom_tile() +
+    scale_fill_manual(values = c("0" = "white", "1" = "#16964a"), 
+                      name = "Signal") +
+    coord_fixed() +
+    theme_void() +
+    theme(legend.position = "none") +
+    ggtitle(sprintf("R_in=%.1f, R_out=%.1f", 
+                   params$inner_radius, params$outer_radius))
+  
+  sample_plots[[length(sample_plots) + 1]] <- p
+}
+
+# Combine sample plots
+library(patchwork)
+sample_grid <- wrap_plots(sample_plots, nrow = 1)
+print(sample_grid)
+```
+
+## Compute Similarity Matrix
+
+```{r compute-similarity-matrix}
+# Compute pairwise similarities between all patterns
+cat("Computing pairwise similarities between all patterns...\n")
+cat("This may take a few minutes for", length(pattern_library), "patterns...\n")
+
+# Initialize similarity matrix
+n_total <- length(pattern_library)
+similarity_matrix <- matrix(NA, nrow = n_total, ncol = n_total)
+pattern_names <- names(pattern_library)
+
+# Progress tracking
+start_time <- Sys.time()
+completed <- 0
+total_comparisons <- n_total * (n_total + 1) / 2  # Only compute upper triangle + diagonal
+
+for (i in 1:n_total) {
+  for (j in i:n_total) {  # Only compute upper triangle + diagonal
+    pattern_i <- pattern_library[[pattern_names[i]]]
+    pattern_j <- pattern_library[[pattern_names[j]]]
+    
+    # Compute SGWT for both patterns separately
+    sgwt_i <- SGWT(data.in = pattern_i, x_col = "X", y_col = "Y", 
+                   signal = "signal_1", k = 10, J = 3, k_fold = 6)
+    sgwt_j <- SGWT(data.in = pattern_j, x_col = "X", y_col = "Y", 
+                   signal = "signal_1", k = 10, J = 3, k_fold = 6)
+    
+    # Compute weighted similarity between SGWT results
+    similarity <- sgwt_weighted_similarity(sgwt_i, sgwt_j, return_parts = FALSE)
+    
+    # Fill both upper and lower triangle (symmetric matrix)
+    similarity_matrix[i, j] <- similarity
+    similarity_matrix[j, i] <- similarity
+    
+    completed <- completed + 1
+    if (completed %% 50 == 0) {
+      elapsed <- as.numeric(difftime(Sys.time(), start_time, units = "mins"))
+      cat(sprintf("Progress: %d/%d comparisons (%.1f%%) - %.1f min elapsed\n", 
+                 completed, total_comparisons, 
+                 100 * completed / total_comparisons, elapsed))
+    }
+  }
+}
+
+# Set row and column names for clarity
+rownames(similarity_matrix) <- pattern_names
+colnames(similarity_matrix) <- pattern_names
+
+elapsed_total <- as.numeric(difftime(Sys.time(), start_time, units = "mins"))
+cat(sprintf("Similarity matrix computation completed in %.1f minutes\n", elapsed_total))
+cat(sprintf("Similarity range: [%.4f, %.4f]\n", 
+           min(similarity_matrix, na.rm = TRUE), 
+           max(similarity_matrix, na.rm = TRUE)))
+```
+
+## Create Comprehensive Similarity Heatmap
+
+```{r similarity-heatmap, fig.width=12, fig.height=10}
+# Prepare data for heatmap visualization
+library(reshape2)
+library(viridis)
+
+# Convert matrix to long format for ggplot
+similarity_df <- melt(similarity_matrix)
+colnames(similarity_df) <- c("Pattern_A", "Pattern_B", "Similarity")
+
+# Extract row and column indices from pattern names
+similarity_df$Row_A <- as.numeric(gsub("pattern_(\\d+)_\\d+", "\\1", similarity_df$Pattern_A))
+similarity_df$Col_A <- as.numeric(gsub("pattern_\\d+_(\\d+)", "\\1", similarity_df$Pattern_A))
+similarity_df$Row_B <- as.numeric(gsub("pattern_(\\d+)_\\d+", "\\1", similarity_df$Pattern_B))
+similarity_df$Col_B <- as.numeric(gsub("pattern_\\d+_(\\d+)", "\\1", similarity_df$Pattern_B))
+
+# Add parameter information
+similarity_df$Inner_A <- radius_range[similarity_df$Row_A]
+similarity_df$Outer_A <- outer_range[similarity_df$Col_A]
+similarity_df$Inner_B <- radius_range[similarity_df$Row_B]
+similarity_df$Outer_B <- outer_range[similarity_df$Col_B]
+
+# Create main heatmap
+heatmap_plot <- ggplot(similarity_df, aes(x = Pattern_A, y = Pattern_B, fill = Similarity)) +
+  geom_tile() +
+  scale_fill_viridis_c(name = "SGWT\nSimilarity", 
+                       option = "plasma",
+                       trans = "sqrt",  # Square root transformation for better visualization
+                       labels = function(x) sprintf("%.3f", x)) +
+  labs(title = "Pattern Similarity Heatmap: SGWT Weighted Similarity Analysis",
+       subtitle = sprintf("Comparing %dx%d patterns with gradient inner (%.1f-%.1f) and outer (%.1f-%.1f) radii",
+                         n_patterns, n_patterns,
+                         min(radius_range), max(radius_range),
+                         min(outer_range), max(outer_range)),
+       x = "Pattern A (Inner Radius →, Outer Radius ↑)",
+       y = "Pattern B (Inner Radius →, Outer Radius ↑)") +
+  theme_minimal() +
+  theme(axis.text.x = element_text(angle = 45, hjust = 1, size = 8),
+        axis.text.y = element_text(size = 8),
+        plot.title = element_text(size = 14, face = "bold"),
+        plot.subtitle = element_text(size = 12),
+        legend.position = "right") +
+  coord_fixed()
+
+print(heatmap_plot)
+```
+
+## Parameter-Based Similarity Analysis
+
+```{r parameter-analysis, fig.width=14, fig.height=6}
+# Create parameter-space heatmaps showing similarity patterns
+# Reshape similarity matrix to parameter space
+
+# Create parameter-based similarity matrix (10x10 for each parameter combination)
+param_similarity <- array(NA, dim = c(n_patterns, n_patterns, n_patterns, n_patterns))
+
+for (i in 1:nrow(similarity_df)) {
+  row_a <- similarity_df$Row_A[i]
+  col_a <- similarity_df$Col_A[i]
+  row_b <- similarity_df$Row_B[i]
+  col_b <- similarity_df$Col_B[i]
+  param_similarity[row_a, col_a, row_b, col_b] <- similarity_df$Similarity[i]
+}
+
+# Create diagonal slice heatmaps (comparing patterns with same inner radius)
+diagonal_data <- data.frame()
+for (i in 1:n_patterns) {
+  for (j in 1:n_patterns) {
+    for (k in 1:n_patterns) {
+      sim_val <- param_similarity[i, j, i, k]  # Same inner radius (i), different outer radius (j vs k)
+      if (!is.na(sim_val)) {
+        diagonal_data <- rbind(diagonal_data, data.frame(
+          inner_radius = radius_range[i],
+          outer_A = outer_range[j],
+          outer_B = outer_range[k],
+          similarity = sim_val,
+          stringsAsFactors = FALSE
+        ))
+      }
+    }
+  }
+}
+
+# Plot similarity as function of outer radius differences (fixed inner radius)
+p1 <- ggplot(diagonal_data, aes(x = outer_A, y = outer_B, fill = similarity)) +
+  geom_tile() +
+  scale_fill_viridis_c(name = "Similarity", option = "viridis") +
+  facet_wrap(~paste("Inner Radius:", round(inner_radius, 1)), ncol = 5) +
+  labs(title = "Similarity vs Outer Radius Combinations",
+       subtitle = "Fixed inner radius, varying outer radius",
+       x = "Outer Radius A", y = "Outer Radius B") +
+  theme_minimal() +
+  theme(axis.text = element_text(size = 6),
+        strip.text = element_text(size = 8))
+
+print(p1)
+```
+
+## Similarity Statistics and Insights
+
+```{r similarity-stats}
+# Analyze similarity patterns and extract insights
+cat("=== Pattern Similarity Analysis Results ===\n")
+
+# Self-similarity (diagonal elements)
+diagonal_similarities <- diag(similarity_matrix)
+cat(sprintf("Self-similarity statistics:\n"))
+cat(sprintf("  Mean: %.4f (SD: %.4f)\n", mean(diagonal_similarities), sd(diagonal_similarities)))
+cat(sprintf("  Range: [%.4f, %.4f]\n", min(diagonal_similarities), max(diagonal_similarities)))
+
+# Off-diagonal similarities
+off_diagonal <- similarity_matrix[upper.tri(similarity_matrix)]
+cat(sprintf("\nCross-pattern similarity statistics:\n"))
+cat(sprintf("  Mean: %.4f (SD: %.4f)\n", mean(off_diagonal), sd(off_diagonal)))
+cat(sprintf("  Range: [%.4f, %.4f]\n", min(off_diagonal), max(off_diagonal)))
+
+# Find most and least similar pattern pairs
+similarity_df_upper <- similarity_df[similarity_df$Row_A <= similarity_df$Row_B & 
+                                    !(similarity_df$Row_A == similarity_df$Row_B & 
+                                      similarity_df$Col_A == similarity_df$Col_B), ]
+
+most_similar <- similarity_df_upper[which.max(similarity_df_upper$Similarity), ]
+least_similar <- similarity_df_upper[which.min(similarity_df_upper$Similarity), ]
+
+cat(sprintf("\nMost similar pattern pair:\n"))
+cat(sprintf("  %s (R_in=%.1f, R_out=%.1f) vs %s (R_in=%.1f, R_out=%.1f)\n",
+           most_similar$Pattern_A, most_similar$Inner_A, most_similar$Outer_A,
+           most_similar$Pattern_B, most_similar$Inner_B, most_similar$Outer_B))
+cat(sprintf("  Similarity: %.4f\n", most_similar$Similarity))
+
+cat(sprintf("\nLeast similar pattern pair:\n"))
+cat(sprintf("  %s (R_in=%.1f, R_out=%.1f) vs %s (R_in=%.1f, R_out=%.1f)\n",
+           least_similar$Pattern_A, least_similar$Inner_A, least_similar$Outer_A,
+           least_similar$Pattern_B, least_similar$Inner_B, least_similar$Outer_B))
+cat(sprintf("  Similarity: %.4f\n", least_similar$Similarity))
+
+# Parameter distance vs similarity correlation
+param_distance <- sqrt((similarity_df$Inner_A - similarity_df$Inner_B)^2 + 
+                      (similarity_df$Outer_A - similarity_df$Outer_B)^2)
+correlation <- cor(param_distance, similarity_df$Similarity, use = "complete.obs")
+
+cat(sprintf("\nParameter distance vs similarity correlation: %.4f\n", correlation))
+cat("(Negative correlation indicates that patterns with similar parameters are more similar)\n")
+```
+
+## Distance vs Similarity Relationship
+
+```{r distance-similarity, fig.width=12, fig.height=5}
+# Visualize relationship between parameter distance and similarity
+param_analysis_df <- data.frame(
+  param_distance = param_distance,
+  similarity = similarity_df$Similarity,
+  is_self = (similarity_df$Pattern_A == similarity_df$Pattern_B)
+)
+
+p_distance <- ggplot(param_analysis_df[!param_analysis_df$is_self, ], 
+                    aes(x = param_distance, y = similarity)) +
+  geom_point(alpha = 0.6, color = "steelblue") +
+  geom_smooth(method = "loess", se = TRUE, color = "red") +
+  labs(title = "Parameter Distance vs SGWT Similarity",
+       subtitle = paste("Correlation:", round(correlation, 4)),
+       x = "Parameter Distance (Euclidean in radius space)",
+       y = "SGWT Weighted Similarity") +
+  theme_minimal()
+
+# Create similarity distribution histogram
+p_hist <- ggplot(param_analysis_df[!param_analysis_df$is_self, ], 
+                aes(x = similarity)) +
+  geom_histogram(bins = 30, fill = "lightblue", alpha = 0.7, color = "black") +
+  geom_vline(xintercept = mean(param_analysis_df$similarity[!param_analysis_df$is_self]), 
+             color = "red", linetype = "dashed", size = 1) +
+  labs(title = "Distribution of SGWT Similarities",
+       subtitle = paste("Mean:", round(mean(param_analysis_df$similarity[!param_analysis_df$is_self]), 4)),
+       x = "SGWT Weighted Similarity",
+       y = "Frequency") +
+  theme_minimal()
+
+combined_analysis <- p_distance + p_hist
+print(combined_analysis)
+```
+
 # Summary
 
 This vignette demonstrated:
@@ -610,7 +946,8 @@ This vignette demonstrated:
 4. **Kernel Comparison**: Evaluated different wavelet kernel types (Mexican Hat, Meyer, Heat)
 5. **Energy Analysis**: Analyzed energy distribution across different scales and patterns
 6. **Cross-Signal Analysis**: Used Graph Cross-Correlation to analyze relationships between signals
-7. ****NEW** Weighted Similarity**: Tested energy-normalized weighted similarity between SGWT results
+7. **Weighted Similarity**: Tested energy-normalized weighted similarity between SGWT results
+8. ****NEW** Comprehensive Pattern Similarity**: Generated 10×10 pattern library with gradient parameters and computed full similarity heatmap
 
 ## Key Features Demonstrated
 
