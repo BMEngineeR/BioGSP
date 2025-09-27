@@ -1,18 +1,18 @@
 Hmm ... looks like a package
 Converting parsed Rd's to LaTeX ...
 Creating pdf output from LaTeX ...
-tar: Rd2.idx: time stamp 2025-09-26 21:27:59 is 3.49658645 s in the future
-tar: Rd2.aux: time stamp 2025-09-26 21:27:59 is 3.489296487 s in the future
-tar: Rd2.out: time stamp 2025-09-26 21:27:59 is 3.481973873 s in the future
-tar: Rd2.toc: time stamp 2025-09-26 21:27:59 is 3.474633817 s in the future
-tar: Rd2.idx: time stamp 2025-09-26 21:27:59 is 2.706804538 s in the future
-tar: Rd2.aux: time stamp 2025-09-26 21:27:59 is 2.681886741 s in the future
-tar: Rd2.out: time stamp 2025-09-26 21:27:59 is 2.671162062 s in the future
-tar: Rd2.toc: time stamp 2025-09-26 21:27:59 is 2.66065064 s in the future
-tar: Rd2.idx: time stamp 2025-09-26 21:28:00 is 2.988625359 s in the future
-tar: Rd2.aux: time stamp 2025-09-26 21:28:00 is 2.978373268 s in the future
-tar: Rd2.out: time stamp 2025-09-26 21:28:00 is 2.968283059 s in the future
-tar: Rd2.toc: time stamp 2025-09-26 21:28:00 is 2.958261697 s in the future
+tar: Rd2.idx: time stamp 2025-09-26 21:46:44 is 3.281364317 s in the future
+tar: Rd2.aux: time stamp 2025-09-26 21:46:44 is 3.273300629 s in the future
+tar: Rd2.out: time stamp 2025-09-26 21:46:44 is 3.260408005 s in the future
+tar: Rd2.toc: time stamp 2025-09-26 21:46:44 is 3.248306311 s in the future
+tar: Rd2.idx: time stamp 2025-09-26 21:46:44 is 2.65863875 s in the future
+tar: Rd2.aux: time stamp 2025-09-26 21:46:44 is 2.649860464 s in the future
+tar: Rd2.out: time stamp 2025-09-26 21:46:44 is 2.641005845 s in the future
+tar: Rd2.toc: time stamp 2025-09-26 21:46:44 is 2.632306906 s in the future
+tar: Rd2.idx: time stamp 2025-09-26 21:46:45 is 3.037698031 s in the future
+tar: Rd2.aux: time stamp 2025-09-26 21:46:45 is 3.027921659 s in the future
+tar: Rd2.out: time stamp 2025-09-26 21:46:45 is 3.018138976 s in the future
+tar: Rd2.toc: time stamp 2025-09-26 21:46:45 is 3.008568326 s in the future
 This is pdfTeX, Version 3.14159265-2.6-1.40.19 (TeX Live 2018) (preloaded format=pdflatex)
  restricted \write18 enabled.
 entering extended mode
@@ -171,7 +171,7 @@ Overfull \hbox (36.7804pt too wide) in paragraph at lines 1390--1390
 eq, n_centers = 3)[] 
 [25] [26]
 No file Rd2.ind.
-[27] (/bmbl_data/Rtmp/RtmpGnNDL1/Rd2pdf111108a4d15e6/Rd2.aux)
+[27] (/bmbl_data/Rtmp/RtmpR3jWUt/Rd2pdf1afabf5aa6b542/Rd2.aux)
 
 Package rerunfilecheck Warning: File `Rd2.out' has changed.
 (rerunfilecheck)                Rerun to get outlines right
@@ -242,18 +242,18 @@ Package hyperref Message: Driver (autodetected): hpdftex.
 (/usr/share/texlive/texmf-dist/tex/latex/base/omsenc.dfu)
 (/usr/share/texlive/texmf-dist/tex/latex/base/ts1enc.dfu)))
 Writing index file Rd2.idx
-(/bmbl_data/Rtmp/RtmpGnNDL1/Rd2pdf111108a4d15e6/Rd2.aux)
+(/bmbl_data/Rtmp/RtmpR3jWUt/Rd2pdf1afabf5aa6b542/Rd2.aux)
 (/usr/share/texlive/texmf-dist/tex/latex/base/ts1cmr.fd)
 (/usr/share/texlive/texmf-dist/tex/latex/psnfss/t1ptm.fd)
 (/usr/share/texlive/texmf-dist/tex/context/base/mkii/supp-pdf.mkii
 [Loading MPS to PDF converter (version 2006.09.02).]
 ) (/usr/share/texlive/texmf-dist/tex/latex/hyperref/nameref.sty
 (/usr/share/texlive/texmf-dist/tex/generic/oberdiek/gettitlestring.sty))
-(/bmbl_data/Rtmp/RtmpGnNDL1/Rd2pdf111108a4d15e6/Rd2.out)
-(/bmbl_data/Rtmp/RtmpGnNDL1/Rd2pdf111108a4d15e6/Rd2.out)
+(/bmbl_data/Rtmp/RtmpR3jWUt/Rd2pdf1afabf5aa6b542/Rd2.out)
+(/bmbl_data/Rtmp/RtmpR3jWUt/Rd2pdf1afabf5aa6b542/Rd2.out)
 (/usr/share/texlive/texmf-dist/tex/latex/psnfss/t1pcr.fd)
 (/usr/share/texlive/texmf-dist/tex/latex/psnfss/ts1ptm.fd)
-(/bmbl_data/Rtmp/RtmpGnNDL1/Rd2pdf111108a4d15e6/Rd2.toc
+(/bmbl_data/Rtmp/RtmpR3jWUt/Rd2pdf1afabf5aa6b542/Rd2.toc
 (/usr/share/texlive/texmf-dist/tex/latex/amsfonts/umsa.fd)
 (/usr/share/texlive/texmf-dist/tex/latex/amsfonts/umsb.fd)
 (/usr/share/texlive/texmf-dist/tex/latex/jknapltx/ursfs.fd) [1{/usr/share/texli
@@ -348,7 +348,7 @@ Overfull \hbox (36.7804pt too wide) in paragraph at lines 1390--1390
 eq, n_centers = 3)[] 
 [26] [27]
 No file Rd2.ind.
-[28] (/bmbl_data/Rtmp/RtmpGnNDL1/Rd2pdf111108a4d15e6/Rd2.aux) )
+[28] (/bmbl_data/Rtmp/RtmpR3jWUt/Rd2pdf1afabf5aa6b542/Rd2.aux) )
 (see the transcript file for additional information){/usr/share/texlive/texmf-d
 ist/fonts/enc/dvips/base/8r.enc}</usr/share/texlive/texmf-dist/fonts/type1/urw/
 courier/ucrr8a.pfb></usr/share/texlive/texmf-dist/fonts/type1/urw/times/utmb8a.
@@ -419,18 +419,18 @@ Package hyperref Message: Driver (autodetected): hpdftex.
 (/usr/share/texlive/texmf-dist/tex/latex/base/omsenc.dfu)
 (/usr/share/texlive/texmf-dist/tex/latex/base/ts1enc.dfu)))
 Writing index file Rd2.idx
-(/bmbl_data/Rtmp/RtmpGnNDL1/Rd2pdf111108a4d15e6/Rd2.aux)
+(/bmbl_data/Rtmp/RtmpR3jWUt/Rd2pdf1afabf5aa6b542/Rd2.aux)
 (/usr/share/texlive/texmf-dist/tex/latex/base/ts1cmr.fd)
 (/usr/share/texlive/texmf-dist/tex/latex/psnfss/t1ptm.fd)
 (/usr/share/texlive/texmf-dist/tex/context/base/mkii/supp-pdf.mkii
 [Loading MPS to PDF converter (version 2006.09.02).]
 ) (/usr/share/texlive/texmf-dist/tex/latex/hyperref/nameref.sty
 (/usr/share/texlive/texmf-dist/tex/generic/oberdiek/gettitlestring.sty))
-(/bmbl_data/Rtmp/RtmpGnNDL1/Rd2pdf111108a4d15e6/Rd2.out)
-(/bmbl_data/Rtmp/RtmpGnNDL1/Rd2pdf111108a4d15e6/Rd2.out)
+(/bmbl_data/Rtmp/RtmpR3jWUt/Rd2pdf1afabf5aa6b542/Rd2.out)
+(/bmbl_data/Rtmp/RtmpR3jWUt/Rd2pdf1afabf5aa6b542/Rd2.out)
 (/usr/share/texlive/texmf-dist/tex/latex/psnfss/t1pcr.fd)
 (/usr/share/texlive/texmf-dist/tex/latex/psnfss/ts1ptm.fd)
-(/bmbl_data/Rtmp/RtmpGnNDL1/Rd2pdf111108a4d15e6/Rd2.toc
+(/bmbl_data/Rtmp/RtmpR3jWUt/Rd2pdf1afabf5aa6b542/Rd2.toc
 (/usr/share/texlive/texmf-dist/tex/latex/amsfonts/umsa.fd)
 (/usr/share/texlive/texmf-dist/tex/latex/amsfonts/umsb.fd)
 (/usr/share/texlive/texmf-dist/tex/latex/jknapltx/ursfs.fd) [1{/usr/share/texli
@@ -523,8 +523,8 @@ vements = 5)[]
 Overfull \hbox (36.7804pt too wide) in paragraph at lines 1390--1390
  []\T1/pcr/m/n/9 sim_data <- simulate_multiscale(Ra_seq = Ra_seq, Rb_seq = Rb_s
 eq, n_centers = 3)[] 
-[26] [27] (/bmbl_data/Rtmp/RtmpGnNDL1/Rd2pdf111108a4d15e6/Rd2.ind [28] [29])
-(/bmbl_data/Rtmp/RtmpGnNDL1/Rd2pdf111108a4d15e6/Rd2.aux)
+[26] [27] (/bmbl_data/Rtmp/RtmpR3jWUt/Rd2pdf1afabf5aa6b542/Rd2.ind [28]
+[29]) (/bmbl_data/Rtmp/RtmpR3jWUt/Rd2pdf1afabf5aa6b542/Rd2.aux)
 
 Package rerunfilecheck Warning: File `Rd2.out' has changed.
 (rerunfilecheck)                Rerun to get outlines right
@@ -603,18 +603,18 @@ Package hyperref Message: Driver (autodetected): hpdftex.
 (/usr/share/texlive/texmf-dist/tex/latex/base/omsenc.dfu)
 (/usr/share/texlive/texmf-dist/tex/latex/base/ts1enc.dfu)))
 Writing index file Rd2.idx
-(/bmbl_data/Rtmp/RtmpGnNDL1/Rd2pdf111108a4d15e6/Rd2.aux)
+(/bmbl_data/Rtmp/RtmpR3jWUt/Rd2pdf1afabf5aa6b542/Rd2.aux)
 (/usr/share/texlive/texmf-dist/tex/latex/base/ts1cmr.fd)
 (/usr/share/texlive/texmf-dist/tex/latex/psnfss/t1ptm.fd)
 (/usr/share/texlive/texmf-dist/tex/context/base/mkii/supp-pdf.mkii
 [Loading MPS to PDF converter (version 2006.09.02).]
 ) (/usr/share/texlive/texmf-dist/tex/latex/hyperref/nameref.sty
 (/usr/share/texlive/texmf-dist/tex/generic/oberdiek/gettitlestring.sty))
-(/bmbl_data/Rtmp/RtmpGnNDL1/Rd2pdf111108a4d15e6/Rd2.out)
-(/bmbl_data/Rtmp/RtmpGnNDL1/Rd2pdf111108a4d15e6/Rd2.out)
+(/bmbl_data/Rtmp/RtmpR3jWUt/Rd2pdf1afabf5aa6b542/Rd2.out)
+(/bmbl_data/Rtmp/RtmpR3jWUt/Rd2pdf1afabf5aa6b542/Rd2.out)
 (/usr/share/texlive/texmf-dist/tex/latex/psnfss/t1pcr.fd)
 (/usr/share/texlive/texmf-dist/tex/latex/psnfss/ts1ptm.fd)
-(/bmbl_data/Rtmp/RtmpGnNDL1/Rd2pdf111108a4d15e6/Rd2.toc
+(/bmbl_data/Rtmp/RtmpR3jWUt/Rd2pdf1afabf5aa6b542/Rd2.toc
 (/usr/share/texlive/texmf-dist/tex/latex/amsfonts/umsa.fd)
 (/usr/share/texlive/texmf-dist/tex/latex/amsfonts/umsb.fd)
 (/usr/share/texlive/texmf-dist/tex/latex/jknapltx/ursfs.fd) [1{/usr/share/texli
@@ -707,8 +707,8 @@ vements = 5)[]
 Overfull \hbox (36.7804pt too wide) in paragraph at lines 1390--1390
  []\T1/pcr/m/n/9 sim_data <- simulate_multiscale(Ra_seq = Ra_seq, Rb_seq = Rb_s
 eq, n_centers = 3)[] 
-[26] [27] (/bmbl_data/Rtmp/RtmpGnNDL1/Rd2pdf111108a4d15e6/Rd2.ind [28] [29])
-(/bmbl_data/Rtmp/RtmpGnNDL1/Rd2pdf111108a4d15e6/Rd2.aux) )
+[26] [27] (/bmbl_data/Rtmp/RtmpR3jWUt/Rd2pdf1afabf5aa6b542/Rd2.ind [28]
+[29]) (/bmbl_data/Rtmp/RtmpR3jWUt/Rd2pdf1afabf5aa6b542/Rd2.aux) )
 (see the transcript file for additional information){/usr/share/texlive/texmf-d
 ist/fonts/enc/dvips/base/8r.enc}</usr/share/texlive/texmf-dist/fonts/type1/publ
 ic/amsfonts/cm/cmsy10.pfb></usr/share/texlive/texmf-dist/fonts/type1/urw/courie
@@ -781,18 +781,18 @@ Package hyperref Message: Driver (autodetected): hpdftex.
 (/usr/share/texlive/texmf-dist/tex/latex/base/omsenc.dfu)
 (/usr/share/texlive/texmf-dist/tex/latex/base/ts1enc.dfu)))
 Writing index file Rd2.idx
-(/bmbl_data/Rtmp/RtmpGnNDL1/Rd2pdf111108a4d15e6/Rd2.aux)
+(/bmbl_data/Rtmp/RtmpR3jWUt/Rd2pdf1afabf5aa6b542/Rd2.aux)
 (/usr/share/texlive/texmf-dist/tex/latex/base/ts1cmr.fd)
 (/usr/share/texlive/texmf-dist/tex/latex/psnfss/t1ptm.fd)
 (/usr/share/texlive/texmf-dist/tex/context/base/mkii/supp-pdf.mkii
 [Loading MPS to PDF converter (version 2006.09.02).]
 ) (/usr/share/texlive/texmf-dist/tex/latex/hyperref/nameref.sty
 (/usr/share/texlive/texmf-dist/tex/generic/oberdiek/gettitlestring.sty))
-(/bmbl_data/Rtmp/RtmpGnNDL1/Rd2pdf111108a4d15e6/Rd2.out)
-(/bmbl_data/Rtmp/RtmpGnNDL1/Rd2pdf111108a4d15e6/Rd2.out)
+(/bmbl_data/Rtmp/RtmpR3jWUt/Rd2pdf1afabf5aa6b542/Rd2.out)
+(/bmbl_data/Rtmp/RtmpR3jWUt/Rd2pdf1afabf5aa6b542/Rd2.out)
 (/usr/share/texlive/texmf-dist/tex/latex/psnfss/t1pcr.fd)
 (/usr/share/texlive/texmf-dist/tex/latex/psnfss/ts1ptm.fd)
-(/bmbl_data/Rtmp/RtmpGnNDL1/Rd2pdf111108a4d15e6/Rd2.toc
+(/bmbl_data/Rtmp/RtmpR3jWUt/Rd2pdf1afabf5aa6b542/Rd2.toc
 (/usr/share/texlive/texmf-dist/tex/latex/amsfonts/umsa.fd)
 (/usr/share/texlive/texmf-dist/tex/latex/amsfonts/umsb.fd)
 (/usr/share/texlive/texmf-dist/tex/latex/jknapltx/ursfs.fd) [1{/usr/share/texli
@@ -885,8 +885,8 @@ vements = 5)[]
 Overfull \hbox (36.7804pt too wide) in paragraph at lines 1390--1390
  []\T1/pcr/m/n/9 sim_data <- simulate_multiscale(Ra_seq = Ra_seq, Rb_seq = Rb_s
 eq, n_centers = 3)[] 
-[26] [27] (/bmbl_data/Rtmp/RtmpGnNDL1/Rd2pdf111108a4d15e6/Rd2.ind [28] [29])
-(/bmbl_data/Rtmp/RtmpGnNDL1/Rd2pdf111108a4d15e6/Rd2.aux) )
+[26] [27] (/bmbl_data/Rtmp/RtmpR3jWUt/Rd2pdf1afabf5aa6b542/Rd2.ind [28]
+[29]) (/bmbl_data/Rtmp/RtmpR3jWUt/Rd2pdf1afabf5aa6b542/Rd2.aux) )
 (see the transcript file for additional information){/usr/share/texlive/texmf-d
 ist/fonts/enc/dvips/base/8r.enc}</usr/share/texlive/texmf-dist/fonts/type1/publ
 ic/amsfonts/cm/cmsy10.pfb></usr/share/texlive/texmf-dist/fonts/type1/urw/courie
@@ -899,4 +899,4 @@ Output written on Rd2.pdf (29 pages, 145403 bytes).
 Transcript written on Rd2.log.
 Saving output to ‘BioGSP-manual.pdf’ ...
 Done
-You may want to clean up by 'rm -Rf /bmbl_data/Rtmp/RtmpGnNDL1/Rd2pdf111108a4d15e6'
+You may want to clean up by 'rm -Rf /bmbl_data/Rtmp/RtmpR3jWUt/Rd2pdf1afabf5aa6b542'

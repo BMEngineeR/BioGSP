@@ -1,4 +1,4 @@
-This is pdfTeX, Version 3.14159265-2.6-1.40.19 (TeX Live 2018) (preloaded format=pdflatex 2024.11.11)  26 SEP 2025 21:27
+This is pdfTeX, Version 3.14159265-2.6-1.40.19 (TeX Live 2018) (preloaded format=pdflatex 2024.11.11)  26 SEP 2025 21:46
 entering extended mode
  restricted \write18 enabled.
  %&-line parsing enabled.
@@ -769,7 +769,7 @@ Now handling font encoding PD1 ...
 
 
 Writing index file Rd2.idx
-(/bmbl_data/Rtmp/RtmpGnNDL1/Rd2pdf111108a4d15e6/Rd2.aux)
+(/bmbl_data/Rtmp/RtmpR3jWUt/Rd2pdf1afabf5aa6b542/Rd2.aux)
 \openout1 = `Rd2.aux'.
 
 LaTeX Font Info:    Checking defaults for OML/cmm/m/it on input line 8.
@@ -826,8 +826,8 @@ LaTeX Info: Redefining \ref on input line 8.
 LaTeX Info: Redefining \pageref on input line 8.
 LaTeX Info: Redefining \nameref on input line 8.
 
-(/bmbl_data/Rtmp/RtmpGnNDL1/Rd2pdf111108a4d15e6/Rd2.out)
-(/bmbl_data/Rtmp/RtmpGnNDL1/Rd2pdf111108a4d15e6/Rd2.out)
+(/bmbl_data/Rtmp/RtmpR3jWUt/Rd2pdf1afabf5aa6b542/Rd2.out)
+(/bmbl_data/Rtmp/RtmpR3jWUt/Rd2pdf1afabf5aa6b542/Rd2.out)
 \@outlinefile=\write4
 \openout4 = `Rd2.out'.
 
@@ -850,7 +850,7 @@ File: ts1ptm.fd 2001/06/04 font definitions for TS1/ptm.
 LaTeX Font Info:    Font shape `T1/ptm/bx/n' in size <14.4> not available
 (Font)              Font shape `T1/ptm/b/n' tried instead on input line 39.
 
-(/bmbl_data/Rtmp/RtmpGnNDL1/Rd2pdf111108a4d15e6/Rd2.toc
+(/bmbl_data/Rtmp/RtmpR3jWUt/Rd2pdf1afabf5aa6b542/Rd2.toc
 LaTeX Font Info:    Try loading font information for U+msa on input line 1.
 
 (/usr/share/texlive/texmf-dist/tex/latex/amsfonts/umsa.fd
@@ -1011,16 +1011,16 @@ Overfull \hbox (36.7804pt too wide) in paragraph at lines 1390--1390
 eq, n_centers = 3)[] 
  []
 
-[26] [27] (/bmbl_data/Rtmp/RtmpGnNDL1/Rd2pdf111108a4d15e6/Rd2.ind [28]
+[26] [27] (/bmbl_data/Rtmp/RtmpR3jWUt/Rd2pdf1afabf5aa6b542/Rd2.ind [28]
 LaTeX Font Info:    Font shape `T1/pcr/m/it' in size <10> not available
 (Font)              Font shape `T1/pcr/m/sl' tried instead on input line 23.
- [29
+
+[29
 
 ])
 Package atveryend Info: Empty hook `BeforeClearDocument' on input line 1510.
 Package atveryend Info: Empty hook `AfterLastShipout' on input line 1510.
-
-(/bmbl_data/Rtmp/RtmpGnNDL1/Rd2pdf111108a4d15e6/Rd2.aux)
+ (/bmbl_data/Rtmp/RtmpR3jWUt/Rd2pdf1afabf5aa6b542/Rd2.aux)
 Package atveryend Info: Executing hook `AtVeryEndDocument' on input line 1510.
 Package atveryend Info: Executing hook `AtEndAfterFileList' on input line 1510.
 
@@ -1030,7 +1030,7 @@ Package atveryend Info: Empty hook `AtVeryVeryEnd' on input line 1510.
  ) 
 Here is how much of TeX's memory you used:
  7469 strings out of 494917
- 103880 string characters out of 6180698
+ 103893 string characters out of 6180698
  177489 words of memory out of 5000000
  10408 multiletter control sequences out of 15000+600000
  39163 words of font info for 62 fonts, out of 8000000 for 9000

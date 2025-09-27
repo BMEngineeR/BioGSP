@@ -153,6 +153,7 @@ simulate_ringpattern <- function(
 #' @param bg_color Background color for plots (default: "grey")
 #' @param signal1_color Color for signal 1 (default: "red")
 #' @param signal2_color Color for signal 2 (default: "blue")
+#' @param show_title Logical; if TRUE (default), add titles to plots with Ra and Rb values
 #'
 #' @return Combined ggplot object with all pattern visualizations
 #' @export
@@ -169,7 +170,8 @@ simulate_ringpattern <- function(
 visualize_multiscale <- function(sim_data, Ra_seq, Rb_seq, 
                                 bg_color = "grey",      
                                 signal1_color = "red",    
-                                signal2_color = "blue") {
+                                signal2_color = "blue",
+                                show_title = TRUE) {
   
   if (!requireNamespace("ggplot2", quietly = TRUE)) {
     stop("ggplot2 package is required for visualization")
@@ -193,8 +195,11 @@ visualize_multiscale <- function(sim_data, Ra_seq, Rb_seq,
                                         "signal_2" = signal2_color)) +
         ggplot2::coord_fixed() +
         ggplot2::theme_void() +
-        ggplot2::theme(legend.position = "none") +
-        ggplot2::ggtitle(paste0("Ra=", round(Ra, 1), ", Rb=", round(Rb, 1)))
+        ggplot2::theme(legend.position = "none")
+      
+      if (show_title) {
+        p <- p + ggplot2::ggtitle(paste0("Ra=", round(Ra, 1), ", Rb=", round(Rb, 1)))
+      }
       
       plot_list[[paste0("Ra_", Ra, "_Rb_", Rb)]] <- p
     }
