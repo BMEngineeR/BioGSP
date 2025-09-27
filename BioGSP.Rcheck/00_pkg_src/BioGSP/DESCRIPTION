@@ -17,6 +17,7 @@ Imports: Matrix, igraph, RANN, RSpectra, ggplot2, patchwork, ggpubr,
         viridis, methods
 Suggests: spdep, spatialEco, sp, gasper, egg, testthat (>= 2.1.0),
         remotes, dplyr, tidyr, knitr, rmarkdown
+VignetteBuilder: knitr
 Depends: R (>= 3.5.0)
 NeedsCompilation: no
-Packaged: 2025-09-26 17:14:55 UTC; cha224
+Packaged: 2025-09-27 01:25:06 UTC; cha224

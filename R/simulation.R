@@ -150,8 +150,9 @@ simulate_ringpattern <- function(
 #' @param sim_data Output from simulate_multiscale function
 #' @param Ra_seq Vector of Ra values used in simulation
 #' @param Rb_seq Vector of Rb values used in simulation
-#' @param signal1_name Name for signal 1 in legend (default: "Circle A")
-#' @param signal2_name Name for signal 2 in legend (default: "Circle B")
+#' @param bg_color Background color for plots (default: "grey")
+#' @param signal1_color Color for signal 1 (default: "red")
+#' @param signal2_color Color for signal 2 (default: "blue")
 #'
 #' @return Combined ggplot object with all pattern visualizations
 #' @export
@@ -210,8 +211,9 @@ visualize_multiscale <- function(sim_data, Ra_seq, Rb_seq,
 #'
 #' @param sim_data Output from simulate_ringpattern function
 #' @param radius_seq Vector of radius values used in simulation
-#' @param signal1_name Name for signal 1 in legend (default: "Solid Circle")
-#' @param signal2_name Name for signal 2 in legend (default: "Concentric Ring")
+#' @param bg_color Background color for plots (default: "grey")
+#' @param signal1_color Color for signal 1 (default: "#16964a")
+#' @param signal2_color Color for signal 2 (default: "#2958a8")
 #'
 #' @return Combined ggplot object with all pattern visualizations
 #' @export

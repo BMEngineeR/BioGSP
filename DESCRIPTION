@@ -35,5 +35,6 @@ Suggests:
     tidyr,
     knitr,
     rmarkdown
+VignetteBuilder: knitr
 Depends: 
     R (>= 3.5.0)

@@ -20,11 +20,11 @@ visualize_multiscale(
 
 \item{Rb_seq}{Vector of Rb values used in simulation}
 
-\item{bg_color}{Background color for visualization (default: "grey")}
+\item{bg_color}{Background color for plots (default: "grey")}
 
-\item{signal1_color}{Color for signal 1 visualization (default: "red")}
+\item{signal1_color}{Color for signal 1 (default: "red")}
 
-\item{signal2_color}{Color for signal 2 visualization (default: "blue")}
+\item{signal2_color}{Color for signal 2 (default: "blue")}
 }
 \value{
 Combined ggplot object with all pattern visualizations

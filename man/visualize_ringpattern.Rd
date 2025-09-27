@@ -17,11 +17,11 @@ visualize_ringpattern(
 
 \item{radius_seq}{Vector of radius values used in simulation}
 
-\item{bg_color}{Background color for visualization (default: "grey")}
+\item{bg_color}{Background color for plots (default: "grey")}
 
-\item{signal1_color}{Color for signal 1 visualization (default: "#16964a")}
+\item{signal1_color}{Color for signal 1 (default: "#16964a")}
 
-\item{signal2_color}{Color for signal 2 visualization (default: "#2958a8")}
+\item{signal2_color}{Color for signal 2 (default: "#2958a8")}
 }
 \value{
 Combined ggplot object with all pattern visualizations

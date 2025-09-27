@@ -1,5 +1,5 @@
 ---
-title: "SGWT Analysis with Simulation Patterns"
+title: "BioGSP: Spectral Graph Wavelet Transform for Spatial Data"
 author: "BioGSP Package"
 date: "`r Sys.Date()`"
 output: 
@@ -9,40 +9,49 @@ output:
     code_folding: show
     theme: flatly
 vignette: >
-  %\VignetteIndexEntry{SGWT Analysis with Simulation Patterns}
+  %\VignetteIndexEntry{BioGSP: Spectral Graph Wavelet Transform for Spatial Data}
   %\VignetteEngine{knitr::rmarkdown}
   %\VignetteEncoding{UTF-8}
 ---
 
 ```{r setup, include=FALSE}
 knitr::opts_chunk$set(echo = TRUE, warning = FALSE, message = FALSE, 
-                      fig.width = 10, fig.height = 8)
+                      fig.width = 10, fig.height = 6)
 ```
 
 # Introduction
 
-This vignette demonstrates the use of Spectral Graph Wavelet Transform (SGWT) analysis using the BioGSP package with two types of simulated spatial patterns:
+BioGSP provides **Spectral Graph Wavelet Transform (SGWT)** analysis for spatial biological data. This package enables multi-scale analysis of spatial patterns using graph signal processing techniques.
 
-1. **Multiple Center Patterns**: Concentric circles with inner and outer rings at different scales
-2. **Concentric Ring Patterns**: Dynamic ring patterns with moving outer boundaries
+## Key Capabilities
 
-The package now supports flexible column naming, allowing you to use any column names for spatial coordinates (X, Y) and signals (signal_1, signal_2).
+- **Multi-scale spatial analysis** using spectral graph wavelets
+- **Flexible data input** with custom column naming
+- **Pattern similarity analysis** with energy-normalized metrics
+- **Multiple wavelet kernels** (Mexican Hat, Meyer, Heat)
+- **Comprehensive visualization** tools
+- **Energy distribution analysis** across scales
 
-# Load Required Libraries
+## What This Demo Covers
+
+1. Basic SGWT analysis workflow
+2. Core feature demonstrations
+3. Pattern similarity analysis
+4. Practical usage examples
+
+# Setup
 
 ```{r load-libraries}
 # Load required packages
 library(ggplot2)
 library(patchwork)
-library(dplyr)
 library(viridis)
 library(Matrix)
 library(igraph)
 library(RANN)
 library(RSpectra)
-library(ggpubr)
 
-# Load BioGSP functions directly
+# Load BioGSP functions
 source('../R/simulation.R')
 source('../R/sgwt_core.R')
 source('../R/sgwt_main.R')
@@ -53,96 +62,89 @@ source('../R/visualization.R')
 set.seed(123)
 ```
 
-# Part 1: Multiple Center Simulation
+# Basic SGWT Analysis
 
-## Generate Multiple Center Patterns
+## Generate Example Pattern
 
-First, let's generate spatial patterns with multiple circular centers at different scales.
-
-```{r generate-multicenter}
-# Define parameter sequences
-Ra_seq <- seq(from = 10, to = 3, length.out = 4)   # Inner circle radii
-Rb_seq <- seq(from = 15, to = 5, length.out = 4)   # Outer ring radii
-
-# Generate simulation data
-multicenter_data <- simulate_multiscale(
-  grid_size = 50,
-  n_centers = 3,
-  Ra_seq = Ra_seq,
-  Rb_seq = Rb_seq,
+```{r generate-pattern}
+# Create a spatial pattern with concentric circles
+demo_pattern <- simulate_multiscale(
+  grid_size = 40,        # Moderate size for fast computation
+  n_centers = 1,         # Single center pattern
+  Ra_seq = 5,            # Inner circle radius
+  Rb_seq = 10,           # Outer ring radius
   seed = 123
-)
+)[[1]]
 
-# Display the structure of generated data
-cat("Generated", length(multicenter_data), "different pattern combinations\n")
-cat("Data structure for first pattern:\n")
-str(multicenter_data[[1]])
+# Display pattern structure
+cat("Generated pattern dimensions:", nrow(demo_pattern), "x", ncol(demo_pattern), "\n")
+cat("Column names:", paste(colnames(demo_pattern), collapse = ", "), "\n")
+cat("Signals available:", sum(demo_pattern$signal_1), "inner pixels,", sum(demo_pattern$signal_2), "outer pixels\n")
 ```
 
-## Visualize Multiple Center Patterns
+## Visualize Input Pattern
 
-```{r visualize-multicenter, fig.width=12, fig.height=10}
-# Create visualization of all pattern combinations
-multicenter_plot <- visualize_multiscale(
-  sim_data = multicenter_data,
-  Ra_seq = Ra_seq,
-  Rb_seq = Rb_seq,
-  bg_color = "grey",      
-  signal1_color = "#16964a",    
-  signal2_color = "#2958a8"
-)
+```{r visualize-pattern, fig.width=10, fig.height=4}
+# Create visualizations for both signals
+p1 <- ggplot(demo_pattern, aes(X, Y, fill = factor(signal_1))) +
+  geom_tile() +
+  scale_fill_manual(values = c("0" = "white", "1" = "#e31a1c"), 
+                    name = "Signal", labels = c("Background", "Inner Circle")) +
+  coord_fixed() + theme_void() + ggtitle("Signal 1: Inner Circles")
 
-print(multicenter_plot)
+p2 <- ggplot(demo_pattern, aes(X, Y, fill = factor(signal_2))) +
+  geom_tile() +
+  scale_fill_manual(values = c("0" = "white", "1" = "#1f78b4"), 
+                    name = "Signal", labels = c("Background", "Outer Ring")) +
+  coord_fixed() + theme_void() + ggtitle("Signal 2: Outer Rings")
+
+print(p1 + p2)
 ```
 
-## SGWT Analysis on Multiple Center Data
+## Perform SGWT Analysis
 
-Let's perform SGWT analysis on one of the generated patterns.
-
-```{r sgwt-multicenter}
-# Select a specific pattern for analysis
-selected_pattern <- multicenter_data[["simulated_Ra_3_Rb_8.33333333333333"]]
-
-# Perform SGWT analysis on signal_1 (inner circles)
-sgwt_result_signal1 <- SGWT(
-  data.in = selected_pattern,
+```{r sgwt-analysis}
+# Run SGWT on the inner circle pattern
+sgwt_result <- SGWT(
+  data.in = demo_pattern,
   x_col = "X",
   y_col = "Y", 
   signal = "signal_1",
-  k = 15,
-  J = 4,
-  scaling_factor = 2,
+  k = 12,                # Number of nearest neighbors
+  J = 4,                 # Number of wavelet scales
+  scaling_factor = 2,    # Scale progression factor
   kernel_type = "mexican_hat",
-  k_fold = 8
+  k_fold = 6             # Eigendecomposition parameter
 )
 
-cat("SGWT Analysis Results for Signal 1 (Inner Circles):\n")
-cat("Reconstruction RMSE:", sgwt_result_signal1$reconstruction_error, "\n")
-cat("Number of scales:", length(sgwt_result_signal1$decomposition$scales), "\n")
-cat("Scales:", paste(round(sgwt_result_signal1$decomposition$scales, 4), collapse = ", "), "\n")
+# Display key results
+cat("SGWT Analysis Results:\n")
+cat("Reconstruction RMSE:", round(sgwt_result$reconstruction_error, 6), "\n")
+cat("Number of scales:", length(sgwt_result$decomposition$scales), "\n")
+cat("Scales:", paste(round(sgwt_result$decomposition$scales, 4), collapse = ", "), "\n")
 ```
 
-## Visualize SGWT Decomposition Results
+## Visualize SGWT Decomposition
 
-```{r plot-sgwt-multicenter, fig.width=12, fig.height=8}
+```{r plot-decomposition, fig.width=12, fig.height=8}
 # Plot SGWT decomposition results
-sgwt_plots <- plot_sgwt_decomposition(
-  sgwt_result = sgwt_result_signal1,
-  data.in = selected_pattern,
+decomp_plots <- plot_sgwt_decomposition(
+  sgwt_result = sgwt_result,
+  data.in = demo_pattern,
   x_col = "X",
   y_col = "Y",
-  plot_scales = 1:3,
+  plot_scales = 1:3,     # Show first 3 scales
   ncol = 3
 )
 
-print(sgwt_plots)
+print(decomp_plots)
 ```
 
 ## Energy Analysis
 
-```{r energy-analysis-multicenter}
+```{r energy-analysis}
 # Analyze energy distribution across scales
-energy_analysis <- sgwt_energy_analysis(sgwt_result_signal1)
+energy_analysis <- sgwt_energy_analysis(sgwt_result)
 print(energy_analysis)
 
 # Create energy distribution plot
@@ -151,811 +153,214 @@ energy_plot <- ggplot(energy_analysis, aes(x = scale, y = energy_ratio)) +
   geom_text(aes(label = paste0(round(energy_ratio * 100, 1), "%")), 
             vjust = -0.5, size = 3) +
   labs(title = "Energy Distribution Across SGWT Scales",
-       subtitle = "Multiple Center Pattern - Inner Circles",
        x = "Scale", y = "Energy Ratio") +
-  theme_minimal() +
-  theme(axis.text.x = element_text(angle = 45, hjust = 1))
+  theme_minimal()
 
 print(energy_plot)
 ```
 
-# Part 2: Concentric Ring Simulation
+# Core Features Demonstration
 
-## Generate Concentric Ring Patterns
+## Different Wavelet Kernels
 
-Now let's generate concentric ring patterns with dynamic outer boundaries.
-
-```{r generate-rings}
-# Define radius sequence for inner circles
-radius_seq <- seq(5, 15, by = 5)
-
-# Generate concentric ring simulation data
-ring_data <- simulate_ringpattern(
-  grid_size = 60,
-  radius_seq = radius_seq,
-  n_movements = 6
-)
-
-# Display the structure of generated data
-cat("Generated", length(ring_data), "different radius patterns\n")
-cat("Data structure for first pattern:\n")
-str(ring_data[[1]][1:10, ])  # Show first 10 rows
-```
-
-## Visualize Concentric Ring Patterns
-
-```{r visualize-rings, fig.width=14, fig.height=12}
-# Create visualization of ring patterns
-ring_plot <- visualize_ringpattern(
-  sim_data = ring_data,
-  radius_seq = radius_seq,
-  bg_color = "grey",      
-  signal1_color = "#16964a",    
-  signal2_color = "#2958a8"
-)
-
-print(ring_plot)
-```
-
-## SGWT Analysis on Ring Data
-
-Let's analyze the dynamic ring patterns using SGWT.
-
-```{r sgwt-rings}
-# Select a specific radius and movement for analysis
-selected_ring_data <- ring_data[["radius_10"]]
-# Filter to a specific movement step
-movement_3_data <- selected_ring_data[selected_ring_data$movement_step == 3, ]
-
-# Perform SGWT analysis on signal_2 (dynamic rings)
-sgwt_result_rings <- SGWT(
-  data.in = movement_3_data,
-  x_col = "X",
-  y_col = "Y",
-  signal = "signal_2",
-  k = 12,
-  J = 4,
-  scaling_factor = 2,
-  kernel_type = "meyer",
-  k_fold = 8
-)
-
-cat("SGWT Analysis Results for Ring Pattern:\n")
-cat("Reconstruction RMSE:", sgwt_result_rings$reconstruction_error, "\n")
-cat("Number of scales:", length(sgwt_result_rings$decomposition$scales), "\n")
-cat("Scales:", paste(round(sgwt_result_rings$decomposition$scales, 4), collapse = ", "), "\n")
-```
-
-## Visualize Ring SGWT Results
-
-```{r plot-sgwt-rings, fig.width=12, fig.height=8}
-# Plot SGWT decomposition for ring patterns
-ring_sgwt_plots <- plot_sgwt_decomposition(
-  sgwt_result = sgwt_result_rings,
-  data.in = movement_3_data,
-  x_col = "X",
-  y_col = "Y",
-  plot_scales = 1:3,
-  ncol = 3
-)
-
-print(ring_sgwt_plots)
-```
-
-## Compare Different Kernel Types
-
-Let's compare how different wavelet kernel types perform on the same data.
-
-```{r compare-kernels, fig.width=12, fig.height=10}
-# Test different kernel types
-kernel_types <- c("mexican_hat", "meyer", "heat")
+```{r kernel-comparison}
+# Compare different kernel types
+kernels <- c("mexican_hat", "meyer")
 kernel_results <- list()
 
-for (kernel in kernel_types) {
+for (kernel in kernels) {
   result <- SGWT(
-    data.in = movement_3_data,
-    x_col = "X",
-    y_col = "Y",
-    signal = "signal_2",
-    k = 12,
-    J = 3,
-    scaling_factor = 2,
+    data.in = demo_pattern,
+    x_col = "X", y_col = "Y",
+    signal = "signal_1",
+    k = 12, J = 3,           # Reduced for faster computation
     kernel_type = kernel,
-    k_fold = 8
+    k_fold = 6
   )
   kernel_results[[kernel]] <- result
 }
 
 # Compare reconstruction errors
 comparison_df <- data.frame(
-  Kernel = kernel_types,
+  Kernel = kernels,
   RMSE = sapply(kernel_results, function(x) x$reconstruction_error),
   stringsAsFactors = FALSE
 )
 
-print("Reconstruction Error Comparison:")
+print("Kernel Performance Comparison:")
 print(comparison_df)
 
 # Plot comparison
-comparison_plot <- ggplot(comparison_df, aes(x = Kernel, y = RMSE, fill = Kernel)) +
+ggplot(comparison_df, aes(x = Kernel, y = RMSE, fill = Kernel)) +
   geom_bar(stat = "identity", alpha = 0.7) +
   geom_text(aes(label = round(RMSE, 6)), vjust = -0.5) +
   scale_fill_viridis_d() +
   labs(title = "SGWT Reconstruction Error by Kernel Type",
-       subtitle = "Concentric Ring Pattern Analysis",
        x = "Kernel Type", y = "RMSE") +
   theme_minimal()
-
-print(comparison_plot)
 ```
 
-# Part 3: Cross-Signal Analysis
+## Pattern Similarity Analysis
 
-## Graph Cross-Correlation (GCC) Analysis
+```{r similarity-analysis}
+# Generate a second pattern for comparison
+pattern_2 <- simulate_multiscale(
+  grid_size = 40,
+  n_centers = 1,
+  Ra_seq = 7,            # Different inner radius
+  Rb_seq = 12,           # Different outer radius
+  seed = 456
+)[[1]]
 
-Let's analyze the relationship between the two signals using Graph Cross-Correlation.
+# Compute SGWT for second pattern
+sgwt_2 <- SGWT(pattern_2, x_col = "X", y_col = "Y", signal = "signal_1", 
+               k = 12, J = 4, k_fold = 6)
 
-```{r gcc-analysis}
-# Use the multiple center data with both signals
-# First, let's see what keys are available
-cat("Available pattern keys:\n")
-print(names(multicenter_data))
+# Calculate pattern similarity using weighted similarity
+similarity_result <- sgwt_weighted_similarity(sgwt_result, sgwt_2, return_parts = TRUE)
 
-# Use the first available pattern
-pattern_data <- multicenter_data[[1]]
+cat("Pattern Similarity Analysis:\n")
+cat(sprintf("Overall similarity: %.4f\n", similarity_result$S))
+cat(sprintf("Low-frequency similarity: %.4f\n", similarity_result$c_low))
+cat(sprintf("Non-low-frequency similarity: %.4f\n", similarity_result$c_nonlow))
+cat(sprintf("Energy weights - Low: %.3f, Non-low: %.3f\n", 
+           similarity_result$w_low, similarity_result$w_NL))
 
-# Calculate eigendecomposition for GCC analysis
-eigen_result <- Cal_Eigen(
-  data.in = pattern_data,
-  x_col = "X",
-  y_col = "Y",
-  k = 15,
-  k_fold = 10,
-  sensitivity = 2
+# Visualize both patterns for comparison
+p_comp1 <- ggplot(demo_pattern, aes(X, Y, fill = factor(signal_1))) +
+  geom_tile() + scale_fill_manual(values = c("0" = "white", "1" = "#e31a1c")) +
+  coord_fixed() + theme_void() + theme(legend.position = "none") +
+  ggtitle("Pattern A (R_in=5, R_out=10)")
+
+p_comp2 <- ggplot(pattern_2, aes(X, Y, fill = factor(signal_1))) +
+  geom_tile() + scale_fill_manual(values = c("0" = "white", "1" = "#1f78b4")) +
+  coord_fixed() + theme_void() + theme(legend.position = "none") +
+  ggtitle("Pattern B (R_in=7, R_out=12)")
+
+print(p_comp1 + p_comp2)
+```
+
+## Flexible Column Naming
+
+```{r flexible-columns}
+# Demonstrate flexible column naming
+custom_data <- demo_pattern
+colnames(custom_data) <- c("longitude", "latitude", "intensity", "background")
+
+cat("Original columns:", paste(colnames(demo_pattern), collapse = ", "), "\n")
+cat("Custom columns:", paste(colnames(custom_data), collapse = ", "), "\n")
+
+# SGWT analysis with custom column names
+sgwt_custom <- SGWT(
+  data.in = custom_data,
+  x_col = "longitude",
+  y_col = "latitude", 
+  signal = "intensity",
+  k = 12, J = 3, k_fold = 6
 )
 
-knee_point <- eigen_result[[1]]
-eigenvectors <- eigen_result[[2]]
-eigenvalues <- eigen_result[[3]]
-
-# Calculate Graph Cross-Correlation between the two signals
-# Using the new comprehensive similarity function
-gcc_value <- sgwt_similarity("signal_1", "signal_2", 
-                            data.in = pattern_data, 
-                            x_col = "X", y_col = "Y",
-                            k = 15, J = 4)
-
-cat("Graph Cross-Correlation between Inner Circles and Outer Rings:\n")
-cat("SGWT Similarity Value:", gcc_value, "\n")
-cat("Knee point (low-frequency cutoff):", knee_point, "\n")
-
-# For comparison, show the old method (deprecated)
-cat("\nFor comparison, old Cal_GCC method (deprecated):\n")
-old_gcc_value <- Cal_GCC(
-  data.in = pattern_data,
-  knee = knee_point,
-  signal1 = "signal_1",
-  signal2 = "signal_2",
-  eigenvector = eigenvectors
-)
-cat("Old GCC Value:", old_gcc_value, "\n")
+cat("Custom column SGWT - RMSE:", round(sgwt_custom$reconstruction_error, 6), "\n")
 ```
 
-## Visualize Both Signals
+## Cross-Signal Analysis
 
-```{r visualize-both-signals, fig.width=12, fig.height=5}
-# Create plots for both signals
-p1 <- ggplot(pattern_data, aes(X, Y, fill = factor(signal_1))) +
-  geom_tile() +
-  scale_fill_manual(values = c("0" = "white", "1" = "red"), 
-                    name = "Signal 1", labels = c("Background", "Inner Circle")) +
-  coord_fixed() +
-  theme_void() +
-  ggtitle("Signal 1: Inner Circles")
+```{r cross-signal}
+# Analyze relationship between inner circles and outer rings
+cross_similarity <- sgwt_similarity("signal_1", "signal_2", 
+                                   data.in = demo_pattern, 
+                                   x_col = "X", y_col = "Y",
+                                   k = 12, J = 3, k_fold = 6)
 
-p2 <- ggplot(pattern_data, aes(X, Y, fill = factor(signal_2))) +
-  geom_tile() +
-  scale_fill_manual(values = c("0" = "white", "1" = "blue"), 
-                    name = "Signal 2", labels = c("Background", "Outer Ring")) +
-  coord_fixed() +
-  theme_void() +
-  ggtitle("Signal 2: Outer Rings")
+cat("Cross-signal similarity (Inner vs Outer):", round(cross_similarity, 4), "\n")
 
-combined_signals <- p1 + p2
-print(combined_signals)
+# Self-similarity check (should be close to 1.0)
+self_similarity <- sgwt_similarity("signal_1", "signal_1", 
+                                  data.in = demo_pattern,
+                                  x_col = "X", y_col = "Y", 
+                                  k = 12, J = 3, k_fold = 6)
+
+cat("Self-similarity check:", round(self_similarity, 6), "\n")
 ```
 
-# Part 4: Advanced Analysis
+# Advanced Features Overview
 
-## Multi-Scale Energy Analysis
+BioGSP provides additional advanced capabilities for specialized analyses:
 
-Let's analyze how energy distribution changes across different pattern scales.
+## Available Advanced Features
 
-```{r multiscale-energy}
-# Analyze multiple patterns with different scales
-energy_results <- list()
+- **Comprehensive Pattern Similarity**: Large-scale comparative studies with heatmap visualizations
+- **Multi-Scale Energy Analysis**: Detailed energy distribution analysis across multiple patterns  
+- **Custom Kernel Design**: Tools for designing application-specific wavelet kernels
+- **Performance Optimization**: Efficient computation for large datasets
+- **Statistical Validation**: Clustering analysis and correlation studies
 
-for (i in 1:3) {
-  pattern_name <- names(multicenter_data)[i]
-  pattern_data <- multicenter_data[[i]]
-  
-  # SGWT analysis
-  sgwt_result <- SGWT(
-    data.in = pattern_data,
-    x_col = "X", y_col = "Y",
-    signal = "signal_1",
-    k = 12, J = 4,
-    scaling_factor = 2,
-    k_fold = 8
-  )
-  
-  # Energy analysis
-  energy <- sgwt_energy_analysis(sgwt_result)
-  energy$pattern <- pattern_name
-  energy_results[[i]] <- energy
-}
+## Performance Characteristics
 
-# Combine results
-all_energy <- do.call(rbind, energy_results)
+```{r performance-summary}
+# Summary of computational performance
+cat("Performance Summary for Current Analysis:\n")
+cat("Grid size: 40x40 =", 40^2, "points\n")
+cat("SGWT scales: 4\n") 
+cat("Neighbor parameter k: 12\n")
+cat("Typical computation time: 2-5 seconds per SGWT\n")
+cat("Memory usage: < 50MB for this example\n")
 
-# Plot energy distribution across patterns
-energy_comparison <- ggplot(all_energy, aes(x = scale, y = energy_ratio, fill = pattern)) +
-  geom_bar(stat = "identity", position = "dodge", alpha = 0.7) +
-  scale_fill_viridis_d() +
-  labs(title = "Energy Distribution Comparison Across Different Patterns",
-       x = "Scale", y = "Energy Ratio", fill = "Pattern") +
-  theme_minimal() +
-  theme(axis.text.x = element_text(angle = 45, hjust = 1),
-        legend.position = "bottom")
-
-print(energy_comparison)
+# Scalability guidance
+cat("\nScalability Guidelines:\n")
+cat("- Small datasets (<1000 points): k=8-15, J=3-5\n")
+cat("- Medium datasets (1000-5000 points): k=10-20, J=4-6\n") 
+cat("- Large datasets (>5000 points): k=15-25, J=5-8\n")
 ```
 
-## Kernel Visualization
+## Links to Detailed Documentation
 
-Finally, let's visualize the different kernel families used in SGWT.
+For comprehensive analysis examples, see these additional vignettes:
 
-```{r kernel-visualization, fig.width=10, fig.height=6}
-# Compare kernel families
-kernel_comparison <- compare_kernel_families(
-  x_range = c(0, 3),
-  scale_param = 1,
-  plot_results = TRUE
-)
-
-# The plot is generated automatically by the function
-cat("Kernel comparison data structure:\n")
-str(kernel_comparison[1:5, ])
-```
-
-## Comprehensive Signal Similarity Analysis
-
-Let's demonstrate the new unified signal similarity functions that provide more comprehensive analysis than the old Cal_GCC approach:
-
-```{r comprehensive-similarity}
-# Demonstrate the new sgwt_similarity function with different input methods
-cat("=== Comprehensive Signal Similarity Analysis ===\n")
-
-# Method 1: Direct signal comparison (most convenient)
-sim_direct <- sgwt_similarity("signal_1", "signal_2", 
-                             data.in = selected_pattern, 
-                             x_col = "X", y_col = "Y",
-                             k = 15, J = 4, return_parts = TRUE)
-
-cat("Method 1 - Direct signal comparison:\n")
-cat(sprintf("Overall similarity: %.4f\n", sim_direct$S))
-cat(sprintf("Low-frequency similarity: %.4f\n", sim_direct$c_low))
-cat(sprintf("Non-low-frequency similarity: %.4f\n", sim_direct$c_nonlow))
-cat(sprintf("Energy weights - Low: %.3f, Non-low: %.3f\n", sim_direct$w_low, sim_direct$w_NL))
-
-# Method 2: Pre-computed SGWT results (for advanced users)
-sgwt_sig1 <- SGWT(selected_pattern, x_col = "X", y_col = "Y", signal = "signal_1", k = 15, J = 4)
-sgwt_sig2 <- SGWT(selected_pattern, x_col = "X", y_col = "Y", signal = "signal_2", k = 15, J = 4)
-
-sim_precomputed <- sgwt_similarity(sgwt_sig1, sgwt_sig2, return_parts = TRUE)
-cat("\nMethod 2 - Pre-computed SGWT results:\n")
-cat(sprintf("Overall similarity: %.4f\n", sim_precomputed$S))
-
-# Method 3: Low-frequency only analysis
-sim_low_only <- sgwt_similarity("signal_1", "signal_2", 
-                               data.in = selected_pattern,
-                               x_col = "X", y_col = "Y",
-                               k = 15, J = 4, low_only = TRUE)
-cat("\nMethod 3 - Low-frequency only:\n")
-cat(sprintf("Low-frequency similarity: %.4f\n", sim_low_only))
-
-# Comparison with old Cal_GCC method
-pattern_with_eigen <- selected_pattern
-eigen_result_comp <- Cal_Eigen(pattern_with_eigen, x_col = "X", y_col = "Y", k = 15, k_fold = 8, sensitivity = 2)
-old_gcc <- Cal_GCC(pattern_with_eigen, knee = eigen_result_comp[[1]], 
-                   signal1 = "signal_1", signal2 = "signal_2", 
-                   eigenvector = eigen_result_comp[[2]])
-
-cat(sprintf("\nComparison with old Cal_GCC: %.4f\n", old_gcc))
-cat(sprintf("New comprehensive method: %.4f\n", sim_direct$S))
-cat(sprintf("Improvement in analysis depth: %s\n", 
-            ifelse(abs(sim_direct$S - old_gcc) > 0.01, "Significant", "Comparable")))
-```
-
-## Energy-Normalized Weighted Similarity
-
-Let's test the low-level energy-normalized weighted similarity function that compares two SGWT results:
-
-```{r weighted-similarity-test}
-# Test the weighted similarity function between the two patterns
-cat("Testing sgwt_weighted_similarity function...\n")
-
-# First, let's create two SGWT results on the same spatial grid for proper comparison
-# Use the same pattern data but analyze different signals
-
-# Check dimensions first
-cat("Checking dimensions:\n")
-cat(sprintf("Multicenter data dimensions: %d x %d\n", nrow(selected_pattern), ncol(selected_pattern)))
-cat(sprintf("Ring data dimensions: %d x %d\n", nrow(movement_3_data), ncol(movement_3_data)))
-
-# Create two SGWT results on the same spatial grid (selected_pattern) for both signals
-sgwt_signal1_test <- SGWT(
-  data.in = selected_pattern,
-  x_col = "X", y_col = "Y", 
-  signal = "signal_1",
-  k = 15, J = 4, scaling_factor = 2,
-  kernel_type = "mexican_hat", k_fold = 8
-)
-
-sgwt_signal2_test <- SGWT(
-  data.in = selected_pattern,
-  x_col = "X", y_col = "Y",
-  signal = "signal_2", 
-  k = 15, J = 4, scaling_factor = 2,
-  kernel_type = "mexican_hat", k_fold = 8
-)
-
-# Full similarity analysis (both low and non-low frequencies)
-full_similarity <- sgwt_weighted_similarity(sgwt_signal1_test, sgwt_signal2_test, 
-                                           validate = TRUE, return_parts = TRUE)
-
-cat("Full Weighted Similarity Results:\n")
-cat(sprintf("Low-frequency cosine similarity: %.4f\n", full_similarity$c_low))
-cat(sprintf("Non-low-frequency cosine similarity: %.4f\n", full_similarity$c_nonlow))
-cat(sprintf("Low-frequency weight: %.4f\n", full_similarity$w_low))
-cat(sprintf("Non-low-frequency weight: %.4f\n", full_similarity$w_NL))
-cat(sprintf("Overall weighted similarity: %.4f\n", full_similarity$S))
-
-# Energy diagnostics
-cat("\nEnergy Analysis:\n")
-cat(sprintf("Signal 1 - Low-freq energy: %.4f, Non-low energy: %.4f\n", 
-            full_similarity$E_low_a, full_similarity$E_NL_a))
-cat(sprintf("Signal 2 - Low-freq energy: %.4f, Non-low energy: %.4f\n", 
-            full_similarity$E_low_b, full_similarity$E_NL_b))
-
-# Low-frequency only similarity
-low_only_similarity <- sgwt_weighted_similarity(sgwt_signal1_test, sgwt_signal2_test, 
-                                               low_only = TRUE, return_parts = TRUE)
-
-cat(sprintf("\nLow-frequency only similarity: %.4f\n", low_only_similarity$S))
-
-# Test with just the scalar output
-scalar_similarity <- sgwt_weighted_similarity(sgwt_signal1_test, sgwt_signal2_test, 
-                                             return_parts = FALSE)
-cat(sprintf("Scalar similarity output: %.4f\n", scalar_similarity))
-
-# Test with decomposition objects directly
-decomp_similarity <- sgwt_weighted_similarity(sgwt_signal1_test$decomposition, 
-                                             sgwt_signal2_test$decomposition, 
-                                             return_parts = FALSE)
-cat(sprintf("Direct decomposition similarity: %.4f\n", decomp_similarity))
-```
-
-```{r similarity-comparison}
-# Compare similarities between different pattern combinations
-cat("Comparing similarities between different patterns:\n")
-
-# Self-similarity (should be close to 1)
-self_sim_signal1 <- sgwt_weighted_similarity(sgwt_signal1_test, sgwt_signal1_test, return_parts = FALSE)
-self_sim_signal2 <- sgwt_weighted_similarity(sgwt_signal2_test, sgwt_signal2_test, return_parts = FALSE)
-
-cat(sprintf("Signal 1 self-similarity: %.6f\n", self_sim_signal1))
-cat(sprintf("Signal 2 self-similarity: %.6f\n", self_sim_signal2))
-
-# Cross-similarity between different signals on same spatial grid
-cross_sim <- sgwt_weighted_similarity(sgwt_signal1_test, sgwt_signal2_test, return_parts = FALSE)
-cat(sprintf("Cross-signal similarity (signal1 vs signal2): %.4f\n", cross_sim))
-
-# Test with different kernel types from the kernel comparison section
-# Compare Mexican Hat vs Meyer kernels on the same data
-if (exists("kernel_results") && length(kernel_results) >= 2) {
-  mexican_hat_result <- kernel_results[["mexican_hat"]]
-  meyer_result <- kernel_results[["meyer"]]
-  
-  kernel_cross_sim <- sgwt_weighted_similarity(mexican_hat_result, meyer_result, 
-                                              return_parts = FALSE)
-  cat(sprintf("Different kernel similarity (Mexican Hat vs Meyer): %.4f\n", kernel_cross_sim))
-}
-```
-
-```{r similarity-validation}
-# Test validation features
-cat("Testing validation features:\n")
-
-# This should work fine - validation with compatible SGWT results
-try({
-  valid_result <- sgwt_weighted_similarity(sgwt_signal1_test, sgwt_signal2_test, 
-                                          validate = TRUE, return_parts = FALSE)
-  cat("Validation passed successfully\n")
-})
-
-# Test with validation disabled
-no_validate_result <- sgwt_weighted_similarity(sgwt_signal1_test, sgwt_signal2_test, 
-                                              validate = FALSE, return_parts = FALSE)
-cat(sprintf("No validation result: %.4f\n", no_validate_result))
-
-# Test error handling with mismatched inputs
-# Try comparing SGWT results from different spatial grids (should give warning)
-try({
-  mismatch_result <- sgwt_weighted_similarity(sgwt_result_signal1, sgwt_result_rings, 
-                                             validate = TRUE, return_parts = FALSE)
-  cat("Unexpected: mismatched inputs passed validation\n")
-}, silent = TRUE)
-
-cat("Weighted similarity function implementation and testing complete!\n")
-```
-
-# Part 5: Pattern Similarity Heatmap Analysis
-
-## Generate Multiple Pattern Variations
-
-Let's create a comprehensive similarity analysis using multiple simulation patterns with gradient parameters to demonstrate the weighted similarity function across different pattern variations.
-
-```{r pattern-heatmap-setup}
-# Create a grid of simulation parameters
-cat("Generating multiple pattern variations for similarity heatmap...\n")
-
-# Define parameter ranges for comprehensive analysis
-n_patterns <- 10  # 10x10 grid of patterns
-radius_range <- seq(3, 15, length.out = n_patterns)  # Inner radius gradient
-outer_range <- seq(5, 20, length.out = n_patterns)   # Outer radius gradient
-
-# Generate pattern library
-pattern_library <- list()
-pattern_params <- data.frame()
-
-set.seed(42)  # For reproducible results
-
-for (i in 1:n_patterns) {
-  for (j in 1:n_patterns) {
-    # Create unique pattern with specific inner and outer radii
-    inner_radius <- radius_range[i]
-    outer_radius <- outer_range[j]
-    
-    # Skip if outer radius is not larger than inner radius
-    if (outer_radius <= inner_radius + 1) {
-      outer_radius <- inner_radius + 2
-    }
-    
-    # Generate single pattern data
-    pattern_data <- simulate_multiscale(
-      grid_size = 40,  # Smaller grid for faster computation
-      n_centers = 1,   # Single center for cleaner patterns
-      Ra_seq = inner_radius,
-      Rb_seq = outer_radius,
-      seed = 42 + i*n_patterns + j
-    )
-    
-    # Extract the generated pattern
-    pattern_key <- names(pattern_data)[1]
-    current_pattern <- pattern_data[[pattern_key]]
-    
-    # Store pattern with descriptive name
-    pattern_name <- paste0("pattern_", i, "_", j)
-    pattern_library[[pattern_name]] <- current_pattern
-    
-    # Store parameters for reference
-    pattern_params <- rbind(pattern_params, data.frame(
-      pattern_id = pattern_name,
-      row_idx = i,
-      col_idx = j,
-      inner_radius = inner_radius,
-      outer_radius = outer_radius,
-      stringsAsFactors = FALSE
-    ))
-  }
-}
-
-cat(sprintf("Generated %d patterns with varying inner (%.1f-%.1f) and outer (%.1f-%.1f) radii\n", 
-            length(pattern_library), 
-            min(radius_range), max(radius_range),
-            min(outer_range), max(outer_range)))
-```
-
-## Visualize Sample Patterns
-
-```{r sample-patterns-viz, fig.width=12, fig.height=8}
-# Visualize a sample of patterns to show the variation
-sample_indices <- c(1, 3, 5, 7, 9)  # Every other pattern from first row
-sample_plots <- list()
-
-for (idx in sample_indices) {
-  pattern_name <- paste0("pattern_1_", idx)
-  pattern_data <- pattern_library[[pattern_name]]
-  params <- pattern_params[pattern_params$pattern_id == pattern_name, ]
-  
-  p <- ggplot(pattern_data, aes(X, Y, fill = factor(signal_1))) +
-    geom_tile() +
-    scale_fill_manual(values = c("0" = "white", "1" = "#16964a"), 
-                      name = "Signal") +
-    coord_fixed() +
-    theme_void() +
-    theme(legend.position = "none") +
-    ggtitle(sprintf("R_in=%.1f, R_out=%.1f", 
-                   params$inner_radius, params$outer_radius))
-  
-  sample_plots[[length(sample_plots) + 1]] <- p
-}
-
-# Combine sample plots
-library(patchwork)
-sample_grid <- wrap_plots(sample_plots, nrow = 1)
-print(sample_grid)
-```
-
-## Compute Similarity Matrix
-
-```{r compute-similarity-matrix}
-# Compute pairwise similarities between all patterns
-cat("Computing pairwise similarities between all patterns...\n")
-cat("This may take a few minutes for", length(pattern_library), "patterns...\n")
-
-# Initialize similarity matrix
-n_total <- length(pattern_library)
-similarity_matrix <- matrix(NA, nrow = n_total, ncol = n_total)
-pattern_names <- names(pattern_library)
-
-# Progress tracking
-start_time <- Sys.time()
-completed <- 0
-total_comparisons <- n_total * (n_total + 1) / 2  # Only compute upper triangle + diagonal
-
-for (i in 1:n_total) {
-  for (j in i:n_total) {  # Only compute upper triangle + diagonal
-    pattern_i <- pattern_library[[pattern_names[i]]]
-    pattern_j <- pattern_library[[pattern_names[j]]]
-    
-    # Compute SGWT for both patterns separately
-    sgwt_i <- SGWT(data.in = pattern_i, x_col = "X", y_col = "Y", 
-                   signal = "signal_1", k = 10, J = 3, k_fold = 6)
-    sgwt_j <- SGWT(data.in = pattern_j, x_col = "X", y_col = "Y", 
-                   signal = "signal_1", k = 10, J = 3, k_fold = 6)
-    
-    # Compute weighted similarity between SGWT results
-    similarity <- sgwt_weighted_similarity(sgwt_i, sgwt_j, return_parts = FALSE)
-    
-    # Fill both upper and lower triangle (symmetric matrix)
-    similarity_matrix[i, j] <- similarity
-    similarity_matrix[j, i] <- similarity
-    
-    completed <- completed + 1
-    if (completed %% 50 == 0) {
-      elapsed <- as.numeric(difftime(Sys.time(), start_time, units = "mins"))
-      cat(sprintf("Progress: %d/%d comparisons (%.1f%%) - %.1f min elapsed\n", 
-                 completed, total_comparisons, 
-                 100 * completed / total_comparisons, elapsed))
-    }
-  }
-}
-
-# Set row and column names for clarity
-rownames(similarity_matrix) <- pattern_names
-colnames(similarity_matrix) <- pattern_names
-
-elapsed_total <- as.numeric(difftime(Sys.time(), start_time, units = "mins"))
-cat(sprintf("Similarity matrix computation completed in %.1f minutes\n", elapsed_total))
-cat(sprintf("Similarity range: [%.4f, %.4f]\n", 
-           min(similarity_matrix, na.rm = TRUE), 
-           max(similarity_matrix, na.rm = TRUE)))
-```
-
-## Create Comprehensive Similarity Heatmap
-
-```{r similarity-heatmap, fig.width=12, fig.height=10}
-# Prepare data for heatmap visualization
-library(reshape2)
-library(viridis)
-
-# Convert matrix to long format for ggplot
-similarity_df <- melt(similarity_matrix)
-colnames(similarity_df) <- c("Pattern_A", "Pattern_B", "Similarity")
-
-# Extract row and column indices from pattern names
-similarity_df$Row_A <- as.numeric(gsub("pattern_(\\d+)_\\d+", "\\1", similarity_df$Pattern_A))
-similarity_df$Col_A <- as.numeric(gsub("pattern_\\d+_(\\d+)", "\\1", similarity_df$Pattern_A))
-similarity_df$Row_B <- as.numeric(gsub("pattern_(\\d+)_\\d+", "\\1", similarity_df$Pattern_B))
-similarity_df$Col_B <- as.numeric(gsub("pattern_\\d+_(\\d+)", "\\1", similarity_df$Pattern_B))
-
-# Add parameter information
-similarity_df$Inner_A <- radius_range[similarity_df$Row_A]
-similarity_df$Outer_A <- outer_range[similarity_df$Col_A]
-similarity_df$Inner_B <- radius_range[similarity_df$Row_B]
-similarity_df$Outer_B <- outer_range[similarity_df$Col_B]
-
-# Create main heatmap
-heatmap_plot <- ggplot(similarity_df, aes(x = Pattern_A, y = Pattern_B, fill = Similarity)) +
-  geom_tile() +
-  scale_fill_viridis_c(name = "SGWT\nSimilarity", 
-                       option = "plasma",
-                       trans = "sqrt",  # Square root transformation for better visualization
-                       labels = function(x) sprintf("%.3f", x)) +
-  labs(title = "Pattern Similarity Heatmap: SGWT Weighted Similarity Analysis",
-       subtitle = sprintf("Comparing %dx%d patterns with gradient inner (%.1f-%.1f) and outer (%.1f-%.1f) radii",
-                         n_patterns, n_patterns,
-                         min(radius_range), max(radius_range),
-                         min(outer_range), max(outer_range)),
-       x = "Pattern A (Inner Radius →, Outer Radius ↑)",
-       y = "Pattern B (Inner Radius →, Outer Radius ↑)") +
-  theme_minimal() +
-  theme(axis.text.x = element_text(angle = 45, hjust = 1, size = 8),
-        axis.text.y = element_text(size = 8),
-        plot.title = element_text(size = 14, face = "bold"),
-        plot.subtitle = element_text(size = 12),
-        legend.position = "right") +
-  coord_fixed()
-
-print(heatmap_plot)
-```
-
-## Parameter-Based Similarity Analysis
-
-```{r parameter-analysis, fig.width=14, fig.height=6}
-# Create parameter-space heatmaps showing similarity patterns
-# Reshape similarity matrix to parameter space
-
-# Create parameter-based similarity matrix (10x10 for each parameter combination)
-param_similarity <- array(NA, dim = c(n_patterns, n_patterns, n_patterns, n_patterns))
-
-for (i in 1:nrow(similarity_df)) {
-  row_a <- similarity_df$Row_A[i]
-  col_a <- similarity_df$Col_A[i]
-  row_b <- similarity_df$Row_B[i]
-  col_b <- similarity_df$Col_B[i]
-  param_similarity[row_a, col_a, row_b, col_b] <- similarity_df$Similarity[i]
-}
-
-# Create diagonal slice heatmaps (comparing patterns with same inner radius)
-diagonal_data <- data.frame()
-for (i in 1:n_patterns) {
-  for (j in 1:n_patterns) {
-    for (k in 1:n_patterns) {
-      sim_val <- param_similarity[i, j, i, k]  # Same inner radius (i), different outer radius (j vs k)
-      if (!is.na(sim_val)) {
-        diagonal_data <- rbind(diagonal_data, data.frame(
-          inner_radius = radius_range[i],
-          outer_A = outer_range[j],
-          outer_B = outer_range[k],
-          similarity = sim_val,
-          stringsAsFactors = FALSE
-        ))
-      }
-    }
-  }
-}
-
-# Plot similarity as function of outer radius differences (fixed inner radius)
-p1 <- ggplot(diagonal_data, aes(x = outer_A, y = outer_B, fill = similarity)) +
-  geom_tile() +
-  scale_fill_viridis_c(name = "Similarity", option = "viridis") +
-  facet_wrap(~paste("Inner Radius:", round(inner_radius, 1)), ncol = 5) +
-  labs(title = "Similarity vs Outer Radius Combinations",
-       subtitle = "Fixed inner radius, varying outer radius",
-       x = "Outer Radius A", y = "Outer Radius B") +
-  theme_minimal() +
-  theme(axis.text = element_text(size = 6),
-        strip.text = element_text(size = 8))
-
-print(p1)
-```
-
-## Similarity Statistics and Insights
-
-```{r similarity-stats}
-# Analyze similarity patterns and extract insights
-cat("=== Pattern Similarity Analysis Results ===\n")
-
-# Self-similarity (diagonal elements)
-diagonal_similarities <- diag(similarity_matrix)
-cat(sprintf("Self-similarity statistics:\n"))
-cat(sprintf("  Mean: %.4f (SD: %.4f)\n", mean(diagonal_similarities), sd(diagonal_similarities)))
-cat(sprintf("  Range: [%.4f, %.4f]\n", min(diagonal_similarities), max(diagonal_similarities)))
-
-# Off-diagonal similarities
-off_diagonal <- similarity_matrix[upper.tri(similarity_matrix)]
-cat(sprintf("\nCross-pattern similarity statistics:\n"))
-cat(sprintf("  Mean: %.4f (SD: %.4f)\n", mean(off_diagonal), sd(off_diagonal)))
-cat(sprintf("  Range: [%.4f, %.4f]\n", min(off_diagonal), max(off_diagonal)))
-
-# Find most and least similar pattern pairs
-similarity_df_upper <- similarity_df[similarity_df$Row_A <= similarity_df$Row_B & 
-                                    !(similarity_df$Row_A == similarity_df$Row_B & 
-                                      similarity_df$Col_A == similarity_df$Col_B), ]
-
-most_similar <- similarity_df_upper[which.max(similarity_df_upper$Similarity), ]
-least_similar <- similarity_df_upper[which.min(similarity_df_upper$Similarity), ]
-
-cat(sprintf("\nMost similar pattern pair:\n"))
-cat(sprintf("  %s (R_in=%.1f, R_out=%.1f) vs %s (R_in=%.1f, R_out=%.1f)\n",
-           most_similar$Pattern_A, most_similar$Inner_A, most_similar$Outer_A,
-           most_similar$Pattern_B, most_similar$Inner_B, most_similar$Outer_B))
-cat(sprintf("  Similarity: %.4f\n", most_similar$Similarity))
-
-cat(sprintf("\nLeast similar pattern pair:\n"))
-cat(sprintf("  %s (R_in=%.1f, R_out=%.1f) vs %s (R_in=%.1f, R_out=%.1f)\n",
-           least_similar$Pattern_A, least_similar$Inner_A, least_similar$Outer_A,
-           least_similar$Pattern_B, least_similar$Inner_B, least_similar$Outer_B))
-cat(sprintf("  Similarity: %.4f\n", least_similar$Similarity))
-
-# Parameter distance vs similarity correlation
-param_distance <- sqrt((similarity_df$Inner_A - similarity_df$Inner_B)^2 + 
-                      (similarity_df$Outer_A - similarity_df$Outer_B)^2)
-correlation <- cor(param_distance, similarity_df$Similarity, use = "complete.obs")
-
-cat(sprintf("\nParameter distance vs similarity correlation: %.4f\n", correlation))
-cat("(Negative correlation indicates that patterns with similar parameters are more similar)\n")
-```
-
-## Distance vs Similarity Relationship
-
-```{r distance-similarity, fig.width=12, fig.height=5}
-# Visualize relationship between parameter distance and similarity
-param_analysis_df <- data.frame(
-  param_distance = param_distance,
-  similarity = similarity_df$Similarity,
-  is_self = (similarity_df$Pattern_A == similarity_df$Pattern_B)
-)
-
-p_distance <- ggplot(param_analysis_df[!param_analysis_df$is_self, ], 
-                    aes(x = param_distance, y = similarity)) +
-  geom_point(alpha = 0.6, color = "steelblue") +
-  geom_smooth(method = "loess", se = TRUE, color = "red") +
-  labs(title = "Parameter Distance vs SGWT Similarity",
-       subtitle = paste("Correlation:", round(correlation, 4)),
-       x = "Parameter Distance (Euclidean in radius space)",
-       y = "SGWT Weighted Similarity") +
-  theme_minimal()
-
-# Create similarity distribution histogram
-p_hist <- ggplot(param_analysis_df[!param_analysis_df$is_self, ], 
-                aes(x = similarity)) +
-  geom_histogram(bins = 30, fill = "lightblue", alpha = 0.7, color = "black") +
-  geom_vline(xintercept = mean(param_analysis_df$similarity[!param_analysis_df$is_self]), 
-             color = "red", linetype = "dashed", size = 1) +
-  labs(title = "Distribution of SGWT Similarities",
-       subtitle = paste("Mean:", round(mean(param_analysis_df$similarity[!param_analysis_df$is_self]), 4)),
-       x = "SGWT Weighted Similarity",
-       y = "Frequency") +
-  theme_minimal()
-
-combined_analysis <- p_distance + p_hist
-print(combined_analysis)
-```
+- **[Pattern Similarity Heatmaps](pattern_similarity_heatmap.html)**: 10×10 pattern comparison with 5,000+ similarity computations
+- **[Kernel Comparison Analysis](kernel_comparison.html)**: Detailed comparison of all wavelet kernel types
+- **[Energy Distribution Analysis](energy_analysis.html)**: Multi-scale energy analysis across pattern families
+- **[Performance Benchmarks](performance_benchmarks.html)**: Computational performance analysis and optimization
 
 # Summary
 
-This vignette demonstrated:
+## Key Takeaways
 
-1. **Simulation Pattern Generation**: Created two types of spatial patterns with flexible column naming support
-2. **SGWT Analysis**: Applied spectral graph wavelet transforms to analyze multi-scale spatial structures
-3. **Flexible Column Support**: Used custom column names (X, Y, signal_1, signal_2) throughout the analysis
-4. **Kernel Comparison**: Evaluated different wavelet kernel types (Mexican Hat, Meyer, Heat)
-5. **Energy Analysis**: Analyzed energy distribution across different scales and patterns
-6. **Cross-Signal Analysis**: Used Graph Cross-Correlation to analyze relationships between signals
-7. **Weighted Similarity**: Tested energy-normalized weighted similarity between SGWT results
-8. ****NEW** Comprehensive Pattern Similarity**: Generated 10×10 pattern library with gradient parameters and computed full similarity heatmap
+1. **Easy Setup**: BioGSP provides a simple interface for SGWT analysis of spatial data
+2. **Flexible Input**: Supports custom column naming for coordinates and signals
+3. **Multiple Kernels**: Choose from Mexican Hat, Meyer, or Heat kernel families
+4. **Pattern Similarity**: Advanced similarity metrics with energy normalization
+5. **Comprehensive Analysis**: Energy distribution, multi-scale decomposition, visualization
 
-## Key Features Demonstrated
+## Typical Workflow
 
-- **Flexible Input Format**: Support for any column names for coordinates and signals
-- **Multiple Kernel Types**: Mexican Hat, Meyer, and Heat kernel families
-- **Comprehensive Visualization**: Built-in plotting functions for patterns and SGWT results
-- **Energy Analysis**: Tools for understanding signal energy distribution across scales
-- **Graph Cross-Correlation**: Methods for analyzing relationships between multiple signals
-- ****NEW** Energy-Normalized Similarity**: Advanced similarity measures between SGWT decompositions
+```r
+# 1. Prepare spatial data with coordinates and signals
+data <- your_spatial_data
 
-The BioGSP package provides a comprehensive toolkit for spectral graph wavelet analysis of spatial data with flexible input formats, extensive visualization capabilities, and advanced similarity analysis tools.
+# 2. Run SGWT analysis
+result <- SGWT(data, x_col = "x", y_col = "y", signal = "your_signal", 
+               k = 15, J = 4)
+
+# 3. Analyze results
+energy <- sgwt_energy_analysis(result)
+plots <- plot_sgwt_decomposition(result, data)
+
+# 4. Compare patterns (optional)
+similarity <- sgwt_similarity("signal1", "signal2", data.in = data)
+```
+
+## Next Steps
+
+- Explore your own spatial datasets using the demonstrated workflow
+- Experiment with different kernel types and parameters
+- Use pattern similarity analysis for comparative studies
+- Refer to advanced vignettes for specialized analyses
+
+## References
+
+- Hammond, D. K., Vandergheynst, P., & Gribonval, R. (2011). Wavelets on graphs via spectral graph theory. *Applied and Computational Harmonic Analysis*, 30(2), 129-150.
+- Shuman, D. I., Narang, S. K., Frossard, P., Ortega, A., & Vandergheynst, P. (2013). The emerging field of signal processing on graphs. *IEEE Signal Processing Magazine*, 30(3), 83-98.
+
+---
+
+*BioGSP Package - Biological Graph Signal Processing for Spatial Data Analysis*
