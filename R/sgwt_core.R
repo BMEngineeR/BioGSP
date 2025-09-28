@@ -73,7 +73,7 @@ sgwt_get_kernels <- function(kernel_type = "mexican_hat") {
 #' @param eigenvalues Eigenvalues of the graph Laplacian
 #' @param scales Vector of scales for the wavelets
 #' @param lmax Maximum eigenvalue (optional)
-#' @param kernel_type Kernel family that defines both scaling and wavelet filters (default: "mexican_hat", options: "mexican_hat", "meyer", "heat")
+#' @param kernel_type Kernel family that defines both scaling and wavelet filters (default: "mexican_hat", options: "mexican_hat", "meyer", "heat") 
 #'
 #' @return List of filters (scaling function + wavelets)
 #' @export
@@ -214,7 +214,7 @@ sgwt_inverse <- function(sgwt_decomp) {
 #' scales <- sgwt_auto_scales(lmax = 2.0, J = 5, scaling_factor = 2)
 sgwt_auto_scales <- function(lmax, J = 5, scaling_factor = 2) {
   # Generate logarithmically spaced scales
-  scales <- lmax / (scaling_factor^(0:(J-1)))
+  scales <- lmax / (scaling_factor^(0:(J - 1)))
   return(scales)
 }
 

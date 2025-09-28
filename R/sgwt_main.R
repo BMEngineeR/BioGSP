@@ -17,6 +17,7 @@
 #' @param laplacian_type Type of graph Laplacian ("unnormalized", "normalized", or "randomwalk", default: "normalized")
 #' @param k_fold Parameter for eigendecomposition (default: 15)
 #' @param return_all Whether to return all analysis results (default: TRUE)
+#' @param verbose Whether to print progress messages (default: TRUE)
 #'
 #' @return If return_all = TRUE, returns a list containing:
 #' \describe{
@@ -62,7 +63,7 @@ SGWT <- function(data.in = NULL, x_col = "x", y_col = "y", signal = NULL, k = 25
                  scales = NULL, J = 5, scaling_factor = 2,
                  kernel_type = "mexican_hat",
                  laplacian_type = "normalized",
-                 k_fold = 15, return_all = TRUE) {
+                 k_fold = 15, return_all = TRUE, verbose = TRUE) {
 
   # Input validation
   if (is.null(data.in) || is.null(signal)) {
@@ -75,7 +76,7 @@ SGWT <- function(data.in = NULL, x_col = "x", y_col = "y", signal = NULL, k = 25
   }
 
   # Build graph from spatial coordinates
-  cat("Building graph from spatial coordinates...\n")
+  if (verbose) cat("Building graph from spatial coordinates...\n")
   nn <- RANN::nn2(data.in[, c(x_col, y_col)], k = k + 1)
   adj_list <- lapply(seq_len(nrow(data.in)), function(i) setdiff(nn$nn.idx[i, ], i))
   edges <- do.call(rbind, lapply(seq_along(adj_list), function(i) cbind(i, adj_list[[i]])))
@@ -84,7 +85,7 @@ SGWT <- function(data.in = NULL, x_col = "x", y_col = "y", signal = NULL, k = 25
   A <- igraph::as_adjacency_matrix(g, sparse = TRUE)
 
   # Compute Laplacian and eigendecomposition
-  cat("Computing Laplacian and eigendecomposition...\n")
+  if (verbose) cat("Computing Laplacian and eigendecomposition...\n")
   L <- cal_laplacian(A, laplacian_type)
   L_decompose_res <- FastDecompositionLap(L, k_fold = k_fold, which = "SM")
   eigenvalues <- L_decompose_res$evalues
@@ -94,7 +95,7 @@ SGWT <- function(data.in = NULL, x_col = "x", y_col = "y", signal = NULL, k = 25
   if (is.null(scales)) {
     lmax <- max(eigenvalues) * 0.95
     scales <- sgwt_auto_scales(lmax, J, scaling_factor)
-    cat(paste("Auto-generated scales:", paste(round(scales, 4), collapse = ", "), "\n"))
+    if (verbose) cat(paste("Auto-generated scales:", paste(round(scales, 4), collapse = ", "), "\n"))
   }
 
   # Extract signal
@@ -106,7 +107,7 @@ SGWT <- function(data.in = NULL, x_col = "x", y_col = "y", signal = NULL, k = 25
 
   # Perform SGWT decomposition
   eigenvectors <- as.matrix(eigenvectors)
-  cat("Performing SGWT decomposition...\n")
+  if (verbose) cat("Performing SGWT decomposition...\n")
   sgwt_result <- sgwt_forward(signal = signal_data,
                               eigenvectors = eigenvectors, eigenvalues = eigenvalues,
                               scales = scales,
@@ -116,7 +117,7 @@ SGWT <- function(data.in = NULL, x_col = "x", y_col = "y", signal = NULL, k = 25
   reconstructed <- sgwt_inverse(sgwt_result)
   reconstruction_error <- sqrt(mean((signal_data - reconstructed)^2))
 
-  cat(paste("Reconstruction RMSE:", round(reconstruction_error, 6), "\n"))
+  if (verbose) cat(paste("Reconstruction RMSE:", round(reconstruction_error, 6), "\n"))
 
   if (return_all) {
     return(list(

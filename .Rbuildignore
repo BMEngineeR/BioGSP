@@ -8,3 +8,4 @@
 ^.*\.tar\.gz$
 ^check_output\.log$
 ^README\.md$
+^.lintr$
