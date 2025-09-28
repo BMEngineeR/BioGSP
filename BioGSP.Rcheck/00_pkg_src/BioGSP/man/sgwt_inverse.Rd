@@ -4,20 +4,30 @@
 \alias{sgwt_inverse}
 \title{Inverse SGWT transform}
 \usage{
-sgwt_inverse(sgwt_decomp)
+sgwt_inverse(sgwt_decomp, original_signal = NULL)
 }
 \arguments{
 \item{sgwt_decomp}{SGWT decomposition object from sgwt_forward}
+
+\item{original_signal}{Original signal for error calculation (optional)}
 }
 \value{
-Reconstructed signal vector
+List containing:
+  \describe{
+    \item{low_pass_approximation}{Low-pass (scaling) approximation}
+    \item{band_pass_approximations}{List of band-pass (wavelet) approximations by scale}
+    \item{reconstructed_signal}{Full reconstructed signal}
+    \item{reconstruction_error}{RMSE if original_signal provided}
+  }
 }
 \description{
-Reconstruct signal from wavelet coefficients
+Reconstruct signal from inverse-transformed signals (coefficients).
+Returns detailed inverse transform results including low-pass, band-pass approximations,
+reconstructed signal, and reconstruction error.
 }
 \examples{
 \dontrun{
 # Assuming you have an SGWT decomposition
-reconstructed <- sgwt_inverse(sgwt_decomp)
+inverse_result <- sgwt_inverse(sgwt_decomp, original_signal)
 }
 }

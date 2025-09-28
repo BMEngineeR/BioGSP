@@ -20,4 +20,4 @@ Suggests: spdep, spatialEco, sp, gasper, egg, testthat (>= 2.1.0),
 VignetteBuilder: knitr
 Depends: R (>= 3.5.0)
 NeedsCompilation: no
-Packaged: 2025-09-27 01:25:06 UTC; cha224
+Packaged: 2025-09-28 15:51:46 UTC; cha224

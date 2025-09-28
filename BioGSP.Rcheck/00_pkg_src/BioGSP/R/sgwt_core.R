@@ -10,7 +10,7 @@
 #'
 #' @return A list with two functions: list(scaling = function(x, scale_param), wavelet = function(x, scale_param))
 #' @export
-sgwt_get_kernels <- function(kernel_type = "mexican_hat") {
+sgwt_get_kernels <- function(kernel_type = "heat") {
   if (kernel_type == "mexican_hat") {
     scaling_fun <- function(x, scale_param) {
       t <- x / scale_param
@@ -73,7 +73,7 @@ sgwt_get_kernels <- function(kernel_type = "mexican_hat") {
 #' @param eigenvalues Eigenvalues of the graph Laplacian
 #' @param scales Vector of scales for the wavelets
 #' @param lmax Maximum eigenvalue (optional)
-#' @param kernel_type Kernel family that defines both scaling and wavelet filters (default: "mexican_hat", options: "mexican_hat", "meyer", "heat")
+#' @param kernel_type Kernel family that defines both scaling and wavelet filters (default: "mexican_hat", options: "mexican_hat", "meyer", "heat") 
 #'
 #' @return List of filters (scaling function + wavelets)
 #' @export
@@ -84,7 +84,7 @@ sgwt_get_kernels <- function(kernel_type = "mexican_hat") {
 #' filters <- compute_sgwt_filters(eigenvals, scales)
 #' filters_meyer <- compute_sgwt_filters(eigenvals, scales, kernel_type = "meyer")
 #' filters_heat <- compute_sgwt_filters(eigenvals, scales, kernel_type = "heat")
-compute_sgwt_filters <- function(eigenvalues, scales, lmax = NULL, kernel_type = "mexican_hat") {
+compute_sgwt_filters <- function(eigenvalues, scales, lmax = NULL, kernel_type = "heat") {
   if (is.null(lmax)) {
     lmax <- max(eigenvalues) * 0.95  # Avoid numerical issues at lambda_max
   }
@@ -114,7 +114,8 @@ compute_sgwt_filters <- function(eigenvalues, scales, lmax = NULL, kernel_type =
 
 #' Forward SGWT transform
 #'
-#' @description Decompose signal into wavelet coefficients using SGWT
+#' @description Decompose signal into inverse-transformed signals (vertex domain) using SGWT.
+#' Also stores original and filtered Fourier coefficients for analysis.
 #'
 #' @param signal Input signal vector
 #' @param eigenvectors Eigenvectors of the graph Laplacian
@@ -123,7 +124,15 @@ compute_sgwt_filters <- function(eigenvalues, scales, lmax = NULL, kernel_type =
 #' @param lmax Maximum eigenvalue (optional)
 #' @param kernel_type Kernel family that defines both scaling and wavelet filters (default: "mexican_hat", options: "mexican_hat", "meyer", "heat")
 #'
-#' @return List containing coefficients, filters, scales, eigenvalues, and eigenvectors
+#' @return List containing:
+#'   \describe{
+#'     \item{coefficients}{Inverse-transformed signals in vertex domain (scaling + wavelet scales)}
+#'     \item{fourier_coefficients}{List with original and filtered Fourier coefficients}
+#'     \item{filters}{Filter bank used}
+#'     \item{scales}{Scales used}
+#'     \item{eigenvalues}{Graph Laplacian eigenvalues}
+#'     \item{eigenvectors}{Graph Laplacian eigenvectors}
+#'   }
 #' @export
 #'
 #' @examples
@@ -133,28 +142,37 @@ compute_sgwt_filters <- function(eigenvalues, scales, lmax = NULL, kernel_type =
 #' result_meyer <- sgwt_forward(signal, eigenvectors, eigenvalues, scales, kernel_type = "meyer")
 #' result_heat <- sgwt_forward(signal, eigenvectors, eigenvalues, scales, kernel_type = "heat")
 #' }
-sgwt_forward <- function(signal, eigenvectors, eigenvalues, scales, lmax = NULL, kernel_type = "mexican_hat") {
+sgwt_forward <- function(signal, eigenvectors, eigenvalues, scales, lmax = NULL, kernel_type = "heat") {
   # Compute filters
   filters <- compute_sgwt_filters(eigenvalues, scales, lmax, kernel_type)
   
   # Transform signal to spectral domain
   signal_hat <- gft(signal, eigenvectors)
   
-  # Apply filters and store coefficients
-  coefficients <- vector("list", length(filters))
+  # Store original and filtered Fourier coefficients
+  fourier_coefficients <- list(
+    original = signal_hat,
+    filtered = vector("list", length(filters))
+  )
+  
+  # Apply filters and store inverse-transformed signals
+  inverse_signals <- vector("list", length(filters))
   
   for (i in seq_along(filters)) {
     # Multiply signal spectrum with filter
     filtered_spectrum <- signal_hat * filters[[i]]
+    fourier_coefficients$filtered[[i]] <- filtered_spectrum
     
     # Transform back to vertex domain (inverse GFT)
-    coefficients[[i]] <- eigenvectors %*% filtered_spectrum
+    inverse_signals[[i]] <- eigenvectors %*% filtered_spectrum
   }
   
-  names(coefficients) <- c("scaling", paste0("wavelet_scale_", seq_along(scales)))
+  names(inverse_signals) <- c("scaling", paste0("wavelet_scale_", seq_along(scales)))
+  names(fourier_coefficients$filtered) <- c("scaling", paste0("wavelet_scale_", seq_along(scales)))
   
   return(list(
-    coefficients = coefficients,
+    coefficients = inverse_signals,  # Renamed for clarity - these are inverse-transformed signals
+    fourier_coefficients = fourier_coefficients,  # Original and filtered Fourier coefficients
     filters = filters,
     scales = scales,
     eigenvalues = eigenvalues,
@@ -164,39 +182,57 @@ sgwt_forward <- function(signal, eigenvectors, eigenvalues, scales, lmax = NULL,
 
 #' Inverse SGWT transform
 #'
-#' @description Reconstruct signal from wavelet coefficients
+#' @description Reconstruct signal from inverse-transformed signals (coefficients).
+#' Returns detailed inverse transform results including low-pass, band-pass approximations,
+#' reconstructed signal, and reconstruction error.
 #'
 #' @param sgwt_decomp SGWT decomposition object from sgwt_forward
+#' @param original_signal Original signal for error calculation (optional)
 #'
-#' @return Reconstructed signal vector
+#' @return List containing:
+#'   \describe{
+#'     \item{low_pass_approximation}{Low-pass (scaling) approximation}
+#'     \item{band_pass_approximations}{List of band-pass (wavelet) approximations by scale}
+#'     \item{reconstructed_signal}{Full reconstructed signal}
+#'     \item{reconstruction_error}{RMSE if original_signal provided}
+#'   }
 #' @export
 #'
 #' @examples
 #' \dontrun{
 #' # Assuming you have an SGWT decomposition
-#' reconstructed <- sgwt_inverse(sgwt_decomp)
+#' inverse_result <- sgwt_inverse(sgwt_decomp, original_signal)
 #' }
-sgwt_inverse <- function(sgwt_decomp) {
+sgwt_inverse <- function(sgwt_decomp, original_signal = NULL) {
   coefficients <- sgwt_decomp$coefficients
-  filters <- sgwt_decomp$filters
-  eigenvectors <- sgwt_decomp$eigenvectors
   
-  # Initialize reconstructed signal
-  reconstructed_signal <- rep(0, nrow(eigenvectors))
+  # Extract low-pass (scaling) approximation
+  low_pass_approximation <- as.vector(coefficients$scaling)
   
-  # Reconstruct by summing all filtered components
-  for (i in seq_along(coefficients)) {
-    # Transform coefficient to spectral domain
-    coeff_hat <- gft(coefficients[[i]], eigenvectors)
-    
-    # Apply filter
-    filtered_coeff <- coeff_hat * filters[[i]]
-    
-    # Transform back and add to reconstruction
-    reconstructed_signal <- reconstructed_signal + as.vector(eigenvectors %*% filtered_coeff)
+  # Extract band-pass (wavelet) approximations
+  wavelet_names <- names(coefficients)[grep("^wavelet_scale_", names(coefficients))]
+  band_pass_approximations <- list()
+  for (name in wavelet_names) {
+    scale_num <- sub("^wavelet_scale_", "", name)
+    band_pass_approximations[[paste0("scale_", scale_num)]] <- as.vector(coefficients[[name]])
   }
   
-  return(reconstructed_signal)
+  # Reconstruct full signal (sum of all components)
+  reconstructed_signal <- Reduce("+", coefficients)
+  reconstructed_signal <- as.vector(reconstructed_signal)
+  
+  # Calculate reconstruction error if original signal provided
+  reconstruction_error <- NULL
+  if (!is.null(original_signal)) {
+    reconstruction_error <- sqrt(mean((original_signal - reconstructed_signal)^2))
+  }
+  
+  return(list(
+    low_pass_approximation = low_pass_approximation,
+    band_pass_approximations = band_pass_approximations,
+    reconstructed_signal = reconstructed_signal,
+    reconstruction_error = reconstruction_error
+  ))
 }
 
 #' Generate automatic scales for SGWT
@@ -214,7 +250,7 @@ sgwt_inverse <- function(sgwt_decomp) {
 #' scales <- sgwt_auto_scales(lmax = 2.0, J = 5, scaling_factor = 2)
 sgwt_auto_scales <- function(lmax, J = 5, scaling_factor = 2) {
   # Generate logarithmically spaced scales
-  scales <- lmax / (scaling_factor^(0:(J-1)))
+  scales <- lmax / (scaling_factor^(0:(J - 1)))
   return(scales)
 }
 

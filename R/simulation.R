@@ -11,6 +11,7 @@
 #' @param seed Random seed for reproducible center placement (default: 123)
 #'
 #' @return List of data frames, each containing X, Y coordinates and circleA, circleB binary signals
+#' @importFrom utils txtProgressBar setTxtProgressBar
 #' @export
 #'
 #' @examples
@@ -33,11 +34,25 @@ simulate_multiscale <- function(
   grid <- expand.grid(X = 1:grid_size, Y = 1:grid_size)
   
   set.seed(seed)
-  centers <- lapply(1:n_centers, function(i) {
-    c(sample(10:(grid_size-10), 1), sample(10:(grid_size-10), 1))
-  })
+  if (n_centers == 1) {
+    # If only one center, place it at the center of the grid
+    centers <- list(c(grid_size/2, grid_size/2))
+  } else {
+    # For multiple centers, place them randomly
+    centers <- lapply(1:n_centers, function(i) {
+      c(sample(10:(grid_size-10), 1), sample(10:(grid_size-10), 1))
+    })
+  }
   
   sim_list <- list()
+  
+  # Calculate total iterations for progress bar
+  total_iterations <- length(Ra_seq) * length(Rb_seq)
+  cat("Generating", total_iterations, "multiscale patterns...\n")
+  
+  # Initialize progress bar
+  pb <- txtProgressBar(min = 0, max = total_iterations, style = 3)
+  iteration <- 0
   
   for (Ra in Ra_seq) {
     for (Rb in Rb_seq) {
@@ -63,8 +78,16 @@ simulate_multiscale <- function(
       )
       name <- paste0("simulated_Ra_", Ra, "_Rb_", Rb)
       sim_list[[name]] <- df
+      
+      # Update progress bar
+      iteration <- iteration + 1
+      setTxtProgressBar(pb, iteration)
     }
   }
+  
+  # Close progress bar
+  close(pb)
+  cat("\nMultiscale simulation completed!\n")
   
   return(sim_list)
 }
@@ -106,6 +129,14 @@ simulate_ringpattern <- function(
   grid <- expand.grid(X = 1:grid_size, Y = 1:grid_size)
   sim_list <- list()
   
+  # Calculate total iterations for progress bar
+  total_iterations <- length(radius_seq)
+  cat("Generating", total_iterations, "concentric ring patterns...\n")
+  
+  # Initialize progress bar
+  pb <- txtProgressBar(min = 0, max = total_iterations, style = 3)
+  iteration <- 0
+  
   for (r in radius_seq) {
     # movement trajectory (outer ring closing in)
     movements <- data.frame(
@@ -138,7 +169,15 @@ simulate_ringpattern <- function(
     # Combine all movements for this radius
     combined_data <- do.call(rbind, plot_data)
     sim_list[[paste0("radius_", r)]] <- combined_data
+    
+    # Update progress bar
+    iteration <- iteration + 1
+    setTxtProgressBar(pb, iteration)
   }
+  
+  # Close progress bar
+  close(pb)
+  cat("\nConcentric ring simulation completed!\n")
   
   return(sim_list)
 }
@@ -187,7 +226,7 @@ visualize_multiscale <- function(sim_data, Ra_seq, Rb_seq,
       df$label <- "Background"
       df$label[df$signal_1 == 1] <- "signal_1"
       df$label[df$signal_2 == 1] <- "signal_2"
-      print(table(df$label))
+      # print(table(df$label))
       p <- ggplot2::ggplot(df, ggplot2::aes_string(x = "X", y = "Y", fill = "label")) +
         ggplot2::geom_tile() +
         ggplot2::scale_fill_manual(values = c("Background" = bg_color,

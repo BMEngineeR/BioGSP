@@ -129,7 +129,7 @@ sgwt_result <- SGWT(data.in = sgwt_data,
                     signal = "signal",
                     k = 8,
                     J = 3,
-                    kernel_type = "mexican_hat")
+                    kernel_type = "heat")
 }
 
 }

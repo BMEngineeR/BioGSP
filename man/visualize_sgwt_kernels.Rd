@@ -9,7 +9,7 @@ visualize_sgwt_kernels(
   scales = NULL,
   J = 4,
   scaling_factor = 2,
-  kernel_type = "mexican_hat",
+  kernel_type = "heat",
   lmax = NULL,
   eigenvalue_range = NULL,
   resolution = 1000
@@ -49,7 +49,7 @@ viz_result <- visualize_sgwt_kernels(
   eigenvalues = eigenvals,
   J = 4,
   scaling_factor = 2,
-  kernel_type = "mexican_hat"
+  kernel_type = "heat"
 )
 print(viz_result$plot)
 }

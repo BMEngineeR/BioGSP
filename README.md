@@ -28,18 +28,19 @@ BioGSP is an R package that brings **Graph Signal Processing** to biological dat
 
 ```mermaid
 graph LR
-    A[Spatial Data] --> B[Build Graph]
-    B --> C[SGWT Analysis]
-    C --> D[Multi-scale Coefficients]
-    D --> E[Pattern Analysis]
-    E --> F[Similarity Scores]
+    A[Spatial Data] --> B[initSGWT]
+    B --> C[runSpecGraph]
+    C --> D[runSGWT]
+    D --> E[runSGCC]
+    E --> F[Results & Visualization]
 ```
 
-1. **Input**: Your spatial data (coordinates + measurements)
-2. **Graph Construction**: Automatically builds a graph connecting nearby points
-3. **SGWT Decomposition**: Breaks down spatial patterns into different scales
-4. **Analysis**: Compute energy, similarity, and other spatial statistics
-5. **Output**: Interpretable results and visualizations
+**New Workflow (v2.0+):**
+1. **`initSGWT()`**: Initialize SGWT object with your spatial data and parameters
+2. **`runSpecGraph()`**: Build graph structure (adjacency, Laplacian, eigendecomposition)
+3. **`runSGWT()`**: Perform forward and inverse SGWT transforms on all signals
+4. **`runSGCC()`**: Calculate weighted similarity between signals
+5. **Visualization**: Use updated plotting functions for comprehensive analysis
 
 ## Installation
 
@@ -57,43 +58,70 @@ devtools::install_github("BMEngineeR/BioGSP")
 
 ## Quick Start
 
-### Basic Analysis
+### New Workflow (Recommended)
 
 ```r
 library(BioGSP)
 
-# Your data should have: x, y coordinates and a signal
+# Your data should have: x, y coordinates and signal(s)
 # Example with synthetic data
 set.seed(123)
 demo_data <- data.frame(
   x = rep(1:10, each = 10) + rnorm(100, 0, 0.1),
   y = rep(1:10, times = 10) + rnorm(100, 0, 0.1),
-  signal = sin(0.5 * rep(1:10, each = 10)) + rnorm(100, 0, 0.1)
+  signal1 = sin(0.5 * rep(1:10, each = 10)) + rnorm(100, 0, 0.1),
+  signal2 = cos(0.3 * rep(1:10, times = 10)) + rnorm(100, 0, 0.1)
 )
 
-# Run SGWT analysis
-result <- SGWT(data.in = demo_data, signal = "signal", k = 8, J = 4, k_fold = 8)
+# Step 1: Initialize SGWT object
+SG <- initSGWT(demo_data, 
+               signals = c("signal1", "signal2"), 
+               k = 8, J = 4, 
+               kernel_type = "heat")
 
-# Check quality
-print(paste("Reconstruction error:", round(result$reconstruction_error, 6)))
+# Step 2: Build spectral graph
+SG <- runSpecGraph(SG)
 
-# Analyze energy distribution across scales
-energy_analysis <- sgwt_energy_analysis(result)
+# Step 3: Run SGWT analysis
+SG <- runSGWT(SG)
+
+# Step 4: Check results
+print(SG)
+
+# Analyze energy distribution
+energy_analysis <- sgwt_energy_analysis(SG, "signal1")
 print(energy_analysis)
+
+# Visualize decomposition
+plots <- plot_sgwt_decomposition(SG, "signal1")
+print(plots)
 ```
 
 ### Compare Two Spatial Patterns
 
 ```r
-# Create two related signals
-demo_data$signal2 <- cos(0.3 * demo_data$y) + rnorm(100, 0, 0.1)
+# Calculate similarity between signals in the same SGWT object
+similarity <- runSGCC("signal1", "signal2", SG = SG)
+print(paste("SGCC Score:", round(similarity$S, 4)))
 
-# Calculate similarity between signals
-similarity <- sgwt_similarity("signal", "signal2", 
-                             data.in = demo_data, 
-                             k = 8, J = 4, k_fold = 8)
-print(paste("SGCC Score:", round(similarity, 4)))
+# Or compare between different SGWT objects
+SG2 <- initSGWT(demo_data, signals = "signal2", k = 8, J = 4)
+SG2 <- runSpecGraph(SG2)
+SG2 <- runSGWT(SG2)
+
+similarity_cross <- runSGCC(SG, SG2)  # Compare first signals from each object
+print(paste("Cross-object SGCC Score:", round(similarity_cross$S, 4)))
 ```
+
+## SGWT Object Structure
+
+The new SGWT object contains:
+
+- **Data**: Original data, coordinate columns, signal names
+- **Graph**: Adjacency matrix, Laplacian matrix, eigenvalues, eigenvectors
+- **Forward**: SGWT forward transform results (Fourier coefficients, filters, scales)
+- **Inverse**: Inverse transform results (low-pass, band-pass approximations, reconstruction error)
+- **Parameters**: All analysis parameters (k, scales, J, kernel_type, etc.)
 
 ## Use Cases
 
@@ -119,32 +147,66 @@ print(paste("SGCC Score:", round(similarity, 4)))
 
 | Function | Purpose |
 |----------|---------|
-| `SGWT()` | Main SGWT analysis function |
-| `sgwt_similarity()` | Compare two spatial patterns |
-| `sgwt_energy_analysis()` | Analyze energy across scales |
-| `plot_sgwt_decomposition()` | Visualize results |
+| `initSGWT()` | Initialize SGWT object with data and parameters |
+| `runSpecGraph()` | Build spectral graph structure |
+| `runSGWT()` | Perform SGWT forward and inverse transforms |
+| `runSGCC()` | Calculate energy-normalized weighted similarity |
+| `plot_sgwt_decomposition()` | Visualize SGWT results |
+| `sgwt_energy_analysis()` | Analyze energy distribution across scales |
+| `demo_sgwt()` | Run complete demonstration |
+
+## Advanced Features
+
+### Multiple Kernel Types
+```r
+# Try different wavelet kernels
+SG_mexican <- initSGWT(demo_data, kernel_type = "mexican_hat")
+SG_meyer <- initSGWT(demo_data, kernel_type = "meyer") 
+SG_heat <- initSGWT(demo_data, kernel_type = "heat")  # Default
+```
+
+### Custom Parameters
+```r
+# Fine-tune analysis parameters
+SG <- initSGWT(demo_data,
+               k = 15,                    # More neighbors for smoother graph
+               J = 6,                     # More scales for finer analysis
+               scaling_factor = 1.5,      # Closer scales
+               laplacian_type = "randomwalk")  # Different Laplacian
+```
+
+### Low-frequency Only Analysis
+```r
+# Focus on smooth spatial patterns
+similarity_low <- runSGCC("signal1", "signal2", SG = SG, low_only = TRUE)
+```
 
 ## Learn More
 
-- **Detailed Documentation**: See [developer_README.md](developer_README.md) for comprehensive function documentation
+- **Detailed Documentation**: See function help pages for comprehensive documentation
 - **Mathematical Theory**: Learn about the underlying graph signal processing concepts
-- **Advanced Examples**: Explore complex analysis workflows
+- **Advanced Examples**: Explore complex analysis workflows in the vignettes
 - **API Reference**: Complete function specifications and parameters
 
 ## Quick Help
 
 **Common Issues:**
 - **"Graph construction failed"**: Try reducing `k` (number of neighbors)
-- **"Eigendecomposition error"**: Adjust `k_fold` parameter (try `k_fold = 5-8` for small datasets)
-- **"k must satisfy 0 < k < nrow(A)"**: Use smaller `k_fold` (for N points, use `k_fold < N/sqrt(N)`)
-- **"Reconstruction error high"**: Normal for noisy data, check if < 0.01
+- **"Eigendecomposition error"**: The `k_neighbor` parameter is now fixed at 25 for stability
+- **"Signal not found"**: Check signal names match your data columns
+- **"SGWT object invalid"**: Ensure you've run the workflow steps in order
 
 **Getting Started:**
 1. Prepare data with x, y coordinates and signal values
-2. Start with `k=8-15` neighbors, `J=3-5` scales, and `k_fold=5-8`
-3. For small datasets (<200 points), use smaller `k_fold` values
-4. Check reconstruction error to validate results
+2. Start with `k=8-15` neighbors, `J=3-5` scales
+3. Use `initSGWT() -> runSpecGraph() -> runSGWT()` workflow
+4. Check reconstruction errors to validate results
 5. Use energy analysis to understand your data's scale distribution
+
+**Parameter Guidelines:**
+- **Small datasets (<200 points)**: k=8-12, J=3-4
+- **Medium datasets (200-1000 points)**: k=12-20, J=4-6  
+- **Large datasets (>1000 points)**: k=15-25, J=5-8
 
 ## References
 
@@ -158,4 +220,4 @@ print(paste("SGCC Score:", round(similarity, 4)))
 
 ---
 
-**License**: GPL-3 | **Maintainer**: BMEngineeR
+**License**: GPL-3 | **Maintainer**: Yuzhou Chang

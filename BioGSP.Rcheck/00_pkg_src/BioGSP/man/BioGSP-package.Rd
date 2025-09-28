@@ -25,12 +25,14 @@ The package enables multi-scale analysis of spatial signals by:
 \section{Main Functions}{
 
 \describe{
-  \item{\code{\link{SGWT}}}{Main function for SGWT analysis}
+  \item{\code{\link{initSGWT}}}{Initialize SGWT object with data and parameters}
+  \item{\code{\link{runSpecGraph}}}{Build graph and compute eigendecomposition}
+  \item{\code{\link{runSGWT}}}{Perform forward and inverse SGWT transforms}
+  \item{\code{\link{runSGCC}}}{Calculate weighted similarity between signals}
   \item{\code{\link{sgwt_forward}}}{Forward SGWT transform}
   \item{\code{\link{sgwt_inverse}}}{Inverse SGWT transform}
   \item{\code{\link{sgwt_energy_analysis}}}{Energy distribution analysis}
   \item{\code{\link{plot_sgwt_decomposition}}}{Visualization of SGWT components}
-  \item{\code{\link{Cal_GCC}}}{Graph Cross-Correlation analysis}
   \item{\code{\link{demo_sgwt}}}{Demonstration with synthetic data}
 }
 }
@@ -65,11 +67,13 @@ data <- data.frame(
   signal = sin(runif(n, 0, 2*pi))
 )
 
-# Apply SGWT
-result <- SGWT(data, signal = "signal", k = 8, J = 4)
+# New workflow: Initialize -> Build Graph -> Run SGWT
+SG <- initSGWT(data, signals = "signal", k = 8, J = 4, kernel_type = "heat")
+SG <- runSpecGraph(SG)
+SG <- runSGWT(SG)
 
 # Analyze results
-energy_analysis <- sgwt_energy_analysis(result)
+energy_analysis <- sgwt_energy_analysis(SG)
 print(energy_analysis)
 }
 

@@ -10,7 +10,7 @@ sgwt_forward(
   eigenvalues,
   scales,
   lmax = NULL,
-  kernel_type = "mexican_hat"
+  kernel_type = "heat"
 )
 }
 \arguments{
@@ -27,10 +27,19 @@ sgwt_forward(
 \item{kernel_type}{Kernel family that defines both scaling and wavelet filters (default: "mexican_hat", options: "mexican_hat", "meyer", "heat")}
 }
 \value{
-List containing coefficients, filters, scales, eigenvalues, and eigenvectors
+List containing:
+  \describe{
+    \item{coefficients}{Inverse-transformed signals in vertex domain (scaling + wavelet scales)}
+    \item{fourier_coefficients}{List with original and filtered Fourier coefficients}
+    \item{filters}{Filter bank used}
+    \item{scales}{Scales used}
+    \item{eigenvalues}{Graph Laplacian eigenvalues}
+    \item{eigenvectors}{Graph Laplacian eigenvectors}
+  }
 }
 \description{
-Decompose signal into wavelet coefficients using SGWT
+Decompose signal into inverse-transformed signals (vertex domain) using SGWT.
+Also stores original and filtered Fourier coefficients for analysis.
 }
 \examples{
 \dontrun{

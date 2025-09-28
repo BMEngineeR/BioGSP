@@ -4,12 +4,7 @@
 \alias{compute_sgwt_filters}
 \title{Compute SGWT filters}
 \usage{
-compute_sgwt_filters(
-  eigenvalues,
-  scales,
-  lmax = NULL,
-  kernel_type = "mexican_hat"
-)
+compute_sgwt_filters(eigenvalues, scales, lmax = NULL, kernel_type = "heat")
 }
 \arguments{
 \item{eigenvalues}{Eigenvalues of the graph Laplacian}

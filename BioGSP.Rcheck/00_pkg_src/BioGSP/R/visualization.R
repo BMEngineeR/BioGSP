@@ -3,10 +3,8 @@
 #' @description Visualize SGWT decomposition components including original signal,
 #' scaling function, wavelet coefficients, and reconstructed signal
 #'
-#' @param sgwt_result SGWT result object from SGWT() function
-#' @param data.in Original data frame with spatial coordinates
-#' @param x_col Character string specifying the column name for X coordinates (default: "x")
-#' @param y_col Character string specifying the column name for Y coordinates (default: "y")
+#' @param SG SGWT object with Forward and Inverse results computed
+#' @param signal_name Name of signal to plot (default: first signal)
 #' @param plot_scales Which wavelet scales to plot (default: first 4)
 #' @param ncol Number of columns in the plot layout (default: 3)
 #'
@@ -15,58 +13,83 @@
 #'
 #' @examples
 #' \dontrun{
-#' # Assuming you have SGWT results
-#' plots <- plot_sgwt_decomposition(sgwt_result, data.in)
+#' # Assuming you have SGWT object
+#' plots <- plot_sgwt_decomposition(SG_object, signal_name = "signal1")
 #' print(plots)
-#' 
-#' # With custom column names
-#' plots2 <- plot_sgwt_decomposition(sgwt_result, data.in, x_col = "X", y_col = "Y")
-#' print(plots2)
 #' }
-plot_sgwt_decomposition <- function(sgwt_result, data.in, x_col = "x", y_col = "y", plot_scales = NULL, ncol = 3) {
-  if (is.null(plot_scales)) {
-    plot_scales <- 1:min(4, length(sgwt_result$decomposition$coefficients) - 1)
+plot_sgwt_decomposition <- function(SG, signal_name = NULL, plot_scales = NULL, ncol = 3) {
+  
+  # Validate input
+  if (!inherits(SG, "SGWT")) {
+    stop("Input must be an SGWT object")
+  }
+  if (is.null(SG$Forward) || is.null(SG$Inverse)) {
+    stop("SGWT object must have Forward and Inverse results computed")
   }
   
+  # Default to first signal if not specified
+  if (is.null(signal_name)) {
+    signal_name <- names(SG$Forward)[1]
+  }
+  
+  # Validate signal exists
+  if (!signal_name %in% names(SG$Forward)) {
+    stop(paste("Signal", signal_name, "not found in SGWT results"))
+  }
+  
+  # Get decomposition and inverse results
+  forward_result <- SG$Forward[[signal_name]]
+  inverse_result <- SG$Inverse[[signal_name]]
+  coefficients <- forward_result$coefficients
+  
+  # Default scales to plot
+  if (is.null(plot_scales)) {
+    n_wavelets <- length(coefficients) - 1  # Exclude scaling
+    plot_scales <- 1:min(4, n_wavelets)
+  }
   
   # Prepare data for plotting
+  data.in <- SG$Data$data
+  x_col <- SG$Data$x_col
+  y_col <- SG$Data$y_col
   plot_data <- data.in
-  coefficients <- sgwt_result$decomposition$coefficients
   
   plot_list <- list()
   
   # Plot original signal
-  plot_data$original <- sgwt_result$original_signal
+  plot_data$original <- as.numeric(data.in[[signal_name]])
   p_orig <- ggplot2::ggplot(plot_data, ggplot2::aes_string(x = x_col, y = y_col, fill = "original")) +
     ggplot2::geom_tile() +
     ggplot2::scale_fill_viridis_c() +
-    ggplot2::labs(title = "Original Signal") +
-    ggplot2::coord_fixed() +  # Add this for equal aspect ratio
+    ggplot2::labs(title = paste("Original Signal:", signal_name)) +
+    ggplot2::coord_fixed() +
     ggplot2::theme_void() +
     ggplot2::theme(legend.position = "none")
   plot_list[["original"]] <- p_orig
   
   # Plot scaling function coefficients
-  plot_data$scaling <- as.vector(Re(coefficients[[1]]))
+  plot_data$scaling <- as.vector(Re(coefficients$scaling))
   p_scaling <- ggplot2::ggplot(plot_data, ggplot2::aes_string(x = x_col, y = y_col, fill = "scaling")) +
     ggplot2::geom_tile() +
     ggplot2::scale_fill_viridis_c() +
-    ggplot2::labs(title = "Scaling Function") +
+    ggplot2::labs(title = "Low-pass (Scaling)") +
     ggplot2::coord_fixed() +
     ggplot2::theme_void() +
     ggplot2::theme(legend.position = "none")
   plot_list[["scaling"]] <- p_scaling
   
   # Plot wavelet coefficients at selected scales
+  wavelet_names <- names(coefficients)[grep("^wavelet_scale_", names(coefficients))]
   for (i in plot_scales) {
-    if (i + 1 <= length(coefficients)) {
+    wavelet_name <- paste0("wavelet_scale_", i)
+    if (wavelet_name %in% wavelet_names) {
       coeff_name <- paste0("wavelet_", i)
-      plot_data[[coeff_name]] <- as.vector(Re(coefficients[[i + 1]]))
+      plot_data[[coeff_name]] <- as.vector(Re(coefficients[[wavelet_name]]))
       
       p_wavelet <- ggplot2::ggplot(plot_data, ggplot2::aes_string(x = x_col, y = y_col, fill = coeff_name)) +
         ggplot2::geom_tile() +
         ggplot2::scale_fill_viridis_c() +
-        ggplot2::labs(title = paste("Wavelet Scale", i)) +
+        ggplot2::labs(title = paste("Band-pass Scale", i)) +
         ggplot2::coord_fixed() +
         ggplot2::theme_void() +
         ggplot2::theme(legend.position = "none")
@@ -76,11 +99,11 @@ plot_sgwt_decomposition <- function(sgwt_result, data.in, x_col = "x", y_col = "
   }
   
   # Plot reconstructed signal
-  plot_data$reconstructed <- sgwt_result$reconstructed_signal
+  plot_data$reconstructed <- inverse_result$reconstructed_signal
   p_recon <- ggplot2::ggplot(plot_data, ggplot2::aes_string(x = x_col, y = y_col, fill = "reconstructed")) +
     ggplot2::geom_tile() +
     ggplot2::scale_fill_viridis_c() +
-    ggplot2::labs(title = "Reconstructed Signal") +
+    ggplot2::labs(title = paste("Reconstructed (RMSE:", round(inverse_result$reconstruction_error, 4), ")")) +
     ggplot2::coord_fixed() +
     ggplot2::theme_void() +
     ggplot2::theme(legend.position = "none")
@@ -96,20 +119,37 @@ plot_sgwt_decomposition <- function(sgwt_result, data.in, x_col = "x", y_col = "
 #' @description Calculate and analyze energy distribution across different scales
 #' in the SGWT decomposition
 #'
-#' @param sgwt_result SGWT result object from SGWT() function
+#' @param SG SGWT object with Forward results computed
+#' @param signal_name Name of signal to analyze (default: first signal)
 #'
 #' @return Data frame with energy analysis results
 #' @export
 #'
 #' @examples
 #' \dontrun{
-#' # Assuming you have SGWT results
-#' energy_analysis <- sgwt_energy_analysis(sgwt_result)
+#' # Assuming you have SGWT object
+#' energy_analysis <- sgwt_energy_analysis(SG_object, signal_name = "signal1")
 #' print(energy_analysis)
 #' }
-sgwt_energy_analysis <- function(sgwt_result) {
-  coefficients <- sgwt_result$decomposition$coefficients
-  scales <- sgwt_result$decomposition$scales
+sgwt_energy_analysis <- function(SG, signal_name = NULL) {
+  
+  # Validate input
+  if (!inherits(SG, "SGWT")) {
+    stop("Input must be an SGWT object")
+  }
+  if (is.null(SG$Forward)) {
+    stop("SGWT object must have Forward results computed")
+  }
+  
+  # Default to first signal if not specified
+  if (is.null(signal_name)) {
+    signal_name <- names(SG$Forward)[1]
+  }
+  
+  # Get forward result
+  forward_result <- SG$Forward[[signal_name]]
+  coefficients <- forward_result$coefficients
+  scales <- forward_result$scales
   
   # Calculate energy at each scale
   energies <- sapply(coefficients, function(coeff) sum(abs(coeff)^2))
@@ -117,13 +157,15 @@ sgwt_energy_analysis <- function(sgwt_result) {
   energy_ratios <- energies / total_energy
   
   # Create results data frame
-  scale_names <- c("scaling", paste0("scale_", seq_along(scales)))
+  scale_names <- names(coefficients)
+  scale_values <- c(scales[1], scales)  # Use first scale for scaling function
   
   energy_df <- data.frame(
     scale = scale_names,
     energy = energies,
     energy_ratio = energy_ratios,
-    scale_value = c(scales[1], scales)  # Use first scale for scaling function
+    scale_value = scale_values,
+    signal = signal_name
   )
   
   return(energy_df)
@@ -205,12 +247,12 @@ plot_FM <- function(input = NULL, FM_idx = c(1:20), ncol = 5){
 #'   eigenvalues = eigenvals,
 #'   J = 4,
 #'   scaling_factor = 2,
-#'   kernel_type = "mexican_hat"
+#'   kernel_type = "heat"
 #' )
 #' print(viz_result$plot)
 #' }
 visualize_sgwt_kernels <- function(eigenvalues, scales = NULL, J = 4, scaling_factor = 2,
-                                   kernel_type = "mexican_hat", lmax = NULL,
+                                   kernel_type = "heat", lmax = NULL,
                                    eigenvalue_range = NULL, resolution = 1000) {
   
   # Set lmax if not provided
@@ -324,14 +366,15 @@ visualize_sgwt_kernels <- function(eigenvalues, scales = NULL, J = 4, scaling_fa
 #' Demo function for SGWT
 #'
 #' @description Demonstration function showing basic SGWT usage with synthetic data
+#' using the new workflow: initSGWT -> runSpecGraph -> runSGWT
 #'
-#' @return List containing demo data, SGWT results, and energy analysis
+#' @return SGWT object with complete analysis
 #' @export
 #'
 #' @examples
 #' \dontrun{
-#' demo_result <- demo_sgwt()
-#' print(demo_result$energy)
+#' SG <- demo_sgwt()
+#' print(SG)
 #' }
 demo_sgwt <- function() {
   cat("=== SGWT Demo ===\n")
@@ -344,33 +387,39 @@ demo_sgwt <- function() {
   x_coords <- rep(1:10, each = 10) + stats::rnorm(n_points, 0, 0.1)
   y_coords <- rep(1:10, times = 10) + stats::rnorm(n_points, 0, 0.1)
   
-  # Create a synthetic signal (e.g., spatial pattern)
-  signal_data <- sin(0.5 * x_coords) * cos(0.3 * y_coords) + 
-                 0.5 * sin(0.8 * x_coords * y_coords) + 
-                 stats::rnorm(n_points, 0, 0.1)
+  # Create synthetic signals
+  signal1 <- sin(0.5 * x_coords) * cos(0.3 * y_coords) + stats::rnorm(n_points, 0, 0.1)
+  signal2 <- 0.5 * sin(0.8 * x_coords * y_coords) + stats::rnorm(n_points, 0, 0.1)
   
   # Create data frame
   demo_data <- data.frame(
     x = x_coords,
     y = y_coords,
-    signal = signal_data
+    signal1 = signal1,
+    signal2 = signal2
   )
   
-  cat("Generated synthetic data with", n_points, "points\n")
+  cat("Generated synthetic data with", n_points, "points and", 2, "signals\n")
   
-  # Apply SGWT
-  sgwt_result <- SGWT(data.in = demo_data, 
-                      signal = "signal", 
-                      k = 8, 
-                      J = 4,
-                      scaling_factor = 2,
-                      k_fold = 8)  # 8 * sqrt(100) = 80 < 100
+  # New SGWT workflow
+  cat("Step 1: Initialize SGWT object\n")
+  SG <- initSGWT(demo_data, signals = c("signal1", "signal2"), k = 8, J = 4)
   
-  # Display energy analysis
-  energy_analysis <- sgwt_energy_analysis(sgwt_result)
+  cat("Step 2: Build spectral graph\n")
+  SG <- runSpecGraph(SG, verbose = TRUE)
+  
+  cat("Step 3: Run SGWT analysis\n")
+  SG <- runSGWT(SG, verbose = TRUE)
+  
+  cat("Step 4: Display results\n")
+  print(SG)
+  
+  # Display energy analysis for first signal
+  energy_analysis <- sgwt_energy_analysis(SG, "signal1")
+  cat("\nEnergy analysis for signal1:\n")
   print(energy_analysis)
   
   cat("\n=== SGWT Demo Complete ===\n")
   
-  return(list(data = demo_data, result = sgwt_result, energy = energy_analysis))
+  return(SG)
 } 

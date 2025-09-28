@@ -1,7 +1,7 @@
 #!/usr/bin/env Rscript
 
-# BioGSP Simulation Pattern Demo
-# This script demonstrates the new simulation functions and flexible column naming
+# BioGSP Simulation Pattern Demo - Updated for New Workflow
+# This script demonstrates the new SGWT workflow: initSGWT -> runSpecGraph -> runSGWT -> runSGCC
 
 # Load required libraries
 library(BioGSP)
@@ -11,7 +11,7 @@ library(patchwork)
 # Set random seed for reproducibility
 set.seed(123)
 
-cat("=== BioGSP Simulation Pattern Demo ===\n\n")
+cat("=== BioGSP Simulation Pattern Demo (New Workflow) ===\n\n")
 
 # ============================================================================
 # Part 1: Multiple Center Simulation
@@ -40,34 +40,42 @@ cat("Selected pattern dimensions:", nrow(pattern_data), "points\n")
 cat("Column names:", paste(colnames(pattern_data), collapse = ", "), "\n\n")
 
 # ============================================================================
-# Part 2: SGWT Analysis with Flexible Column Naming
+# Part 2: NEW SGWT Workflow - Initialize and Build Graph
 # ============================================================================
 
-cat("2. Performing SGWT Analysis on signal_1 (Inner Circles)...\n")
+cat("2. NEW WORKFLOW - Step 1: Initialize SGWT Object...\n")
 
-# Perform SGWT analysis using custom column names (X, Y, signal_1)
-sgwt_result <- SGWT(
+# Step 1: Initialize SGWT object with custom column names
+SG <- initSGWT(
   data.in = pattern_data,
   x_col = "X",           # Custom X coordinate column name
   y_col = "Y",           # Custom Y coordinate column name  
-  signal = "signal_1",   # Analyze the inner circles
+  signals = c("signal_1", "signal_2"),  # Analyze both signals
   k = 8,
   J = 3,
   scaling_factor = 2,
-  kernel_type = "mexican_hat",
-  k_fold = 6
+  kernel_type = "heat"
 )
 
+cat("SGWT object initialized!\n")
+print(SG)
+
+cat("\nStep 2: Build Spectral Graph...\n")
+# Step 2: Build spectral graph
+SG <- runSpecGraph(SG, verbose = TRUE)
+
+cat("\nStep 3: Run SGWT Analysis...\n")
+# Step 3: Run SGWT forward and inverse transforms
+SG <- runSGWT(SG, verbose = TRUE)
+
 cat("SGWT Analysis completed!\n")
-cat("Reconstruction RMSE:", round(sgwt_result$reconstruction_error, 6), "\n")
-cat("Number of scales:", length(sgwt_result$decomposition$scales), "\n")
-cat("Scales:", paste(round(sgwt_result$decomposition$scales, 4), collapse = ", "), "\n\n")
+print(SG)
 
 # ============================================================================
 # Part 3: Concentric Ring Simulation
 # ============================================================================
 
-cat("3. Generating Concentric Ring Patterns...\n")
+cat("\n3. Generating Concentric Ring Patterns...\n")
 
 # Generate ring patterns
 ring_data <- simulate_ringpattern(
@@ -87,95 +95,89 @@ cat("Selected ring pattern dimensions:", nrow(movement_data), "points\n")
 cat("Column names:", paste(colnames(movement_data), collapse = ", "), "\n\n")
 
 # ============================================================================
-# Part 4: SGWT Analysis on Ring Pattern
+# Part 4: NEW WORKFLOW - Ring Pattern Analysis
 # ============================================================================
 
-cat("4. Performing SGWT Analysis on signal_2 (Dynamic Ring)...\n")
+cat("4. NEW WORKFLOW - Ring Pattern Analysis...\n")
 
-# Analyze the dynamic ring using Meyer kernel
-sgwt_ring_result <- SGWT(
+# Initialize second SGWT object for ring pattern
+SG_ring <- initSGWT(
   data.in = movement_data,
   x_col = "X",
   y_col = "Y",
-  signal = "signal_2",   # Analyze the dynamic ring
+  signals = c("signal_2"),   # Analyze the dynamic ring
   k = 8,
   J = 3,
   scaling_factor = 2,
-  kernel_type = "meyer",
-  k_fold = 6
+  kernel_type = "meyer"
 )
 
+# Build graph and run analysis
+SG_ring <- runSpecGraph(SG_ring, verbose = FALSE)
+SG_ring <- runSGWT(SG_ring, verbose = FALSE)
+
 cat("Ring SGWT Analysis completed!\n")
-cat("Reconstruction RMSE:", round(sgwt_ring_result$reconstruction_error, 6), "\n\n")
 
 # ============================================================================
 # Part 5: Energy Analysis Comparison
 # ============================================================================
 
-cat("5. Comparing Energy Distributions...\n")
+cat("\n5. Comparing Energy Distributions...\n")
 
 # Energy analysis for both patterns
-energy_circles <- sgwt_energy_analysis(sgwt_result)
-energy_rings <- sgwt_energy_analysis(sgwt_ring_result)
+energy_circles <- sgwt_energy_analysis(SG, "signal_1")
+energy_rings <- sgwt_energy_analysis(SG_ring, "signal_2")
 
-cat("Energy Distribution - Inner Circles:\n")
+cat("Energy Distribution - Inner Circles (signal_1):\n")
 print(energy_circles)
 
-cat("\nEnergy Distribution - Dynamic Rings:\n")
+cat("\nEnergy Distribution - Dynamic Rings (signal_2):\n")
 print(energy_rings)
 
 # ============================================================================
-# Part 6: Cross-Signal Analysis
+# Part 6: NEW WORKFLOW - Cross-Signal Similarity Analysis
 # ============================================================================
 
-cat("\n6. Performing Graph Cross-Correlation Analysis...\n")
+cat("\n6. NEW WORKFLOW - Cross-Signal Similarity Analysis...\n")
 
-# Calculate eigendecomposition for GCC
-eigen_result <- Cal_Eigen(
-  data.in = pattern_data,
-  x_col = "X",
-  y_col = "Y",
-  k = 10,
-  k_fold = 8,
-  sensitivity = 2
-)
+# Calculate similarity between signal_1 and signal_2 in the same object
+similarity_within <- runSGCC("signal_1", "signal_2", SG = SG, return_parts = TRUE)
 
-knee_point <- eigen_result[[1]]
-eigenvectors <- eigen_result[[2]]
+cat("Similarity between signal_1 and signal_2 (within same graph):\n")
+cat("Overall Similarity (S):", round(similarity_within$S, 4), "\n")
+cat("Low-frequency similarity:", round(similarity_within$c_low, 4), "\n")
+cat("Non-low-frequency similarity:", round(similarity_within$c_nonlow, 4), "\n")
+cat("Energy weights - Low:", round(similarity_within$w_low, 3), ", Non-low:", round(similarity_within$w_NL, 3), "\n\n")
 
-# Calculate GCC between signal_1 and signal_2
-gcc_value <- Cal_GCC(
-  data.in = pattern_data,
-  knee = knee_point,
-  signal1 = "signal_1",  # Inner circles
-  signal2 = "signal_2",  # Outer rings
-  eigenvector = eigenvectors
-)
-
-cat("Graph Cross-Correlation between signals:", round(gcc_value, 4), "\n")
-cat("Knee point (frequency cutoff):", knee_point, "\n\n")
+# Calculate similarity between different SGWT objects
+similarity_cross <- runSGCC(SG, SG_ring, return_parts = FALSE)
+cat("Cross-object similarity (circles vs rings):", round(similarity_cross, 4), "\n\n")
 
 # ============================================================================
-# Part 7: Kernel Comparison
+# Part 7: Kernel Comparison with New Workflow
 # ============================================================================
 
-cat("7. Comparing Different Kernel Types...\n")
+cat("7. Comparing Different Kernel Types with New Workflow...\n")
 
 kernel_types <- c("mexican_hat", "meyer", "heat")
 reconstruction_errors <- numeric(length(kernel_types))
 
 for (i in seq_along(kernel_types)) {
-  result <- SGWT(
+  # Create temporary SGWT object for each kernel
+  SG_temp <- initSGWT(
     data.in = pattern_data,
     x_col = "X",
     y_col = "Y",
-    signal = "signal_1",
+    signals = "signal_1",
     k = 8,
     J = 3,
-    kernel_type = kernel_types[i],
-    k_fold = 6
+    kernel_type = kernel_types[i]
   )
-  reconstruction_errors[i] <- result$reconstruction_error
+  
+  SG_temp <- runSpecGraph(SG_temp, verbose = FALSE)
+  SG_temp <- runSGWT(SG_temp, verbose = FALSE)
+  
+  reconstruction_errors[i] <- SG_temp$Inverse$signal_1$reconstruction_error
 }
 
 comparison_df <- data.frame(
@@ -186,14 +188,46 @@ comparison_df <- data.frame(
 cat("Kernel Performance Comparison:\n")
 print(comparison_df)
 
+# ============================================================================
+# Part 8: Low-frequency Only Analysis
+# ============================================================================
+
+cat("\n8. Low-frequency Only Similarity Analysis...\n")
+
+# Compare using only low-frequency components
+similarity_low <- runSGCC("signal_1", "signal_2", SG = SG, low_only = TRUE, return_parts = TRUE)
+
+cat("Low-frequency only similarity:\n")
+cat("Similarity score:", round(similarity_low$S, 4), "\n")
+cat("Note: c_nonlow is NA for low-only analysis\n\n")
+
+# ============================================================================
+# Part 9: Demo Visualization (if ggpubr is available)
+# ============================================================================
+
+cat("9. Demonstration Complete!\n")
+
+# Try to create a simple visualization
+if (requireNamespace("ggpubr", quietly = TRUE)) {
+  cat("Creating visualization plots...\n")
+  tryCatch({
+    plots <- plot_sgwt_decomposition(SG, "signal_1")
+    cat("Visualization plots created successfully!\n")
+  }, error = function(e) {
+    cat("Note: Visualization requires additional packages\n")
+  })
+} else {
+  cat("Note: Install 'ggpubr' for visualization features\n")
+}
+
 cat("\n=== Demo Complete ===\n")
-cat("All functions successfully demonstrated flexible column naming support!\n")
+cat("NEW WORKFLOW successfully demonstrated!\n")
 cat("Key features tested:\n")
-cat("- Multiple center pattern simulation\n")
-cat("- Concentric ring pattern simulation\n")
-cat("- SGWT analysis with custom column names (X, Y, signal_1, signal_2)\n")
-cat("- Energy distribution analysis\n")
-cat("- Graph Cross-Correlation analysis\n")
+cat("- initSGWT(): Initialize SGWT objects with flexible column naming\n")
+cat("- runSpecGraph(): Build spectral graph structure\n")
+cat("- runSGWT(): Perform forward and inverse SGWT transforms\n")
+cat("- runSGCC(): Calculate energy-normalized weighted similarity\n")
+cat("- sgwt_energy_analysis(): Analyze energy distribution across scales\n")
 cat("- Multiple kernel type comparison\n")
-
-
+cat("- Low-frequency only analysis\n")
+cat("- Cross-object similarity comparison\n")

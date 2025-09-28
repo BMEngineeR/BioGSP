@@ -124,7 +124,7 @@
 #'                     signal = "signal",
 #'                     k = 8,
 #'                     J = 3,
-#'                     kernel_type = "mexican_hat")
+#'                     kernel_type = "heat")
 #' }
 #'
 #' @keywords datasets spatial CODEX SGWT

@@ -4,10 +4,12 @@
 \alias{sgwt_energy_analysis}
 \title{Analyze SGWT energy distribution across scales}
 \usage{
-sgwt_energy_analysis(sgwt_result)
+sgwt_energy_analysis(SG, signal_name = NULL)
 }
 \arguments{
-\item{sgwt_result}{SGWT result object from SGWT() function}
+\item{SG}{SGWT object with Forward results computed}
+
+\item{signal_name}{Name of signal to analyze (default: first signal)}
 }
 \value{
 Data frame with energy analysis results
@@ -18,8 +20,8 @@ in the SGWT decomposition
 }
 \examples{
 \dontrun{
-# Assuming you have SGWT results
-energy_analysis <- sgwt_energy_analysis(sgwt_result)
+# Assuming you have SGWT object
+energy_analysis <- sgwt_energy_analysis(SG_object, signal_name = "signal1")
 print(energy_analysis)
 }
 }

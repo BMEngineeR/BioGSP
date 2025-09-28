@@ -7,14 +7,15 @@
 demo_sgwt()
 }
 \value{
-List containing demo data, SGWT results, and energy analysis
+SGWT object with complete analysis
 }
 \description{
 Demonstration function showing basic SGWT usage with synthetic data
+using the new workflow: initSGWT -> runSpecGraph -> runSGWT
 }
 \examples{
 \dontrun{
-demo_result <- demo_sgwt()
-print(demo_result$energy)
+SG <- demo_sgwt()
+print(SG)
 }
 }

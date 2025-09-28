@@ -4,23 +4,12 @@
 \alias{plot_sgwt_decomposition}
 \title{Plot SGWT decomposition results}
 \usage{
-plot_sgwt_decomposition(
-  sgwt_result,
-  data.in,
-  x_col = "x",
-  y_col = "y",
-  plot_scales = NULL,
-  ncol = 3
-)
+plot_sgwt_decomposition(SG, signal_name = NULL, plot_scales = NULL, ncol = 3)
 }
 \arguments{
-\item{sgwt_result}{SGWT result object from SGWT() function}
+\item{SG}{SGWT object with Forward and Inverse results computed}
 
-\item{data.in}{Original data frame with spatial coordinates}
-
-\item{x_col}{Character string specifying the column name for X coordinates (default: "x")}
-
-\item{y_col}{Character string specifying the column name for Y coordinates (default: "y")}
+\item{signal_name}{Name of signal to plot (default: first signal)}
 
 \item{plot_scales}{Which wavelet scales to plot (default: first 4)}
 
@@ -35,12 +24,8 @@ scaling function, wavelet coefficients, and reconstructed signal
 }
 \examples{
 \dontrun{
-# Assuming you have SGWT results
-plots <- plot_sgwt_decomposition(sgwt_result, data.in)
+# Assuming you have SGWT object
+plots <- plot_sgwt_decomposition(SG_object, signal_name = "signal1")
 print(plots)
-
-# With custom column names
-plots2 <- plot_sgwt_decomposition(sgwt_result, data.in, x_col = "X", y_col = "Y")
-print(plots2)
 }
 }

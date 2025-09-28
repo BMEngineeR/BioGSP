@@ -68,11 +68,13 @@ Type 'q()' to quit R.
 > ##D   signal = sin(runif(n, 0, 2*pi))
 > ##D )
 > ##D 
-> ##D # Apply SGWT
-> ##D result <- SGWT(data, signal = "signal", k = 8, J = 4)
+> ##D # New workflow: Initialize -> Build Graph -> Run SGWT
+> ##D SG <- initSGWT(data, signals = "signal", k = 8, J = 4, kernel_type = "heat")
+> ##D SG <- runSpecGraph(SG)
+> ##D SG <- runSGWT(SG)
 > ##D 
 > ##D # Analyze results
-> ##D energy_analysis <- sgwt_energy_analysis(result)
+> ##D energy_analysis <- sgwt_energy_analysis(SG)
 > ##D print(energy_analysis)
 > ## End(Not run)
 > 
@@ -81,60 +83,6 @@ Type 'q()' to quit R.
 > 
 > base::assign(".dptime", (proc.time() - get(".ptime", pos = "CheckExEnv")), pos = "CheckExEnv")
 > base::cat("BioGSP-package", base::get(".format_ptime", pos = 'CheckExEnv')(get(".dptime", pos = "CheckExEnv")), "\n", file=base::get(".ExTimings", pos = 'CheckExEnv'), append=TRUE, sep="\t")
-> cleanEx()
-> nameEx("Cal_Eigen")
-> ### * Cal_Eigen
-> 
-> flush(stderr()); flush(stdout())
-> 
-> base::assign(".ptime", proc.time(), pos = "CheckExEnv")
-> ### Name: Cal_Eigen
-> ### Title: Calculate eigenvalues and eigenvectors with knee detection
-> ### Aliases: Cal_Eigen
-> 
-> ### ** Examples
-> 
-> ## Not run: 
-> ##D # Create spatial data
-> ##D data <- data.frame(x = runif(100), y = runif(100))
-> ##D result <- Cal_Eigen(data, k = 10)
-> ##D 
-> ##D # With custom column names
-> ##D data2 <- data.frame(X = runif(100), Y = runif(100))
-> ##D result2 <- Cal_Eigen(data2, x_col = "X", y_col = "Y", k = 10)
-> ## End(Not run)
-> 
-> 
-> 
-> base::assign(".dptime", (proc.time() - get(".ptime", pos = "CheckExEnv")), pos = "CheckExEnv")
-> base::cat("Cal_Eigen", base::get(".format_ptime", pos = 'CheckExEnv')(get(".dptime", pos = "CheckExEnv")), "\n", file=base::get(".ExTimings", pos = 'CheckExEnv'), append=TRUE, sep="\t")
-> cleanEx()
-> nameEx("Cal_GCC")
-> ### * Cal_GCC
-> 
-> flush(stderr()); flush(stdout())
-> 
-> base::assign(".ptime", proc.time(), pos = "CheckExEnv")
-> ### Name: Cal_GCC
-> ### Title: Calculate Graph Cross-Correlation (GCC) - DEPRECATED
-> ### Aliases: Cal_GCC
-> 
-> ### ** Examples
-> 
-> ## Not run: 
-> ##D # DEPRECATED - use sgwt_similarity instead
-> ##D # gcc_value <- Cal_GCC(data, knee = 10, signal1 = "sig1", signal2 = "sig2", eigenvector = U)
-> ##D 
-> ##D # NEW RECOMMENDED APPROACH:
-> ##D # sgwt1 <- SGWT(data, signal = "signal1", k = 25, J = 4)
-> ##D # sgwt2 <- SGWT(data, signal = "signal2", k = 25, J = 4)  
-> ##D # similarity <- sgwt_similarity(sgwt1, sgwt2)
-> ## End(Not run)
-> 
-> 
-> 
-> base::assign(".dptime", (proc.time() - get(".ptime", pos = "CheckExEnv")), pos = "CheckExEnv")
-> base::cat("Cal_GCC", base::get(".format_ptime", pos = 'CheckExEnv')(get(".dptime", pos = "CheckExEnv")), "\n", file=base::get(".ExTimings", pos = 'CheckExEnv'), append=TRUE, sep="\t")
 > cleanEx()
 > nameEx("FastDecompositionLap")
 > ### * FastDecompositionLap
@@ -151,52 +99,13 @@ Type 'q()' to quit R.
 > ## Not run: 
 > ##D # Create a Laplacian matrix and decompose
 > ##D L <- matrix(c(2, -1, -1, -1, 2, -1, -1, -1, 2), nrow = 3)
-> ##D decomp <- FastDecompositionLap(L, k_fold = 2)
+> ##D decomp <- FastDecompositionLap(L, k_neighbor = 25)
 > ## End(Not run)
 > 
 > 
 > 
 > base::assign(".dptime", (proc.time() - get(".ptime", pos = "CheckExEnv")), pos = "CheckExEnv")
 > base::cat("FastDecompositionLap", base::get(".format_ptime", pos = 'CheckExEnv')(get(".dptime", pos = "CheckExEnv")), "\n", file=base::get(".ExTimings", pos = 'CheckExEnv'), append=TRUE, sep="\t")
-> cleanEx()
-> nameEx("SGWT")
-> ### * SGWT
-> 
-> flush(stderr()); flush(stdout())
-> 
-> base::assign(".ptime", proc.time(), pos = "CheckExEnv")
-> ### Name: SGWT
-> ### Title: Spectral Graph Wavelet Transform (SGWT)
-> ### Aliases: SGWT
-> 
-> ### ** Examples
-> 
-> ## Not run: 
-> ##D # Generate synthetic spatial data
-> ##D set.seed(123)
-> ##D n_points <- 100
-> ##D x_coords <- rep(1:10, each = 10) + rnorm(n_points, 0, 0.1)
-> ##D y_coords <- rep(1:10, times = 10) + rnorm(n_points, 0, 0.1)
-> ##D signal_data <- sin(0.5 * x_coords) * cos(0.3 * y_coords) + rnorm(n_points, 0, 0.1)
-> ##D 
-> ##D demo_data <- data.frame(x = x_coords, y = y_coords, signal = signal_data)
-> ##D 
-> ##D # Apply SGWT
-> ##D result <- SGWT(data.in = demo_data, signal = "signal", k = 8, J = 4)
-> ##D 
-> ##D # With custom column names
-> ##D demo_data2 <- data.frame(X = x_coords, Y = y_coords, signal_1 = signal_data)
-> ##D result2 <- SGWT(data.in = demo_data2, x_col = "X", y_col = "Y", signal = "signal_1", k = 8, J = 4)
-> ##D 
-> ##D # View reconstruction error
-> ##D print(result$reconstruction_error)
-> ## End(Not run)
-> 
-> 
-> 
-> 
-> base::assign(".dptime", (proc.time() - get(".ptime", pos = "CheckExEnv")), pos = "CheckExEnv")
-> base::cat("SGWT", base::get(".format_ptime", pos = 'CheckExEnv')(get(".dptime", pos = "CheckExEnv")), "\n", file=base::get(".ExTimings", pos = 'CheckExEnv'), append=TRUE, sep="\t")
 > cleanEx()
 > nameEx("cal_laplacian")
 > ### * cal_laplacian
@@ -352,7 +261,7 @@ BCL6+ B Cell BCL6- B Cell        CD4 T     CD4 Treg        CD8 T           DC
 > ##D                     signal = "signal",
 > ##D                     k = 8,
 > ##D                     J = 3,
-> ##D                     kernel_type = "mexican_hat")
+> ##D                     kernel_type = "heat")
 > ## End(Not run)
 > 
 > 
@@ -443,8 +352,8 @@ detaching ‘package:ggplot2’
 > ### ** Examples
 > 
 > ## Not run: 
-> ##D demo_result <- demo_sgwt()
-> ##D print(demo_result$energy)
+> ##D SG <- demo_sgwt()
+> ##D print(SG)
 > ## End(Not run)
 > 
 > 
@@ -491,6 +400,30 @@ detaching ‘package:ggplot2’
 > 
 > base::assign(".dptime", (proc.time() - get(".ptime", pos = "CheckExEnv")), pos = "CheckExEnv")
 > base::cat("hello_sgwt", base::get(".format_ptime", pos = 'CheckExEnv')(get(".dptime", pos = "CheckExEnv")), "\n", file=base::get(".ExTimings", pos = 'CheckExEnv'), append=TRUE, sep="\t")
+> cleanEx()
+> nameEx("initSGWT")
+> ### * initSGWT
+> 
+> flush(stderr()); flush(stdout())
+> 
+> base::assign(".ptime", proc.time(), pos = "CheckExEnv")
+> ### Name: initSGWT
+> ### Title: Initialize SGWT object
+> ### Aliases: initSGWT
+> 
+> ### ** Examples
+> 
+> ## Not run: 
+> ##D # Initialize SGWT object
+> ##D data <- data.frame(x = runif(100), y = runif(100), 
+> ##D                   signal1 = rnorm(100), signal2 = rnorm(100))
+> ##D SG <- initSGWT(data, signals = c("signal1", "signal2"))
+> ## End(Not run)
+> 
+> 
+> 
+> base::assign(".dptime", (proc.time() - get(".ptime", pos = "CheckExEnv")), pos = "CheckExEnv")
+> base::cat("initSGWT", base::get(".format_ptime", pos = 'CheckExEnv')(get(".dptime", pos = "CheckExEnv")), "\n", file=base::get(".ExTimings", pos = 'CheckExEnv'), append=TRUE, sep="\t")
 > cleanEx()
 > nameEx("install_and_load")
 > ### * install_and_load
@@ -549,19 +482,85 @@ detaching ‘package:ggplot2’
 > ### ** Examples
 > 
 > ## Not run: 
-> ##D # Assuming you have SGWT results
-> ##D plots <- plot_sgwt_decomposition(sgwt_result, data.in)
+> ##D # Assuming you have SGWT object
+> ##D plots <- plot_sgwt_decomposition(SG_object, signal_name = "signal1")
 > ##D print(plots)
-> ##D 
-> ##D # With custom column names
-> ##D plots2 <- plot_sgwt_decomposition(sgwt_result, data.in, x_col = "X", y_col = "Y")
-> ##D print(plots2)
 > ## End(Not run)
 > 
 > 
 > 
 > base::assign(".dptime", (proc.time() - get(".ptime", pos = "CheckExEnv")), pos = "CheckExEnv")
 > base::cat("plot_sgwt_decomposition", base::get(".format_ptime", pos = 'CheckExEnv')(get(".dptime", pos = "CheckExEnv")), "\n", file=base::get(".ExTimings", pos = 'CheckExEnv'), append=TRUE, sep="\t")
+> cleanEx()
+> nameEx("runSGCC")
+> ### * runSGCC
+> 
+> flush(stderr()); flush(stdout())
+> 
+> base::assign(".ptime", proc.time(), pos = "CheckExEnv")
+> ### Name: runSGCC
+> ### Title: Run SGCC weighted similarity analysis
+> ### Aliases: runSGCC
+> 
+> ### ** Examples
+> 
+> ## Not run: 
+> ##D # Between two signals in same SGWT object
+> ##D similarity <- runSGCC("signal1", "signal2", SG = SG_object)
+> ##D 
+> ##D # Between two SGWT objects
+> ##D similarity <- runSGCC(SG_object1, SG_object2)
+> ## End(Not run)
+> 
+> 
+> 
+> base::assign(".dptime", (proc.time() - get(".ptime", pos = "CheckExEnv")), pos = "CheckExEnv")
+> base::cat("runSGCC", base::get(".format_ptime", pos = 'CheckExEnv')(get(".dptime", pos = "CheckExEnv")), "\n", file=base::get(".ExTimings", pos = 'CheckExEnv'), append=TRUE, sep="\t")
+> cleanEx()
+> nameEx("runSGWT")
+> ### * runSGWT
+> 
+> flush(stderr()); flush(stdout())
+> 
+> base::assign(".ptime", proc.time(), pos = "CheckExEnv")
+> ### Name: runSGWT
+> ### Title: Run SGWT forward and inverse transforms for all signals
+> ### Aliases: runSGWT
+> 
+> ### ** Examples
+> 
+> ## Not run: 
+> ##D SG <- initSGWT(data)
+> ##D SG <- runSpecGraph(SG)
+> ##D SG <- runSGWT(SG)
+> ## End(Not run)
+> 
+> 
+> 
+> base::assign(".dptime", (proc.time() - get(".ptime", pos = "CheckExEnv")), pos = "CheckExEnv")
+> base::cat("runSGWT", base::get(".format_ptime", pos = 'CheckExEnv')(get(".dptime", pos = "CheckExEnv")), "\n", file=base::get(".ExTimings", pos = 'CheckExEnv'), append=TRUE, sep="\t")
+> cleanEx()
+> nameEx("runSpecGraph")
+> ### * runSpecGraph
+> 
+> flush(stderr()); flush(stdout())
+> 
+> base::assign(".ptime", proc.time(), pos = "CheckExEnv")
+> ### Name: runSpecGraph
+> ### Title: Build spectral graph for SGWT object
+> ### Aliases: runSpecGraph
+> 
+> ### ** Examples
+> 
+> ## Not run: 
+> ##D SG <- initSGWT(data)
+> ##D SG <- runSpecGraph(SG)
+> ## End(Not run)
+> 
+> 
+> 
+> base::assign(".dptime", (proc.time() - get(".ptime", pos = "CheckExEnv")), pos = "CheckExEnv")
+> base::cat("runSpecGraph", base::get(".format_ptime", pos = 'CheckExEnv')(get(".dptime", pos = "CheckExEnv")), "\n", file=base::get(".ExTimings", pos = 'CheckExEnv'), append=TRUE, sep="\t")
 > cleanEx()
 > nameEx("sgwt_auto_scales")
 > ### * sgwt_auto_scales
@@ -595,8 +594,8 @@ detaching ‘package:ggplot2’
 > ### ** Examples
 > 
 > ## Not run: 
-> ##D # Assuming you have SGWT results
-> ##D energy_analysis <- sgwt_energy_analysis(sgwt_result)
+> ##D # Assuming you have SGWT object
+> ##D energy_analysis <- sgwt_energy_analysis(SG_object, signal_name = "signal1")
 > ##D print(energy_analysis)
 > ## End(Not run)
 > 
@@ -643,69 +642,13 @@ detaching ‘package:ggplot2’
 > 
 > ## Not run: 
 > ##D # Assuming you have an SGWT decomposition
-> ##D reconstructed <- sgwt_inverse(sgwt_decomp)
+> ##D inverse_result <- sgwt_inverse(sgwt_decomp, original_signal)
 > ## End(Not run)
 > 
 > 
 > 
 > base::assign(".dptime", (proc.time() - get(".ptime", pos = "CheckExEnv")), pos = "CheckExEnv")
 > base::cat("sgwt_inverse", base::get(".format_ptime", pos = 'CheckExEnv')(get(".dptime", pos = "CheckExEnv")), "\n", file=base::get(".ExTimings", pos = 'CheckExEnv'), append=TRUE, sep="\t")
-> cleanEx()
-> nameEx("sgwt_similarity")
-> ### * sgwt_similarity
-> 
-> flush(stderr()); flush(stdout())
-> 
-> base::assign(".ptime", proc.time(), pos = "CheckExEnv")
-> ### Name: sgwt_similarity
-> ### Title: Comprehensive Signal Similarity Analysis
-> ### Aliases: sgwt_similarity
-> 
-> ### ** Examples
-> 
-> ## Not run: 
-> ##D # Method 1: Direct signals in data frame
-> ##D data <- data.frame(x = runif(100), y = runif(100), 
-> ##D                   signal1 = rnorm(100), signal2 = rnorm(100))
-> ##D sim1 <- sgwt_similarity("signal1", "signal2", data.in = data)
-> ##D 
-> ##D # Method 2: Pre-computed SGWT results
-> ##D sgwt1 <- SGWT(data, signal = "signal1", k = 25, J = 4)
-> ##D sgwt2 <- SGWT(data, signal = "signal2", k = 25, J = 4)
-> ##D sim2 <- sgwt_similarity(sgwt1, sgwt2)
-> ##D 
-> ##D # Method 3: Mixed - one SGWT result, one raw signal
-> ##D sim3 <- sgwt_similarity(sgwt1, "signal2", data.in = data)
-> ## End(Not run)
-> 
-> 
-> 
-> base::assign(".dptime", (proc.time() - get(".ptime", pos = "CheckExEnv")), pos = "CheckExEnv")
-> base::cat("sgwt_similarity", base::get(".format_ptime", pos = 'CheckExEnv')(get(".dptime", pos = "CheckExEnv")), "\n", file=base::get(".ExTimings", pos = 'CheckExEnv'), append=TRUE, sep="\t")
-> cleanEx()
-> nameEx("sgwt_weighted_similarity")
-> ### * sgwt_weighted_similarity
-> 
-> flush(stderr()); flush(stdout())
-> 
-> base::assign(".ptime", proc.time(), pos = "CheckExEnv")
-> ### Name: sgwt_weighted_similarity
-> ### Title: Energy-normalized weighted similarity between two SGWT results
-> ### Aliases: sgwt_weighted_similarity
-> 
-> ### ** Examples
-> 
-> ## Not run: 
-> ##D # Assume two SGWT results sgwt_res1 and sgwt_res2 from SGWT(..., return_all=TRUE)
-> ##D sim <- sgwt_weighted_similarity(sgwt_res1, sgwt_res2)
-> ##D sim_low <- sgwt_weighted_similarity(sgwt_res1, sgwt_res2, low_only = TRUE)
-> ##D str(sim)
-> ## End(Not run)
-> 
-> 
-> 
-> base::assign(".dptime", (proc.time() - get(".ptime", pos = "CheckExEnv")), pos = "CheckExEnv")
-> base::cat("sgwt_weighted_similarity", base::get(".format_ptime", pos = 'CheckExEnv')(get(".dptime", pos = "CheckExEnv")), "\n", file=base::get(".ExTimings", pos = 'CheckExEnv'), append=TRUE, sep="\t")
 > cleanEx()
 > nameEx("simulate_multiscale")
 > ### * simulate_multiscale
@@ -832,7 +775,7 @@ detaching ‘package:ggplot2’
 > ##D   eigenvalues = eigenvals,
 > ##D   J = 4,
 > ##D   scaling_factor = 2,
-> ##D   kernel_type = "mexican_hat"
+> ##D   kernel_type = "heat"
 > ##D )
 > ##D print(viz_result$plot)
 > ## End(Not run)
@@ -846,7 +789,7 @@ detaching ‘package:ggplot2’
 > cleanEx()
 > options(digits = 7L)
 > base::cat("Time elapsed: ", proc.time() - base::get("ptime", pos = 'CheckExEnv'),"\n")
-Time elapsed:  4.307 0.082 5.252 0 0 
+Time elapsed:  3.361 0.128 3.941 0 0 
 > grDevices::dev.off()
 null device 
           1 

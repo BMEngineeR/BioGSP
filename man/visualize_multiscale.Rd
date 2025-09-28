@@ -10,7 +10,8 @@ visualize_multiscale(
   Rb_seq,
   bg_color = "grey",
   signal1_color = "red",
-  signal2_color = "blue"
+  signal2_color = "blue",
+  show_title = TRUE
 )
 }
 \arguments{
@@ -25,6 +26,8 @@ visualize_multiscale(
 \item{signal1_color}{Color for signal 1 (default: "red")}
 
 \item{signal2_color}{Color for signal 2 (default: "blue")}
+
+\item{show_title}{Logical; if TRUE (default), add titles to plots with Ra and Rb values}
 }
 \value{
 Combined ggplot object with all pattern visualizations

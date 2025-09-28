@@ -4,7 +4,7 @@
 \alias{sgwt_get_kernels}
 \title{Get a unified kernel family (low-pass and band-pass) by kernel_type}
 \usage{
-sgwt_get_kernels(kernel_type = "mexican_hat")
+sgwt_get_kernels(kernel_type = "heat")
 }
 \arguments{
 \item{kernel_type}{Kernel family name ("mexican_hat", "meyer", or "heat")}
