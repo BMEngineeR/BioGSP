@@ -36,7 +36,7 @@ graph LR
     E --> F[Results & Visualization]
 ```
 
-**New Workflow (v2.0+):**
+**Workflow**
 1. **`initSGWT()`**: Initialize SGWT object with your spatial data and parameters
 2. **`runSpecGraph()`**: Build graph structure (adjacency, Laplacian, eigendecomposition) and auto-generate scales
 3. **`runSGWT()`**: Perform forward and inverse SGWT transforms on all signals
@@ -59,7 +59,7 @@ devtools::install_github("BMEngineeR/BioGSP")
 
 ## Quick Start
 
-### New Workflow (Recommended)
+### Workflow (Recommended)
 
 ```r
 library(BioGSP)
@@ -68,8 +68,8 @@ library(BioGSP)
 # Example with synthetic data
 set.seed(123)
 demo_data <- data.frame(
-  x = rep(1:10, each = 10) + rnorm(100, 0, 0.1),
-  y = rep(1:10, times = 10) + rnorm(100, 0, 0.1),
+  x = rep(1:10, each = 10) ,
+  y = rep(1:10, times = 10),
   signal1 = sin(0.5 * rep(1:10, each = 10)) + rnorm(100, 0, 0.1),
   signal2 = cos(0.3 * rep(1:10, times = 10)) + rnorm(100, 0, 0.1)
 )
@@ -132,30 +132,14 @@ The new SGWT object contains:
 - **Inverse**: Inverse transform results (vertex approximations, reconstructed signal, reconstruction error)
 - **Parameters**: All analysis parameters (scales, J, kernel_type, etc.) - scales auto-generated in runSpecGraph
 
-**Key Features:**
-- **Fourier Domain Analysis**: `runSGCC()` and `sgwt_energy_analysis()` work directly with spectral coefficients
-- **DC Component Handling**: Automatically excludes λ = 0 component for meaningful pattern analysis
-- **Energy Conservation**: Analysis consistent with Parseval's theorem
-
 ## Use Cases
 
 ### Biological Applications
 - **Spatial Transcriptomics**: Compare gene expression patterns across tissue regions
-- **Single-cell Analysis**: Analyze spatial organization of cell types
+- **Single-cell Analysis**: Analyze the spatial organization of cell types
 - **Cancer Research**: Identify spatial heterogeneity in tumors
 - **Developmental Biology**: Track pattern formation during development
 
-### Research Applications
-- **Neuroscience**: Brain connectivity and neural signal analysis
-- **Environmental Science**: Spatial patterns in ecological data
-- **Medical Imaging**: Multi-scale analysis of medical images
-- **Social Networks**: Analyze signals on network data
-
-### Data Analysis Tasks
-- **Pattern Discovery**: Find recurring spatial motifs
-- **Quality Control**: Assess spatial consistency in experiments
-- **Batch Effect Detection**: Compare datasets for systematic differences
-- **Multi-modal Integration**: Correlate different measurement types
 
 ## Key Functions
 
@@ -178,51 +162,6 @@ SG_mexican <- initSGWT(demo_data, kernel_type = "mexican_hat")
 SG_meyer <- initSGWT(demo_data, kernel_type = "meyer") 
 SG_heat <- initSGWT(demo_data, kernel_type = "heat")  # Default
 ```
-
-### Custom Parameters
-```r
-# Fine-tune analysis parameters
-SG <- initSGWT(demo_data,
-               k = 15,                    # More neighbors for smoother graph
-               J = 6,                     # More scales for finer analysis
-               scaling_factor = 1.5,      # Closer scales
-               laplacian_type = "randomwalk")  # Different Laplacian
-```
-
-### Low-frequency Only Analysis
-```r
-# Focus on smooth spatial patterns (scaling coefficients only, excludes DC)
-similarity_low <- runSGCC("signal1", "signal2", SG = SG, low_only = TRUE)
-print(paste("Low-frequency only similarity:", round(similarity_low$S, 4)))
-```
-
-## Learn More
-
-- **Detailed Documentation**: See function help pages for comprehensive documentation
-- **Mathematical Theory**: Learn about the underlying graph signal processing concepts
-- **Advanced Examples**: Explore complex analysis workflows in the vignettes
-- **API Reference**: Complete function specifications and parameters
-
-## Quick Help
-
-**Common Issues:**
-- **"Graph construction failed"**: Try reducing `k` (number of neighbors)
-- **"Eigendecomposition error"**: The `k_eigen` parameter is now fixed at 25 for stability
-- **"Signal not found"**: Check signal names match your data columns
-- **"SGWT object invalid"**: Ensure you've run the workflow steps in order
-
-**Getting Started:**
-1. Prepare data with x, y coordinates and signal values
-2. Start with `k=8-15` neighbors, `J=3-5` scales (scales auto-generated in runSpecGraph)
-3. Use `initSGWT() -> runSpecGraph() -> runSGWT()` workflow
-4. Check reconstruction errors to validate results
-5. Use Fourier domain energy analysis to understand your data's scale distribution (DC component excluded)
-
-**Parameter Guidelines:**
-- **Small datasets (<200 points)**: k=8-12, J=3-4
-- **Medium datasets (200-1000 points)**: k=12-20, J=4-6  
-- **Large datasets (>1000 points)**: k=15-25, J=5-8
-
 
 ## Support
 
