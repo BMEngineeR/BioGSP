@@ -118,7 +118,7 @@ print(paste("Energy weights - Low:", round(similarity$w_low, 4), "High:", round(
 # Or compare between different SGWT objects
 SG2 <- initSGWT(demo_data, signals = "signal2", J = 4)
 # Scales auto-generated during graph construction
-SG2 <- runSpecGraph(SG2, k = 8, laplacian_type = "normalized", length_eigenvalue = 25)
+SG2 <- runSpecGraph(SG2, k = 8, laplacian_type = "normalized", length_eigenvalue = 30)
 SG2 <- runSGWT(SG2)
 
 similarity_cross <- runSGCC(SG, SG2)  # Compare first signals from each object

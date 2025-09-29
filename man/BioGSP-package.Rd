@@ -83,6 +83,14 @@ Hammond, D. K., Vandergheynst, P., & Gribonval, R. (2011).
 Wavelets on graphs via spectral graph theory.
 Applied and Computational Harmonic Analysis, 30(2), 129-150.
 }
+\seealso{
+Useful links:
+\itemize{
+  \item \url{https://github.com/BMEngineeR/BioGSP}
+  \item Report bugs at \url{https://github.com/BMEngineeR/BioGSP/issues}
+}
+
+}
 \author{
 BioGSP Development Team
 }
