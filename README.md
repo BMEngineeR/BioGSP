@@ -1,5 +1,7 @@
 # BioGSP: Biological Graph Signal Processing
 
+<img src="man/figures/logo.svg" align="right" height="139" alt="BioGSP logo" />
+
 [![GitHub](https://img.shields.io/badge/GitHub-BMEngineeR%2FBioGSP-blue)](https://github.com/BMEngineeR/BioGSP)
 
 ## What is BioGSP?

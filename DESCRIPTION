@@ -11,6 +11,8 @@ Description: Implementation of Graph Signal Processing (GSP) methods including S
     including forward and inverse transforms, energy analysis, and visualization functions 
     tailored for biological applications.
 License: GPL-3
+URL: https://github.com/BMEngineeR/BioGSP
+BugReports: https://github.com/BMEngineeR/BioGSP/issues
 Encoding: UTF-8
 RoxygenNote: 7.2.3
 Imports: 
