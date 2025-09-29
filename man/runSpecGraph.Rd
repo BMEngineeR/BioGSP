@@ -4,10 +4,22 @@
 \alias{runSpecGraph}
 \title{Build spectral graph for SGWT object}
 \usage{
-runSpecGraph(SG, verbose = TRUE)
+runSpecGraph(
+  SG,
+  k = 25,
+  laplacian_type = "normalized",
+  length_eigenvalue = NULL,
+  verbose = TRUE
+)
 }
 \arguments{
 \item{SG}{SGWT object from initSGWT()}
+
+\item{k}{Number of nearest neighbors for graph construction (default: 25)}
+
+\item{laplacian_type}{Type of graph Laplacian ("unnormalized", "normalized", or "randomwalk") (default: "normalized")}
+
+\item{length_eigenvalue}{Number of eigenvalues/eigenvectors to compute (default: NULL, uses full length)}
 
 \item{verbose}{Whether to print progress messages (default: TRUE)}
 }
@@ -21,6 +33,10 @@ Laplacian matrix, eigenvalues, and eigenvectors.
 \examples{
 \dontrun{
 SG <- initSGWT(data)
-SG <- runSpecGraph(SG)
+# Uses full length by default
+SG <- runSpecGraph(SG, k = 30, laplacian_type = "normalized")  
+# Or specify custom length
+SG <- runSpecGraph(SG, k = 30, laplacian_type = "normalized", 
+                   length_eigenvalue = 30)  
 }
 }

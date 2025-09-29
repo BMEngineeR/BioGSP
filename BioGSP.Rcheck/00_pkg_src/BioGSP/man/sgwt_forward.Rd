@@ -2,7 +2,7 @@
 % Please edit documentation in R/sgwt_core.R
 \name{sgwt_forward}
 \alias{sgwt_forward}
-\title{Forward SGWT transform}
+\title{Forward SGWT transform (single or batch)}
 \usage{
 sgwt_forward(
   signal,
@@ -14,7 +14,7 @@ sgwt_forward(
 )
 }
 \arguments{
-\item{signal}{Input signal vector}
+\item{signal}{Input signal vector OR matrix where each column is a signal (n_vertices x n_signals)}
 
 \item{eigenvectors}{Eigenvectors of the graph Laplacian}
 
@@ -24,28 +24,27 @@ sgwt_forward(
 
 \item{lmax}{Maximum eigenvalue (optional)}
 
-\item{kernel_type}{Kernel family that defines both scaling and wavelet filters (default: "mexican_hat", options: "mexican_hat", "meyer", "heat")}
+\item{kernel_type}{Kernel family that defines both scaling and wavelet filters (default: "heat")}
 }
 \value{
 List containing:
   \describe{
-    \item{coefficients}{Inverse-transformed signals in vertex domain (scaling + wavelet scales)}
     \item{fourier_coefficients}{List with original and filtered Fourier coefficients}
     \item{filters}{Filter bank used}
-    \item{scales}{Scales used}
-    \item{eigenvalues}{Graph Laplacian eigenvalues}
-    \item{eigenvectors}{Graph Laplacian eigenvectors}
   }
 }
 \description{
-Decompose signal into inverse-transformed signals (vertex domain) using SGWT.
-Also stores original and filtered Fourier coefficients for analysis.
+Transform signal(s) to spectral domain and apply SGWT filters.
+Handles both single signals (vector) and multiple signals (matrix) efficiently.
+Stores original and filtered Fourier coefficients for analysis.
 }
 \examples{
 \dontrun{
-# Assuming you have eigenvalues, eigenvectors, and a signal
+# Single signal
 result <- sgwt_forward(signal, eigenvectors, eigenvalues, scales)
-result_meyer <- sgwt_forward(signal, eigenvectors, eigenvalues, scales, kernel_type = "meyer")
-result_heat <- sgwt_forward(signal, eigenvectors, eigenvalues, scales, kernel_type = "heat")
+
+# Multiple signals (batch processing)
+signals_matrix <- cbind(signal1, signal2, signal3)
+result <- sgwt_forward(signals_matrix, eigenvectors, eigenvalues, scales)
 }
 }

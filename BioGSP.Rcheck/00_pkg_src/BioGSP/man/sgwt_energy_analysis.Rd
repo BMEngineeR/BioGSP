@@ -2,7 +2,7 @@
 % Please edit documentation in R/visualization.R
 \name{sgwt_energy_analysis}
 \alias{sgwt_energy_analysis}
-\title{Analyze SGWT energy distribution across scales}
+\title{Analyze SGWT energy distribution across scales in Fourier domain}
 \usage{
 sgwt_energy_analysis(SG, signal_name = NULL)
 }
@@ -12,11 +12,12 @@ sgwt_energy_analysis(SG, signal_name = NULL)
 \item{signal_name}{Name of signal to analyze (default: first signal)}
 }
 \value{
-Data frame with energy analysis results
+Data frame with energy analysis results computed in Fourier domain
 }
 \description{
 Calculate and analyze energy distribution across different scales
-in the SGWT decomposition
+using Fourier domain coefficients directly (consistent with Parseval's theorem).
+Excludes DC component for more accurate energy analysis.
 }
 \examples{
 \dontrun{

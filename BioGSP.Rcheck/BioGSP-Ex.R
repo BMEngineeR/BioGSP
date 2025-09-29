@@ -80,7 +80,7 @@ base::assign(".ptime", proc.time(), pos = "CheckExEnv")
 ## Not run: 
 ##D # Create a Laplacian matrix and decompose
 ##D L <- matrix(c(2, -1, -1, -1, 2, -1, -1, -1, 2), nrow = 3)
-##D decomp <- FastDecompositionLap(L, k_neighbor = 25)
+##D decomp <- FastDecompositionLap(L, k_eigen = 25)
 ## End(Not run)
 
 
@@ -319,6 +319,31 @@ hello_sgwt()
 base::assign(".dptime", (proc.time() - get(".ptime", pos = "CheckExEnv")), pos = "CheckExEnv")
 base::cat("hello_sgwt", base::get(".format_ptime", pos = 'CheckExEnv')(get(".dptime", pos = "CheckExEnv")), "\n", file=base::get(".ExTimings", pos = 'CheckExEnv'), append=TRUE, sep="\t")
 cleanEx()
+nameEx("igft")
+### * igft
+
+flush(stderr()); flush(stdout())
+
+base::assign(".ptime", proc.time(), pos = "CheckExEnv")
+### Name: igft
+### Title: Inverse Graph Fourier Transform
+### Aliases: igft
+
+### ** Examples
+
+## Not run: 
+##D # Single signal
+##D signal_reconstructed <- igft(fourier_coeffs, eigenvectors)
+##D 
+##D # Multiple signals (batch processing)
+##D signals_reconstructed <- igft(fourier_coeffs_matrix, eigenvectors)
+## End(Not run)
+
+
+
+base::assign(".dptime", (proc.time() - get(".ptime", pos = "CheckExEnv")), pos = "CheckExEnv")
+base::cat("igft", base::get(".format_ptime", pos = 'CheckExEnv')(get(".dptime", pos = "CheckExEnv")), "\n", file=base::get(".ExTimings", pos = 'CheckExEnv'), append=TRUE, sep="\t")
+cleanEx()
 nameEx("initSGWT")
 ### * initSGWT
 
@@ -372,14 +397,18 @@ flush(stderr()); flush(stdout())
 
 base::assign(".ptime", proc.time(), pos = "CheckExEnv")
 ### Name: plot_FM
-### Title: Plot frequency modes
+### Title: Plot Fourier modes (eigenvectors) from SGWT object
 ### Aliases: plot_FM
 
 ### ** Examples
 
 ## Not run: 
-##D # This function requires specific data structure (df_hex_combine)
-##D # plot_FM(FM_idx = 1:10, ncol = 5)
+##D # Plot both low and high frequency modes
+##D SG <- initSGWT(data) %>% runSpecGraph()
+##D plot_FM(SG, mode_type = "both", n_modes = 4)
+##D 
+##D # Plot only low frequency modes
+##D plot_FM(SG, mode_type = "low", n_modes = 8)
 ## End(Not run)
 
 
@@ -417,7 +446,7 @@ flush(stderr()); flush(stdout())
 
 base::assign(".ptime", proc.time(), pos = "CheckExEnv")
 ### Name: runSGCC
-### Title: Run SGCC weighted similarity analysis
+### Title: Run SGCC weighted similarity analysis in Fourier domain
 ### Aliases: runSGCC
 
 ### ** Examples
@@ -450,7 +479,8 @@ base::assign(".ptime", proc.time(), pos = "CheckExEnv")
 ## Not run: 
 ##D SG <- initSGWT(data)
 ##D SG <- runSpecGraph(SG)
-##D SG <- runSGWT(SG)
+##D SG <- runSGWT(SG)  # Uses batch processing by default
+##D SG <- runSGWT(SG, use_batch = FALSE)  # Force individual processing
 ## End(Not run)
 
 
@@ -472,7 +502,11 @@ base::assign(".ptime", proc.time(), pos = "CheckExEnv")
 
 ## Not run: 
 ##D SG <- initSGWT(data)
-##D SG <- runSpecGraph(SG)
+##D # Uses full length by default
+##D SG <- runSpecGraph(SG, k = 30, laplacian_type = "normalized")  
+##D # Or specify custom length
+##D SG <- runSpecGraph(SG, k = 30, laplacian_type = "normalized", 
+##D                    length_eigenvalue = 30)  
 ## End(Not run)
 
 
@@ -506,7 +540,7 @@ flush(stderr()); flush(stdout())
 
 base::assign(".ptime", proc.time(), pos = "CheckExEnv")
 ### Name: sgwt_energy_analysis
-### Title: Analyze SGWT energy distribution across scales
+### Title: Analyze SGWT energy distribution across scales in Fourier domain
 ### Aliases: sgwt_energy_analysis
 
 ### ** Examples
@@ -529,16 +563,18 @@ flush(stderr()); flush(stdout())
 
 base::assign(".ptime", proc.time(), pos = "CheckExEnv")
 ### Name: sgwt_forward
-### Title: Forward SGWT transform
+### Title: Forward SGWT transform (single or batch)
 ### Aliases: sgwt_forward
 
 ### ** Examples
 
 ## Not run: 
-##D # Assuming you have eigenvalues, eigenvectors, and a signal
+##D # Single signal
 ##D result <- sgwt_forward(signal, eigenvectors, eigenvalues, scales)
-##D result_meyer <- sgwt_forward(signal, eigenvectors, eigenvalues, scales, kernel_type = "meyer")
-##D result_heat <- sgwt_forward(signal, eigenvectors, eigenvalues, scales, kernel_type = "heat")
+##D 
+##D # Multiple signals (batch processing)
+##D signals_matrix <- cbind(signal1, signal2, signal3)
+##D result <- sgwt_forward(signals_matrix, eigenvectors, eigenvalues, scales)
 ## End(Not run)
 
 
@@ -553,14 +589,17 @@ flush(stderr()); flush(stdout())
 
 base::assign(".ptime", proc.time(), pos = "CheckExEnv")
 ### Name: sgwt_inverse
-### Title: Inverse SGWT transform
+### Title: Inverse SGWT transform (single or batch)
 ### Aliases: sgwt_inverse
 
 ### ** Examples
 
 ## Not run: 
-##D # Assuming you have an SGWT decomposition
-##D inverse_result <- sgwt_inverse(sgwt_decomp, original_signal)
+##D # Single signal
+##D inverse_result <- sgwt_inverse(sgwt_decomp, eigenvectors, original_signal)
+##D 
+##D # Multiple signals (batch processing)
+##D inverse_result <- sgwt_inverse(sgwt_decomp, eigenvectors, original_signals_matrix)
 ## End(Not run)
 
 

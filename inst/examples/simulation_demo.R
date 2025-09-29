@@ -51,7 +51,6 @@ SG <- initSGWT(
   x_col = "X",           # Custom X coordinate column name
   y_col = "Y",           # Custom Y coordinate column name  
   signals = c("signal_1", "signal_2"),  # Analyze both signals
-  k = 8,
   J = 3,
   scaling_factor = 2,
   kernel_type = "heat"
@@ -61,8 +60,8 @@ cat("SGWT object initialized!\n")
 print(SG)
 
 cat("\nStep 2: Build Spectral Graph...\n")
-# Step 2: Build spectral graph
-SG <- runSpecGraph(SG, verbose = TRUE)
+# Step 2: Build spectral graph (using k=8 neighbors and 30 eigenvalues for better approximation)
+SG <- runSpecGraph(SG, k = 8, laplacian_type = "normalized", length_eigenvalue = 30, verbose = TRUE)
 
 cat("\nStep 3: Run SGWT Analysis...\n")
 # Step 3: Run SGWT forward and inverse transforms
@@ -113,7 +112,7 @@ SG_ring <- initSGWT(
 )
 
 # Build graph and run analysis
-SG_ring <- runSpecGraph(SG_ring, verbose = FALSE)
+SG_ring <- runSpecGraph(SG_ring, k = 8, laplacian_type = "normalized", verbose = FALSE)
 SG_ring <- runSGWT(SG_ring, verbose = FALSE)
 
 cat("Ring SGWT Analysis completed!\n")
@@ -169,12 +168,11 @@ for (i in seq_along(kernel_types)) {
     x_col = "X",
     y_col = "Y",
     signals = "signal_1",
-    k = 8,
     J = 3,
     kernel_type = kernel_types[i]
   )
   
-  SG_temp <- runSpecGraph(SG_temp, verbose = FALSE)
+  SG_temp <- runSpecGraph(SG_temp, k = 8, laplacian_type = "normalized", verbose = FALSE)
   SG_temp <- runSGWT(SG_temp, verbose = FALSE)
   
   reconstruction_errors[i] <- SG_temp$Inverse$signal_1$reconstruction_error

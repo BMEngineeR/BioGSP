@@ -4,10 +4,12 @@
 \alias{runSGWT}
 \title{Run SGWT forward and inverse transforms for all signals}
 \usage{
-runSGWT(SG, verbose = TRUE)
+runSGWT(SG, use_batch = TRUE, verbose = TRUE)
 }
 \arguments{
 \item{SG}{SGWT object with Graph slot populated}
+
+\item{use_batch}{Whether to use batch processing for multiple signals (default: TRUE)}
 
 \item{verbose}{Whether to print progress messages (default: TRUE)}
 }
@@ -16,12 +18,14 @@ Updated SGWT object with Forward and Inverse slots populated
 }
 \description{
 Perform SGWT analysis on all signals in the SGWT object.
+Uses batch processing for multiple signals when possible for efficiency.
 Assumes Graph slot is populated by runSpecGraph().
 }
 \examples{
 \dontrun{
 SG <- initSGWT(data)
 SG <- runSpecGraph(SG)
-SG <- runSGWT(SG)
+SG <- runSGWT(SG)  # Uses batch processing by default
+SG <- runSGWT(SG, use_batch = FALSE)  # Force individual processing
 }
 }

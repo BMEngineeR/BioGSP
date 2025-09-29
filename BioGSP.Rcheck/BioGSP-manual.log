@@ -1,4 +1,4 @@
-This is pdfTeX, Version 3.14159265-2.6-1.40.19 (TeX Live 2018) (preloaded format=pdflatex 2024.11.11)  28 SEP 2025 11:54
+This is pdfTeX, Version 3.14159265-2.6-1.40.19 (TeX Live 2018) (preloaded format=pdflatex 2024.11.11)  29 SEP 2025 02:07
 entering extended mode
  restricted \write18 enabled.
  %&-line parsing enabled.
@@ -769,7 +769,7 @@ Now handling font encoding PD1 ...
 
 
 Writing index file Rd2.idx
-(/bmbl_data/Rtmp/RtmplZaJEC/Rd2pdf3518096806b81e/Rd2.aux)
+(/bmbl_data/Rtmp/Rtmp3TuXdT/Rd2pdf18192f7cd23eb2/Rd2.aux)
 \openout1 = `Rd2.aux'.
 
 LaTeX Font Info:    Checking defaults for OML/cmm/m/it on input line 8.
@@ -826,8 +826,8 @@ LaTeX Info: Redefining \ref on input line 8.
 LaTeX Info: Redefining \pageref on input line 8.
 LaTeX Info: Redefining \nameref on input line 8.
 
-(/bmbl_data/Rtmp/RtmplZaJEC/Rd2pdf3518096806b81e/Rd2.out)
-(/bmbl_data/Rtmp/RtmplZaJEC/Rd2pdf3518096806b81e/Rd2.out)
+(/bmbl_data/Rtmp/Rtmp3TuXdT/Rd2pdf18192f7cd23eb2/Rd2.out)
+(/bmbl_data/Rtmp/Rtmp3TuXdT/Rd2pdf18192f7cd23eb2/Rd2.out)
 \@outlinefile=\write4
 \openout4 = `Rd2.out'.
 
@@ -850,7 +850,7 @@ File: ts1ptm.fd 2001/06/04 font definitions for TS1/ptm.
 LaTeX Font Info:    Font shape `T1/ptm/bx/n' in size <14.4> not available
 (Font)              Font shape `T1/ptm/b/n' tried instead on input line 39.
 
-(/bmbl_data/Rtmp/RtmplZaJEC/Rd2pdf3518096806b81e/Rd2.toc
+(/bmbl_data/Rtmp/Rtmp3TuXdT/Rd2pdf18192f7cd23eb2/Rd2.toc
 LaTeX Font Info:    Try loading font information for U+msa on input line 1.
 
 (/usr/share/texlive/texmf-dist/tex/latex/amsfonts/umsa.fd
@@ -936,88 +936,94 @@ Overfull \hbox (20.58041pt too wide) in paragraph at lines 405--405
 _type = "heat")[] 
  []
 
-[8] [9] [10] [11]
-Overfull \hbox (2.60802pt too wide) in paragraph at lines 626--627
+[8] [9] [10] [11] [12]
+Overfull \hbox (2.60802pt too wide) in paragraph at lines 660--661
 []\T1/ptm/m/n/10 Character vec-tor of sig-nal col-umn names to an-a-lyze. If NU
 LL, all non-coordinate
  []
 
-[12] [13]
-Overfull \hbox (66.78088pt too wide) in paragraph at lines 732--732
+[13]
+Overfull \hbox (36.78088pt too wide) in paragraph at lines 727--727
+ []\T1/pcr/m/n/10 plot_FM(SG, mode_type = "both", n_modes = 6, ncol = 3, point_
+size = 1.5)[] 
+ []
+
+
+Overfull \hbox (66.78088pt too wide) in paragraph at lines 771--771
  []\T1/pcr/m/n/10 plot_sgwt_decomposition(SG, signal_name = NULL, plot_scales =
  NULL, ncol = 3)[] 
  []
 
-[14] [15] [16] [17]
-Overfull \hbox (9.78043pt too wide) in paragraph at lines 973--973
+[14] [15] [16]
+Overfull \hbox (5.07787pt too wide) in paragraph at lines 943--944
+[]\T1/ptm/m/n/10 Number of eigen-val-ues/eigenvectors to com-pute (de-fault: NU
+LL, uses full length) 
+ []
+
+[17] [18]
+Overfull \hbox (9.78043pt too wide) in paragraph at lines 1034--1034
  []\T1/pcr/m/n/9 energy_analysis <- sgwt_energy_analysis(SG_object, signal_name
  = "signal1")[] 
  []
 
-[18]
-Overfull \hbox (7.61737pt too wide) in paragraph at lines 1011--1012
-[]\T1/ptm/m/n/10 Kernel fam-ily that de-fines both scal-ing and wavelet fil-ter
-s (de-fault: "mex-i-can_hat",
- []
-
 [19]
-Overfull \hbox (112.38031pt too wide) in paragraph at lines 1035--1035
- []\T1/pcr/m/n/9 result_meyer <- sgwt_forward(signal, eigenvectors, eigenvalues
-, scales, kernel_type = "meyer")[] 
- []
-
-
-Overfull \hbox (101.58032pt too wide) in paragraph at lines 1036--1036
- []\T1/pcr/m/n/9 result_heat <- sgwt_forward(signal, eigenvectors, eigenvalues,
- scales, kernel_type = "heat")[] 
- []
-
-
-Overfull \hbox (7.55559pt too wide) in paragraph at lines 1062--1063
+Overfull \hbox (7.55559pt too wide) in paragraph at lines 1122--1123
 []\T1/ptm/m/n/10 A list with two func-tions: list(scaling = func-tion(x, scale_
 param), wavelet = func-tion(x, scale_param)) 
  []
 
-[20] [21]
-Overfull \hbox (36.7804pt too wide) in paragraph at lines 1155--1155
+[20]
+Overfull \hbox (4.38043pt too wide) in paragraph at lines 1172--1172
+ []\T1/pcr/m/n/9 inverse_result <- sgwt_inverse(sgwt_decomp, eigenvectors, orig
+inal_signal)[] 
+ []
+
+
+Overfull \hbox (47.58038pt too wide) in paragraph at lines 1175--1175
+ []\T1/pcr/m/n/9 inverse_result <- sgwt_inverse(sgwt_decomp, eigenvectors, orig
+inal_signals_matrix)[] 
+ []
+
+[21]
+Overfull \hbox (36.7804pt too wide) in paragraph at lines 1227--1227
  []\T1/pcr/m/n/9 patterns <- simulate_multiscale(Ra_seq = Ra_seq, Rb_seq = Rb_s
 eq, n_centers = 3)[] 
  []
 
-
-Overfull \hbox (4.38043pt too wide) in paragraph at lines 1206--1206
+[22]
+Overfull \hbox (4.38043pt too wide) in paragraph at lines 1278--1278
  []\T1/pcr/m/n/9 patterns <- simulate_ringpattern(radius_seq = radius_seq, n_mo
 vements = 5)[] 
  []
 
-[22]
-Overfull \hbox (36.7804pt too wide) in paragraph at lines 1259--1259
+[23]
+Overfull \hbox (36.7804pt too wide) in paragraph at lines 1331--1331
  []\T1/pcr/m/n/9 sim_data <- simulate_multiscale(Ra_seq = Ra_seq, Rb_seq = Rb_s
 eq, n_centers = 3)[] 
  []
 
-[23] [24] [25] (/bmbl_data/Rtmp/RtmplZaJEC/Rd2pdf3518096806b81e/Rd2.ind
-[26]
+[24] [25] [26] (/bmbl_data/Rtmp/Rtmp3TuXdT/Rd2pdf18192f7cd23eb2/Rd2.ind
+[27]
 LaTeX Font Info:    Font shape `T1/pcr/m/it' in size <10> not available
 (Font)              Font shape `T1/pcr/m/sl' tried instead on input line 23.
- [27
+ [28
 
 ])
-Package atveryend Info: Empty hook `BeforeClearDocument' on input line 1379.
-Package atveryend Info: Empty hook `AfterLastShipout' on input line 1379.
- (/bmbl_data/Rtmp/RtmplZaJEC/Rd2pdf3518096806b81e/Rd2.aux)
-Package atveryend Info: Executing hook `AtVeryEndDocument' on input line 1379.
-Package atveryend Info: Executing hook `AtEndAfterFileList' on input line 1379.
+Package atveryend Info: Empty hook `BeforeClearDocument' on input line 1451.
+Package atveryend Info: Empty hook `AfterLastShipout' on input line 1451.
+ (/bmbl_data/Rtmp/Rtmp3TuXdT/Rd2pdf18192f7cd23eb2/Rd2.aux)
+Package atveryend Info: Executing hook `AtVeryEndDocument' on input line 1451.
+Package atveryend Info: Executing hook `AtEndAfterFileList' on input line 1451.
 
 Package rerunfilecheck Info: File `Rd2.out' has not changed.
-(rerunfilecheck)             Checksum: 467CF3B8816893C5E1C43E6E25E66785;2125.
-Package atveryend Info: Empty hook `AtVeryVeryEnd' on input line 1379.
+(rerunfilecheck)             Checksum: E0A7A87CF790CE793EDFFF8AD71E95AE;2166.
+Package atveryend Info: Empty hook `AtVeryVeryEnd' on input line 1451.
  ) 
 Here is how much of TeX's memory you used:
- 7465 strings out of 494917
- 103752 string characters out of 6180698
+ 7474 strings out of 494917
+ 103849 string characters out of 6180698
  177489 words of memory out of 5000000
- 10409 multiletter control sequences out of 15000+600000
+ 10410 multiletter control sequences out of 15000+600000
  39456 words of font info for 63 fonts, out of 8000000 for 9000
  14 hyphenation exceptions out of 8191
  37i,6n,34p,262b,593s stack positions out of 5000i,500n,10000p,200000b,80000s
@@ -1028,10 +1034,10 @@ type1/urw/courier/ucrro8a.pfb></usr/share/texlive/texmf-dist/fonts/type1/urw/ti
 mes/utmb8a.pfb></usr/share/texlive/texmf-dist/fonts/type1/urw/times/utmr8a.pfb>
 </usr/share/texlive/texmf-dist/fonts/type1/urw/times/utmr8a.pfb></usr/share/tex
 live/texmf-dist/fonts/type1/urw/times/utmri8a.pfb>
-Output written on Rd2.pdf (27 pages, 139828 bytes).
+Output written on Rd2.pdf (28 pages, 141948 bytes).
 PDF statistics:
- 596 PDF objects out of 1000 (max. 8388607)
- 554 compressed objects within 6 object streams
- 235 named destinations out of 1000 (max. 500000)
- 249 words of extra memory for PDF output out of 10000 (max. 10000000)
+ 613 PDF objects out of 1000 (max. 8388607)
+ 570 compressed objects within 6 object streams
+ 243 named destinations out of 1000 (max. 500000)
+ 257 words of extra memory for PDF output out of 10000 (max. 10000000)
 

@@ -43,7 +43,7 @@ cal_laplacian <- function(W, type = c("unnormalized", "normalized", "randomwalk"
 #' @description Perform fast eigendecomposition using RSpectra for large matrices
 #'
 #' @param laplacianMat Laplacian matrix
-#' @param k_neighbor Number of neighbors for eigenvalue computation (default: 25)
+#' @param k_eigen Number of eigenvalues to compute (default: 25)
 #' @param which Which eigenvalues to compute ("LM", "SM", etc.)
 #' @param sigma Shift parameter for eigenvalue computation
 #' @param opts Additional options for eigenvalue computation
@@ -57,11 +57,11 @@ cal_laplacian <- function(W, type = c("unnormalized", "normalized", "randomwalk"
 #' \dontrun{
 #' # Create a Laplacian matrix and decompose
 #' L <- matrix(c(2, -1, -1, -1, 2, -1, -1, -1, 2), nrow = 3)
-#' decomp <- FastDecompositionLap(L, k_neighbor = 25)
+#' decomp <- FastDecompositionLap(L, k_eigen = 25)
 #' }
-FastDecompositionLap <- function(laplacianMat = NULL, k_neighbor = 25, which = "LM", sigma = NULL, opts = list(),
+FastDecompositionLap <- function(laplacianMat = NULL, k_eigen = 25, which = "LM", sigma = NULL, opts = list(),
                                  lower = TRUE, ...) {
-  res_decom <- RSpectra::eigs_sym(laplacianMat, k = k_neighbor, which = which, sigma = sigma, opts = opts,
+  res_decom <- RSpectra::eigs_sym(laplacianMat, k = k_eigen, which = which, sigma = sigma, opts = opts,
                         lower = lower)
   return(list(evalues = rev(res_decom$values),
               evectors = res_decom$vectors[, rev(seq_len(ncol(res_decom$vectors)))]))
@@ -87,6 +87,47 @@ gft <- function(signal, U) {
 
   # Compute GFT: transpose(U) %*% signal
   return(t(U) %*% signal)
+}
+
+#' Inverse Graph Fourier Transform
+#'
+#' @description Compute the Inverse Graph Fourier Transform (IGFT) of spectral coefficients using Laplacian eigenvectors.
+#'
+#' @param fourier_coeffs Input Fourier coefficients (vector or matrix)
+#' @param U Matrix of eigenvectors (dense matrix preferred)
+#'
+#' @return Reconstructed signal in the vertex domain (vector or matrix)
+#' @export
+#'
+#' @examples
+#' \dontrun{
+#' # Single signal
+#' signal_reconstructed <- igft(fourier_coeffs, eigenvectors)
+#' 
+#' # Multiple signals (batch processing)
+#' signals_reconstructed <- igft(fourier_coeffs_matrix, eigenvectors)
+#' }
+igft <- function(fourier_coeffs, U) {
+  # Check if input was originally a vector
+  was_vector <- is.vector(fourier_coeffs)
+  
+  # Convert fourier_coeffs to column matrix if it's a vector
+  if (was_vector) {
+    fourier_coeffs <- matrix(fourier_coeffs, ncol = 1)
+  }
+
+  # Ensure U is a matrix (convert if it's data.frame or other object)
+  U <- as.matrix(U)
+
+  # Compute IGFT: U %*% fourier_coeffs
+  result <- U %*% fourier_coeffs
+  
+  # Return as vector if input was originally a vector (single signal)
+  if (was_vector && ncol(result) == 1) {
+    return(as.vector(result))
+  }
+  
+  return(result)
 }
 
 
@@ -247,18 +288,5 @@ hello_sgwt <- function() {
   if (!is.null(x$decomposition)) x$decomposition else x
 }
 
-# Private helper function: Return matrix n×J of wavelet coefficients ordered by scale index
-.wavelet_matrix <- function(decomp) {
-  nm <- names(decomp$coefficients)
-  idx <- grep("^wavelet_scale_", nm)
-  if (length(idx) == 0L) stop("No wavelet coefficients found (expected names starting with 'wavelet_scale_').")
-  # Order by numeric suffix
-  ord <- order(as.integer(sub("^wavelet_scale_", "", nm[idx])))
-  mats <- lapply(nm[idx][ord], function(k) as.numeric(decomp$coefficients[[k]]))
-  W <- do.call(cbind, mats) # n × J (column = scale)
-  # Replace non-finite with 0
-  W[!is.finite(W)] <- 0
-  return(W)
-}
 
 

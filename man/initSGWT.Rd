@@ -9,12 +9,10 @@ initSGWT(
   x_col = "x",
   y_col = "y",
   signals = NULL,
-  k = 25,
   scales = NULL,
   J = 5,
   scaling_factor = 2,
-  kernel_type = "heat",
-  laplacian_type = "normalized"
+  kernel_type = "heat"
 )
 }
 \arguments{
@@ -26,8 +24,6 @@ initSGWT(
 
 \item{signals}{Character vector of signal column names to analyze. If NULL, all non-coordinate columns are used.}
 
-\item{k}{Number of nearest neighbors for graph construction (default: 25)}
-
 \item{scales}{Vector of scales for the wavelets. If NULL, scales are auto-generated.}
 
 \item{J}{Number of scales to generate if scales is NULL (default: 5)}
@@ -35,8 +31,6 @@ initSGWT(
 \item{scaling_factor}{Scaling factor between consecutive scales (default: 2)}
 
 \item{kernel_type}{Kernel family ("mexican_hat", "meyer", or "heat") (default: "heat")}
-
-\item{laplacian_type}{Type of graph Laplacian ("unnormalized", "normalized", or "randomwalk") (default: "normalized")}
 }
 \value{
 SGWT object with Data and Parameters slots initialized

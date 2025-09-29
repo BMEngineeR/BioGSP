@@ -6,7 +6,7 @@
 \usage{
 FastDecompositionLap(
   laplacianMat = NULL,
-  k_neighbor = 25,
+  k_eigen = 25,
   which = "LM",
   sigma = NULL,
   opts = list(),
@@ -17,7 +17,7 @@ FastDecompositionLap(
 \arguments{
 \item{laplacianMat}{Laplacian matrix}
 
-\item{k_neighbor}{Number of neighbors for eigenvalue computation (default: 25)}
+\item{k_eigen}{Number of eigenvalues to compute (default: 25)}
 
 \item{which}{Which eigenvalues to compute ("LM", "SM", etc.)}
 
@@ -39,6 +39,6 @@ Perform fast eigendecomposition using RSpectra for large matrices
 \dontrun{
 # Create a Laplacian matrix and decompose
 L <- matrix(c(2, -1, -1, -1, 2, -1, -1, -1, 2), nrow = 3)
-decomp <- FastDecompositionLap(L, k_neighbor = 25)
+decomp <- FastDecompositionLap(L, k_eigen = 25)
 }
 }

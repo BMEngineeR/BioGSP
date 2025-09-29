@@ -17,11 +17,12 @@ BioGSP is an R package that brings **Graph Signal Processing** to biological dat
 
 ## What is SGCC?
 
-**Spectral Graph Cross-Correlation (SGCC)** measures how similar two spatial patterns are across different scales:
+**Spectral Graph Cross-Correlation (SGCC)** measures how similar two spatial patterns are across different scales using Fourier domain analysis:
 
--  **Pattern Comparison**: Compare two spatial signals on the same graph structure
+-  **Fourier Domain Computation**: Works directly with spectral coefficients for mathematical accuracy
+-  **DC Component Exclusion**: Ignores constant offset (λ = 0) to focus on meaningful spatial patterns
 -  **Multi-scale Similarity**: Considers both fine-scale and broad-scale similarities
--  **Energy Normalized**: Fair comparison regardless of signal magnitude
+-  **Energy Normalized**: Fair comparison using Parseval's theorem-consistent energy weighting
 -  **Robust Metric**: Ranges from -1 to 1, where higher values indicate greater similarity
 
 ## How This Package Works
@@ -37,10 +38,10 @@ graph LR
 
 **New Workflow (v2.0+):**
 1. **`initSGWT()`**: Initialize SGWT object with your spatial data and parameters
-2. **`runSpecGraph()`**: Build graph structure (adjacency, Laplacian, eigendecomposition)
+2. **`runSpecGraph()`**: Build graph structure (adjacency, Laplacian, eigendecomposition) and auto-generate scales
 3. **`runSGWT()`**: Perform forward and inverse SGWT transforms on all signals
-4. **`runSGCC()`**: Calculate weighted similarity between signals
-5. **Visualization**: Use updated plotting functions for comprehensive analysis
+4. **`runSGCC()`**: Calculate Fourier domain weighted similarity between signals (excludes DC component)
+5. **Visualization**: Use updated plotting functions with Fourier domain energy analysis
 
 ## Installation
 
@@ -76,11 +77,15 @@ demo_data <- data.frame(
 # Step 1: Initialize SGWT object
 SG <- initSGWT(demo_data, 
                signals = c("signal1", "signal2"), 
-               k = 8, J = 4, 
+               J = 4, 
                kernel_type = "heat")
 
-# Step 2: Build spectral graph
-SG <- runSpecGraph(SG)
+# Step 2: Build spectral graph (scales auto-generated based on eigenvalues)
+SG <- runSpecGraph(SG, k = 8, laplacian_type = "normalized", length_eigenvalue = 30)
+
+# Visualize Fourier modes (eigenvectors) - 5 low and 5 high frequency modes
+fourier_modes <- plot_FM(SG, mode_type = "both", n_modes = 5, ncol = 5)
+print(fourier_modes)
 
 # Step 3: Run SGWT analysis
 SG <- runSGWT(SG)
@@ -88,7 +93,7 @@ SG <- runSGWT(SG)
 # Step 4: Check results
 print(SG)
 
-# Analyze energy distribution
+# Analyze energy distribution (Fourier domain, excludes DC component)
 energy_analysis <- sgwt_energy_analysis(SG, "signal1")
 print(energy_analysis)
 
@@ -100,13 +105,17 @@ print(plots)
 ### Compare Two Spatial Patterns
 
 ```r
-# Calculate similarity between signals in the same SGWT object
+# Calculate Fourier domain similarity between signals in the same SGWT object
 similarity <- runSGCC("signal1", "signal2", SG = SG)
 print(paste("SGCC Score:", round(similarity$S, 4)))
+print(paste("Low-frequency similarity:", round(similarity$c_low, 4)))
+print(paste("High-frequency similarity:", round(similarity$c_nonlow, 4)))
+print(paste("Energy weights - Low:", round(similarity$w_low, 4), "High:", round(similarity$w_NL, 4)))
 
 # Or compare between different SGWT objects
-SG2 <- initSGWT(demo_data, signals = "signal2", k = 8, J = 4)
-SG2 <- runSpecGraph(SG2)
+SG2 <- initSGWT(demo_data, signals = "signal2", J = 4)
+# Scales auto-generated during graph construction
+SG2 <- runSpecGraph(SG2, k = 8, laplacian_type = "normalized", length_eigenvalue = 25)
 SG2 <- runSGWT(SG2)
 
 similarity_cross <- runSGCC(SG, SG2)  # Compare first signals from each object
@@ -119,9 +128,14 @@ The new SGWT object contains:
 
 - **Data**: Original data, coordinate columns, signal names
 - **Graph**: Adjacency matrix, Laplacian matrix, eigenvalues, eigenvectors
-- **Forward**: SGWT forward transform results (Fourier coefficients, filters, scales)
-- **Inverse**: Inverse transform results (low-pass, band-pass approximations, reconstruction error)
-- **Parameters**: All analysis parameters (k, scales, J, kernel_type, etc.)
+- **Forward**: SGWT forward transform results (original and filtered Fourier coefficients, filters)
+- **Inverse**: Inverse transform results (vertex approximations, reconstructed signal, reconstruction error)
+- **Parameters**: All analysis parameters (scales, J, kernel_type, etc.) - scales auto-generated in runSpecGraph
+
+**Key Features:**
+- **Fourier Domain Analysis**: `runSGCC()` and `sgwt_energy_analysis()` work directly with spectral coefficients
+- **DC Component Handling**: Automatically excludes λ = 0 component for meaningful pattern analysis
+- **Energy Conservation**: Analysis consistent with Parseval's theorem
 
 ## Use Cases
 
@@ -148,11 +162,11 @@ The new SGWT object contains:
 | Function | Purpose |
 |----------|---------|
 | `initSGWT()` | Initialize SGWT object with data and parameters |
-| `runSpecGraph()` | Build spectral graph structure |
+| `runSpecGraph()` | Build spectral graph structure and auto-generate scales |
 | `runSGWT()` | Perform SGWT forward and inverse transforms |
-| `runSGCC()` | Calculate energy-normalized weighted similarity |
+| `runSGCC()` | Calculate Fourier domain energy-normalized weighted similarity (excludes DC) |
 | `plot_sgwt_decomposition()` | Visualize SGWT results |
-| `sgwt_energy_analysis()` | Analyze energy distribution across scales |
+| `sgwt_energy_analysis()` | Analyze energy distribution across scales in Fourier domain (excludes DC) |
 | `demo_sgwt()` | Run complete demonstration |
 
 ## Advanced Features
@@ -177,8 +191,9 @@ SG <- initSGWT(demo_data,
 
 ### Low-frequency Only Analysis
 ```r
-# Focus on smooth spatial patterns
+# Focus on smooth spatial patterns (scaling coefficients only, excludes DC)
 similarity_low <- runSGCC("signal1", "signal2", SG = SG, low_only = TRUE)
+print(paste("Low-frequency only similarity:", round(similarity_low$S, 4)))
 ```
 
 ## Learn More
@@ -192,25 +207,22 @@ similarity_low <- runSGCC("signal1", "signal2", SG = SG, low_only = TRUE)
 
 **Common Issues:**
 - **"Graph construction failed"**: Try reducing `k` (number of neighbors)
-- **"Eigendecomposition error"**: The `k_neighbor` parameter is now fixed at 25 for stability
+- **"Eigendecomposition error"**: The `k_eigen` parameter is now fixed at 25 for stability
 - **"Signal not found"**: Check signal names match your data columns
 - **"SGWT object invalid"**: Ensure you've run the workflow steps in order
 
 **Getting Started:**
 1. Prepare data with x, y coordinates and signal values
-2. Start with `k=8-15` neighbors, `J=3-5` scales
+2. Start with `k=8-15` neighbors, `J=3-5` scales (scales auto-generated in runSpecGraph)
 3. Use `initSGWT() -> runSpecGraph() -> runSGWT()` workflow
 4. Check reconstruction errors to validate results
-5. Use energy analysis to understand your data's scale distribution
+5. Use Fourier domain energy analysis to understand your data's scale distribution (DC component excluded)
 
 **Parameter Guidelines:**
 - **Small datasets (<200 points)**: k=8-12, J=3-4
 - **Medium datasets (200-1000 points)**: k=12-20, J=4-6  
 - **Large datasets (>1000 points)**: k=15-25, J=5-8
 
-## References
-
-- Hammond, D. K., Vandergheynst, P., & Gribonval, R. (2011). Wavelets on graphs via spectral graph theory. *Applied and Computational Harmonic Analysis*, 30(2), 129-150.
 
 ## Support
 

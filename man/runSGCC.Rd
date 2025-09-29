@@ -2,7 +2,7 @@
 % Please edit documentation in R/sgwt_main.R
 \name{runSGCC}
 \alias{runSGCC}
-\title{Run SGCC weighted similarity analysis}
+\title{Run SGCC weighted similarity analysis in Fourier domain}
 \usage{
 runSGCC(
   signal1,
@@ -30,11 +30,12 @@ runSGCC(
 \item{low_only}{Logical; if TRUE, compute only low-frequency similarity (default: FALSE)}
 }
 \value{
-Similarity analysis results
+Similarity analysis results computed in Fourier domain
 }
 \description{
 Calculate energy-normalized weighted similarity between two signals
-from SGWT Forward results or between two SGWT objects.
+using Fourier domain coefficients directly (no vertex domain reconstruction).
+Excludes DC component and uses energy-based weighting consistent with Parseval's theorem.
 }
 \examples{
 \dontrun{

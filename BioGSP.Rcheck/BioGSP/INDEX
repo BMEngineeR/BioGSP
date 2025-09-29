@@ -11,22 +11,26 @@ demo_sgwt               Demo function for SGWT
 find_knee_point         Find knee point in a curve
 gft                     Graph Fourier Transform
 hello_sgwt              Hello function for SGWT package demonstration
+igft                    Inverse Graph Fourier Transform
 initSGWT                Initialize SGWT object
 install_and_load        Install and load packages
-plot_FM                 Plot frequency modes
+plot_FM                 Plot Fourier modes (eigenvectors) from SGWT
+                        object
 plot_sgwt_decomposition
                         Plot SGWT decomposition results
 print.SGWT              Print method for SGWT objects
-runSGCC                 Run SGCC weighted similarity analysis
+runSGCC                 Run SGCC weighted similarity analysis in
+                        Fourier domain
 runSGWT                 Run SGWT forward and inverse transforms for all
                         signals
 runSpecGraph            Build spectral graph for SGWT object
 sgwt_auto_scales        Generate automatic scales for SGWT
 sgwt_energy_analysis    Analyze SGWT energy distribution across scales
-sgwt_forward            Forward SGWT transform
+                        in Fourier domain
+sgwt_forward            Forward SGWT transform (single or batch)
 sgwt_get_kernels        Get a unified kernel family (low-pass and
                         band-pass) by kernel_type
-sgwt_inverse            Inverse SGWT transform
+sgwt_inverse            Inverse SGWT transform (single or batch)
 simulate_multiscale     Simulate Multiple Center Patterns
 simulate_ringpattern    Simulate Concentric Ring Patterns
 visualize_multiscale    Visualize Multiple Center Simulation Results

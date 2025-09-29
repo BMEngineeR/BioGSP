@@ -2,26 +2,35 @@
 % Please edit documentation in R/visualization.R
 \name{plot_FM}
 \alias{plot_FM}
-\title{Plot frequency modes}
+\title{Plot Fourier modes (eigenvectors) from SGWT object}
 \usage{
-plot_FM(input = NULL, FM_idx = c(1:20), ncol = 5)
+plot_FM(SG, mode_type = "both", n_modes = 6, ncol = 3, point_size = 1.5)
 }
 \arguments{
-\item{input}{Input data (currently not used, for future compatibility)}
+\item{SG}{SGWT object with Graph slot computed (from runSpecGraph)}
 
-\item{FM_idx}{Indices of frequency modes to plot (default: 1:20)}
+\item{mode_type}{Type of modes to plot: "low", "high", or "both" (default: "both")}
 
-\item{ncol}{Number of columns in plot layout (default: 5)}
+\item{n_modes}{Number of modes to plot for each type (default: 6)}
+
+\item{ncol}{Number of columns in plot layout (default: 3)}
+
+\item{point_size}{Size of points in the plot (default: 1.5)}
 }
 \value{
-Combined plot of frequency modes
+Combined plot of Fourier modes
 }
 \description{
-Plot frequency modes from graph Fourier analysis
+Plot low-frequency and high-frequency Fourier modes (eigenvectors) 
+from the graph Laplacian eigendecomposition in an SGWT object
 }
 \examples{
 \dontrun{
-# This function requires specific data structure (df_hex_combine)
-# plot_FM(FM_idx = 1:10, ncol = 5)
+# Plot both low and high frequency modes
+SG <- initSGWT(data) \%>\% runSpecGraph()
+plot_FM(SG, mode_type = "both", n_modes = 4)
+
+# Plot only low frequency modes
+plot_FM(SG, mode_type = "low", n_modes = 8)
 }
 }

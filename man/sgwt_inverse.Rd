@@ -2,32 +2,41 @@
 % Please edit documentation in R/sgwt_core.R
 \name{sgwt_inverse}
 \alias{sgwt_inverse}
-\title{Inverse SGWT transform}
+\title{Inverse SGWT transform (single or batch)}
 \usage{
-sgwt_inverse(sgwt_decomp, original_signal = NULL)
+sgwt_inverse(sgwt_decomp, eigenvectors, original_signal = NULL)
 }
 \arguments{
 \item{sgwt_decomp}{SGWT decomposition object from sgwt_forward}
 
-\item{original_signal}{Original signal for error calculation (optional)}
+\item{eigenvectors}{Eigenvectors of the graph Laplacian (for inverse GFT)}
+
+\item{original_signal}{Original signal vector OR matrix (n_vertices x n_signals) for error calculation (optional)}
 }
 \value{
 List containing:
   \describe{
-    \item{low_pass_approximation}{Low-pass (scaling) approximation}
-    \item{band_pass_approximations}{List of band-pass (wavelet) approximations by scale}
-    \item{reconstructed_signal}{Full reconstructed signal}
-    \item{reconstruction_error}{RMSE if original_signal provided}
+    \item{vertex_approximations}{Named list with inverse-transformed signals in vertex domain:}
+      \itemize{
+        \item{\code{low_pass}: Low-pass (scaling) approximation}
+        \item{\code{wavelet_1}, \code{wavelet_2}, etc.: Band-pass (wavelet) approximations by scale}
+      }
+    \item{reconstructed_signal}{Full reconstructed signal (vector or matrix)}
+    \item{reconstruction_error}{RMSE (scalar for single signal, vector for multiple signals)}
   }
 }
 \description{
-Reconstruct signal from inverse-transformed signals (coefficients).
+Reconstruct signal(s) from filtered Fourier coefficients using inverse GFT.
+Handles both single signals and multiple signals efficiently.
 Returns detailed inverse transform results including low-pass, band-pass approximations,
-reconstructed signal, and reconstruction error.
+reconstructed signal(s), and reconstruction error(s).
 }
 \examples{
 \dontrun{
-# Assuming you have an SGWT decomposition
-inverse_result <- sgwt_inverse(sgwt_decomp, original_signal)
+# Single signal
+inverse_result <- sgwt_inverse(sgwt_decomp, eigenvectors, original_signal)
+
+# Multiple signals (batch processing)
+inverse_result <- sgwt_inverse(sgwt_decomp, eigenvectors, original_signals_matrix)
 }
 }

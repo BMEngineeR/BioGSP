@@ -9,6 +9,7 @@ FastDecompositionLap	FastDecompositionLap
 find_knee_point	find_knee_point
 gft	gft
 hello_sgwt	hello_sgwt
+igft	igft
 initSGWT	initSGWT
 install_and_load	install_and_load
 plot_FM	plot_FM

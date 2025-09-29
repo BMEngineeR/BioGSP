@@ -112,41 +112,53 @@ compute_sgwt_filters <- function(eigenvalues, scales, lmax = NULL, kernel_type =
   return(filters)
 }
 
-#' Forward SGWT transform
+#' Forward SGWT transform (single or batch)
 #'
-#' @description Decompose signal into inverse-transformed signals (vertex domain) using SGWT.
-#' Also stores original and filtered Fourier coefficients for analysis.
+#' @description Transform signal(s) to spectral domain and apply SGWT filters.
+#' Handles both single signals (vector) and multiple signals (matrix) efficiently.
+#' Stores original and filtered Fourier coefficients for analysis.
 #'
-#' @param signal Input signal vector
+#' @param signal Input signal vector OR matrix where each column is a signal (n_vertices x n_signals)
 #' @param eigenvectors Eigenvectors of the graph Laplacian
 #' @param eigenvalues Eigenvalues of the graph Laplacian
 #' @param scales Vector of scales for the wavelets
 #' @param lmax Maximum eigenvalue (optional)
-#' @param kernel_type Kernel family that defines both scaling and wavelet filters (default: "mexican_hat", options: "mexican_hat", "meyer", "heat")
+#' @param kernel_type Kernel family that defines both scaling and wavelet filters (default: "heat")
 #'
 #' @return List containing:
 #'   \describe{
-#'     \item{coefficients}{Inverse-transformed signals in vertex domain (scaling + wavelet scales)}
 #'     \item{fourier_coefficients}{List with original and filtered Fourier coefficients}
 #'     \item{filters}{Filter bank used}
-#'     \item{scales}{Scales used}
-#'     \item{eigenvalues}{Graph Laplacian eigenvalues}
-#'     \item{eigenvectors}{Graph Laplacian eigenvectors}
 #'   }
 #' @export
 #'
 #' @examples
 #' \dontrun{
-#' # Assuming you have eigenvalues, eigenvectors, and a signal
+#' # Single signal
 #' result <- sgwt_forward(signal, eigenvectors, eigenvalues, scales)
-#' result_meyer <- sgwt_forward(signal, eigenvectors, eigenvalues, scales, kernel_type = "meyer")
-#' result_heat <- sgwt_forward(signal, eigenvectors, eigenvalues, scales, kernel_type = "heat")
+#' 
+#' # Multiple signals (batch processing)
+#' signals_matrix <- cbind(signal1, signal2, signal3)
+#' result <- sgwt_forward(signals_matrix, eigenvectors, eigenvalues, scales)
 #' }
 sgwt_forward <- function(signal, eigenvectors, eigenvalues, scales, lmax = NULL, kernel_type = "heat") {
+  
+  # Validate dimensions
+  if (is.matrix(signal)) {
+    if (nrow(eigenvectors) != nrow(signal)) {
+      stop("Number of vertices in signals matrix must match eigenvectors")
+    }
+  } else {
+    if (nrow(eigenvectors) != length(signal)) {
+      stop("Number of vertices in signal vector must match eigenvectors")
+    }
+  }
+  
   # Compute filters
   filters <- compute_sgwt_filters(eigenvalues, scales, lmax, kernel_type)
   
-  # Transform signal to spectral domain
+  # Transform signal(s) to spectral domain using GFT
+  # gft handles both vectors and matrices automatically
   signal_hat <- gft(signal, eigenvectors)
   
   # Store original and filtered Fourier coefficients
@@ -155,85 +167,105 @@ sgwt_forward <- function(signal, eigenvectors, eigenvalues, scales, lmax = NULL,
     filtered = vector("list", length(filters))
   )
   
-  # Apply filters and store inverse-transformed signals
-  inverse_signals <- vector("list", length(filters))
-  
+  # Apply filters and store filtered Fourier coefficients
   for (i in seq_along(filters)) {
-    # Multiply signal spectrum with filter
-    filtered_spectrum <- signal_hat * filters[[i]]
+    # Apply filter - works for both single signals and matrices
+    filtered_spectrum <- signal_hat * as.vector(filters[[i]])
     fourier_coefficients$filtered[[i]] <- filtered_spectrum
-    
-    # Transform back to vertex domain (inverse GFT)
-    inverse_signals[[i]] <- eigenvectors %*% filtered_spectrum
   }
   
-  names(inverse_signals) <- c("scaling", paste0("wavelet_scale_", seq_along(scales)))
   names(fourier_coefficients$filtered) <- c("scaling", paste0("wavelet_scale_", seq_along(scales)))
   
   return(list(
-    coefficients = inverse_signals,  # Renamed for clarity - these are inverse-transformed signals
-    fourier_coefficients = fourier_coefficients,  # Original and filtered Fourier coefficients
-    filters = filters,
-    scales = scales,
-    eigenvalues = eigenvalues,
-    eigenvectors = eigenvectors
+    fourier_coefficients = fourier_coefficients,
+    filters = filters
   ))
 }
 
-#' Inverse SGWT transform
+
+#' Inverse SGWT transform (single or batch)
 #'
-#' @description Reconstruct signal from inverse-transformed signals (coefficients).
+#' @description Reconstruct signal(s) from filtered Fourier coefficients using inverse GFT.
+#' Handles both single signals and multiple signals efficiently.
 #' Returns detailed inverse transform results including low-pass, band-pass approximations,
-#' reconstructed signal, and reconstruction error.
+#' reconstructed signal(s), and reconstruction error(s).
 #'
 #' @param sgwt_decomp SGWT decomposition object from sgwt_forward
-#' @param original_signal Original signal for error calculation (optional)
+#' @param eigenvectors Eigenvectors of the graph Laplacian (for inverse GFT)
+#' @param original_signal Original signal vector OR matrix (n_vertices x n_signals) for error calculation (optional)
 #'
 #' @return List containing:
 #'   \describe{
-#'     \item{low_pass_approximation}{Low-pass (scaling) approximation}
-#'     \item{band_pass_approximations}{List of band-pass (wavelet) approximations by scale}
-#'     \item{reconstructed_signal}{Full reconstructed signal}
-#'     \item{reconstruction_error}{RMSE if original_signal provided}
+#'     \item{vertex_approximations}{Named list with inverse-transformed signals in vertex domain:}
+#'       \itemize{
+#'         \item{\code{low_pass}: Low-pass (scaling) approximation}
+#'         \item{\code{wavelet_1}, \code{wavelet_2}, etc.: Band-pass (wavelet) approximations by scale}
+#'       }
+#'     \item{reconstructed_signal}{Full reconstructed signal (vector or matrix)}
+#'     \item{reconstruction_error}{RMSE (scalar for single signal, vector for multiple signals)}
 #'   }
 #' @export
 #'
 #' @examples
 #' \dontrun{
-#' # Assuming you have an SGWT decomposition
-#' inverse_result <- sgwt_inverse(sgwt_decomp, original_signal)
+#' # Single signal
+#' inverse_result <- sgwt_inverse(sgwt_decomp, eigenvectors, original_signal)
+#' 
+#' # Multiple signals (batch processing)
+#' inverse_result <- sgwt_inverse(sgwt_decomp, eigenvectors, original_signals_matrix)
 #' }
-sgwt_inverse <- function(sgwt_decomp, original_signal = NULL) {
-  coefficients <- sgwt_decomp$coefficients
+sgwt_inverse <- function(sgwt_decomp, eigenvectors, original_signal = NULL) {
+  filtered_fourier <- sgwt_decomp$fourier_coefficients$filtered
   
-  # Extract low-pass (scaling) approximation
-  low_pass_approximation <- as.vector(coefficients$scaling)
+  # Perform inverse GFT on all filtered coefficients using igft function
+  vertex_approximations <- vector("list", length(filtered_fourier))
+  names(vertex_approximations) <- names(filtered_fourier)
   
-  # Extract band-pass (wavelet) approximations
-  wavelet_names <- names(coefficients)[grep("^wavelet_scale_", names(coefficients))]
-  band_pass_approximations <- list()
-  for (name in wavelet_names) {
-    scale_num <- sub("^wavelet_scale_", "", name)
-    band_pass_approximations[[paste0("scale_", scale_num)]] <- as.vector(coefficients[[name]])
+  for (i in seq_along(filtered_fourier)) {
+    # Use igft function for inverse transform - handles both single signals and batches
+    vertex_approximations[[i]] <- igft(filtered_fourier[[i]], eigenvectors)
   }
   
-  # Reconstruct full signal (sum of all components)
-  reconstructed_signal <- Reduce("+", coefficients)
-  reconstructed_signal <- as.vector(reconstructed_signal)
+  # Rename components for clarity
+  names(vertex_approximations)[names(vertex_approximations) == "scaling"] <- "low_pass"
+  wavelet_names <- names(vertex_approximations)[grep("^wavelet_scale_", names(vertex_approximations))]
+  for (name in wavelet_names) {
+    scale_num <- sub("^wavelet_scale_", "", name)
+    names(vertex_approximations)[names(vertex_approximations) == name] <- paste0("wavelet_", scale_num)
+  }
   
-  # Calculate reconstruction error if original signal provided
+  # Reconstruct signal(s) - sum of all components
+  reconstructed <- Reduce("+", vertex_approximations)
+  
+  # Calculate reconstruction error(s) if original signal provided
   reconstruction_error <- NULL
   if (!is.null(original_signal)) {
-    reconstruction_error <- sqrt(mean((original_signal - reconstructed_signal)^2))
+    # Validate dimensions
+    if (is.matrix(original_signal) && is.matrix(reconstructed)) {
+      if (ncol(original_signal) != ncol(reconstructed) || nrow(original_signal) != nrow(reconstructed)) {
+        stop("Dimensions of original_signal must match reconstructed signal")
+      }
+      # Calculate RMSE for each signal (column)
+      reconstruction_error <- sqrt(colMeans((original_signal - reconstructed)^2))
+    } else if (is.vector(original_signal) && (is.vector(reconstructed) || ncol(reconstructed) == 1)) {
+      reconstructed_vec <- as.vector(reconstructed)
+      if (length(original_signal) != length(reconstructed_vec)) {
+        stop("Length of original_signal must match reconstructed signal")
+      }
+      # Calculate RMSE for single signal
+      reconstruction_error <- sqrt(mean((original_signal - reconstructed_vec)^2))
+    } else {
+      stop("Type mismatch between original_signal and reconstructed signal")
+    }
   }
   
   return(list(
-    low_pass_approximation = low_pass_approximation,
-    band_pass_approximations = band_pass_approximations,
-    reconstructed_signal = reconstructed_signal,
+    vertex_approximations = vertex_approximations,
+    reconstructed_signal = reconstructed,
     reconstruction_error = reconstruction_error
   ))
 }
+
 
 #' Generate automatic scales for SGWT
 #'

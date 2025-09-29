@@ -38,9 +38,9 @@ plot_sgwt_decomposition <- function(SG, signal_name = NULL, plot_scales = NULL, 
   }
   
   # Get decomposition and inverse results
-  forward_result <- SG$Forward[[signal_name]]
   inverse_result <- SG$Inverse[[signal_name]]
-  coefficients <- forward_result$coefficients
+  # Get coefficients from inverse results (vertex_approximations)
+  coefficients <- inverse_result$vertex_approximations
   
   # Default scales to plot
   if (is.null(plot_scales)) {
@@ -52,77 +52,89 @@ plot_sgwt_decomposition <- function(SG, signal_name = NULL, plot_scales = NULL, 
   data.in <- SG$Data$data
   x_col <- SG$Data$x_col
   y_col <- SG$Data$y_col
-  plot_data <- data.in
+  
+  # Create a helper function to create individual plots
+  create_plot <- function(data, x_col, y_col, fill_var, title, subtitle = NULL) {
+    # Use aes_string for compatibility and to avoid linting issues
+    p <- ggplot2::ggplot(data, ggplot2::aes_string(x = x_col, y = y_col, fill = fill_var)) +
+      ggplot2::geom_tile() +
+      ggplot2::scale_fill_viridis_c() +
+      ggplot2::labs(title = title, subtitle = subtitle) +
+      ggplot2::coord_fixed() +
+      ggplot2::theme_void() +
+      ggplot2::theme(
+        legend.position = "none",
+        plot.title = ggplot2::element_text(size = 10, hjust = 0.5),
+        plot.subtitle = ggplot2::element_text(size = 8, hjust = 0.5)
+      )
+    return(p)
+  }
   
   plot_list <- list()
   
   # Plot original signal
-  plot_data$original <- as.numeric(data.in[[signal_name]])
-  p_orig <- ggplot2::ggplot(plot_data, ggplot2::aes_string(x = x_col, y = y_col, fill = "original")) +
-    ggplot2::geom_tile() +
-    ggplot2::scale_fill_viridis_c() +
-    ggplot2::labs(title = paste("Original Signal:", signal_name)) +
-    ggplot2::coord_fixed() +
-    ggplot2::theme_void() +
-    ggplot2::theme(legend.position = "none")
+  plot_data_orig <- data.in
+  plot_data_orig$original <- as.numeric(data.in[[signal_name]])
+  p_orig <- create_plot(plot_data_orig, x_col, y_col, "original", 
+                       paste("Original Signal:", signal_name))
   plot_list[["original"]] <- p_orig
   
-  # Plot scaling function coefficients
-  plot_data$scaling <- as.vector(Re(coefficients$scaling))
-  p_scaling <- ggplot2::ggplot(plot_data, ggplot2::aes_string(x = x_col, y = y_col, fill = "scaling")) +
-    ggplot2::geom_tile() +
-    ggplot2::scale_fill_viridis_c() +
-    ggplot2::labs(title = "Low-pass (Scaling)") +
-    ggplot2::coord_fixed() +
-    ggplot2::theme_void() +
-    ggplot2::theme(legend.position = "none")
+  # Plot scaling function coefficients (now called low_pass)
+  plot_data_scaling <- data.in
+  plot_data_scaling$scaling <- as.vector(Re(coefficients$low_pass))
+  p_scaling <- create_plot(plot_data_scaling, x_col, y_col, "scaling", 
+                          "Low-pass (Scaling)")
   plot_list[["scaling"]] <- p_scaling
   
-  # Plot wavelet coefficients at selected scales
-  wavelet_names <- names(coefficients)[grep("^wavelet_scale_", names(coefficients))]
+  # Plot wavelet coefficients at selected scales (now called wavelet_1, wavelet_2, etc.)
+  wavelet_names <- names(coefficients)[grep("^wavelet_", names(coefficients))]
   for (i in plot_scales) {
-    wavelet_name <- paste0("wavelet_scale_", i)
+    wavelet_name <- paste0("wavelet_", i)
     if (wavelet_name %in% wavelet_names) {
       coeff_name <- paste0("wavelet_", i)
-      plot_data[[coeff_name]] <- as.vector(Re(coefficients[[wavelet_name]]))
+      plot_data_wavelet <- data.in
+      plot_data_wavelet[[coeff_name]] <- as.vector(Re(coefficients[[wavelet_name]]))
       
-      p_wavelet <- ggplot2::ggplot(plot_data, ggplot2::aes_string(x = x_col, y = y_col, fill = coeff_name)) +
-        ggplot2::geom_tile() +
-        ggplot2::scale_fill_viridis_c() +
-        ggplot2::labs(title = paste("Band-pass Scale", i)) +
-        ggplot2::coord_fixed() +
-        ggplot2::theme_void() +
-        ggplot2::theme(legend.position = "none")
-      
+      p_wavelet <- create_plot(plot_data_wavelet, x_col, y_col, coeff_name, 
+                              paste("Band-pass Scale", i))
       plot_list[[coeff_name]] <- p_wavelet
     }
   }
   
   # Plot reconstructed signal
-  plot_data$reconstructed <- inverse_result$reconstructed_signal
-  p_recon <- ggplot2::ggplot(plot_data, ggplot2::aes_string(x = x_col, y = y_col, fill = "reconstructed")) +
-    ggplot2::geom_tile() +
-    ggplot2::scale_fill_viridis_c() +
-    ggplot2::labs(title = paste("Reconstructed (RMSE:", round(inverse_result$reconstruction_error, 4), ")")) +
-    ggplot2::coord_fixed() +
-    ggplot2::theme_void() +
-    ggplot2::theme(legend.position = "none")
+  plot_data_recon <- data.in
+  plot_data_recon$reconstructed <- inverse_result$reconstructed_signal
+  p_recon <- create_plot(plot_data_recon, x_col, y_col, "reconstructed", 
+                        "Reconstructed", 
+                        paste("RMSE:", round(inverse_result$reconstruction_error, 4)))
   plot_list[["reconstructed"]] <- p_recon
   
-  # Combine plots
-  combined_plot <- ggpubr::ggarrange(plotlist = plot_list, ncol = ncol)
+  # Validate that we have plots to combine
+  if (length(plot_list) == 0) {
+    stop("No plots were created. Check your SGWT object structure.")
+  }
+  
+  # Combine plots using gridExtra (most reliable)
+  n_plots <- length(plot_list)
+  nrow <- ceiling(n_plots / ncol)
+  
+  # Use gridExtra::grid.arrange for reliable plot combination
+  combined_plot <- gridExtra::grid.arrange(grobs = plot_list, ncol = ncol, nrow = nrow)
+  
+  # Return the combined plot
   return(combined_plot)
 }
 
-#' Analyze SGWT energy distribution across scales
+#' Analyze SGWT energy distribution across scales in Fourier domain
 #'
 #' @description Calculate and analyze energy distribution across different scales
-#' in the SGWT decomposition
+#' using Fourier domain coefficients directly (consistent with Parseval's theorem).
+#' Excludes DC component for more accurate energy analysis.
 #'
 #' @param SG SGWT object with Forward results computed
 #' @param signal_name Name of signal to analyze (default: first signal)
 #'
-#' @return Data frame with energy analysis results
+#' @return Data frame with energy analysis results computed in Fourier domain
 #' @export
 #'
 #' @examples
@@ -146,77 +158,215 @@ sgwt_energy_analysis <- function(SG, signal_name = NULL) {
     signal_name <- names(SG$Forward)[1]
   }
   
-  # Get forward result
-  forward_result <- SG$Forward[[signal_name]]
-  coefficients <- forward_result$coefficients
-  scales <- forward_result$scales
+  # Validate signal exists
+  if (!signal_name %in% names(SG$Forward)) {
+    stop(paste("Signal", signal_name, "not found in SGWT Forward results"))
+  }
   
-  # Calculate energy at each scale
-  energies <- sapply(coefficients, function(coeff) sum(abs(coeff)^2))
+  # Get Forward results and scales from Parameters
+  forward_result <- SG$Forward[[signal_name]]
+  fourier_coeffs <- forward_result$fourier_coefficients$filtered
+  scales <- SG$Parameters$scales
+  
+  if (is.null(fourier_coeffs)) {
+    stop("Fourier coefficients not found in Forward results")
+  }
+  
+  # Calculate energies in Fourier domain (consistent with Parseval's theorem)
+  energies <- numeric()
+  scale_names <- character()
+  scale_values <- numeric()
+  
+  # Scaling (low-pass) energy - exclude DC component
+  if ("scaling" %in% names(fourier_coeffs)) {
+    scaling_coeffs <- as.numeric(fourier_coeffs$scaling)
+    # Exclude DC component (first coefficient)
+    if (length(scaling_coeffs) > 1) {
+      scaling_coeffs <- scaling_coeffs[-1]
+    }
+    scaling_energy <- sum(abs(scaling_coeffs)^2)
+    
+    energies <- c(energies, scaling_energy)
+    scale_names <- c(scale_names, "low_pass")
+    scale_values <- c(scale_values, scales[1])  # Use first scale for scaling function
+  }
+  
+  # Wavelet energies - exclude DC components
+  wavelet_names <- names(fourier_coeffs)[grep("^wavelet_scale_", names(fourier_coeffs))]
+  if (length(wavelet_names) > 0) {
+    # Order by scale index
+    scale_indices <- as.integer(sub("^wavelet_scale_", "", wavelet_names))
+    ord <- order(scale_indices)
+    wavelet_names <- wavelet_names[ord]
+    scale_indices <- scale_indices[ord]
+    
+    for (i in seq_along(wavelet_names)) {
+      wavelet_coeffs <- as.numeric(fourier_coeffs[[wavelet_names[i]]])
+      # Exclude DC component if present
+      if (length(wavelet_coeffs) > 1) {
+        wavelet_coeffs <- wavelet_coeffs[-1]
+      }
+      wavelet_energy <- sum(abs(wavelet_coeffs)^2)
+      
+      energies <- c(energies, wavelet_energy)
+      scale_names <- c(scale_names, paste0("wavelet_", scale_indices[i]))
+      scale_values <- c(scale_values, scales[scale_indices[i]])
+    }
+  }
+  
+  # Calculate energy ratios
   total_energy <- sum(energies)
-  energy_ratios <- energies / total_energy
+  energy_ratios <- if (total_energy > 0) energies / total_energy else rep(0, length(energies))
   
   # Create results data frame
-  scale_names <- names(coefficients)
-  scale_values <- c(scales[1], scales)  # Use first scale for scaling function
-  
   energy_df <- data.frame(
     scale = scale_names,
     energy = energies,
     energy_ratio = energy_ratios,
     scale_value = scale_values,
-    signal = signal_name
+    signal = signal_name,
+    stringsAsFactors = FALSE
   )
   
   return(energy_df)
 }
 
-#' Plot frequency modes
+#' Plot Fourier modes (eigenvectors) from SGWT object
 #'
-#' @description Plot frequency modes from graph Fourier analysis
+#' @description Plot low-frequency and high-frequency Fourier modes (eigenvectors) 
+#' from the graph Laplacian eigendecomposition in an SGWT object
 #'
-#' @param input Input data (currently not used, for future compatibility)
-#' @param FM_idx Indices of frequency modes to plot (default: 1:20)
-#' @param ncol Number of columns in plot layout (default: 5)
+#' @param SG SGWT object with Graph slot computed (from runSpecGraph)
+#' @param mode_type Type of modes to plot: "low", "high", or "both" (default: "both")
+#' @param n_modes Number of modes to plot for each type (default: 6)
+#' @param ncol Number of columns in plot layout (default: 3)
+#' @param point_size Size of points in the plot (default: 1.5)
 #'
-#' @return Combined plot of frequency modes
+#' @return Combined plot of Fourier modes
 #' @export
 #'
 #' @examples
 #' \dontrun{
-#' # This function requires specific data structure (df_hex_combine)
-#' # plot_FM(FM_idx = 1:10, ncol = 5)
+#' # Plot both low and high frequency modes
+#' SG <- initSGWT(data) %>% runSpecGraph()
+#' plot_FM(SG, mode_type = "both", n_modes = 4)
+#' 
+#' # Plot only low frequency modes
+#' plot_FM(SG, mode_type = "low", n_modes = 8)
 #' }
-plot_FM <- function(input = NULL, FM_idx = c(1:20), ncol = 5){
+plot_FM <- function(SG, mode_type = "both", n_modes = 6, ncol = 3, point_size = 1.5){
   
-  # Create a vector of frequency column names
-  freq_columns <- paste0("Freq", FM_idx)
-  # Create a list to store the plots
+  # Validate input
+  if (!inherits(SG, "SGWT")) {
+    stop("Input must be an SGWT object")
+  }
+  if (is.null(SG$Graph)) {
+    stop("SGWT object must have Graph slot computed. Run runSpecGraph() first.")
+  }
+  
+  # Extract components
+  data.in <- SG$Data$data
+  x_col <- SG$Data$x_col
+  y_col <- SG$Data$y_col
+  eigenvalues <- SG$Graph$eigenvalues
+  eigenvectors <- as.matrix(SG$Graph$eigenvectors)
+  
+  # Validate mode_type
+  mode_type <- match.arg(mode_type, c("low", "high", "both"))
+  
+  # Determine which modes to plot based on eigenvalue spectrum
+  n_total <- length(eigenvalues)
+  n_modes <- min(n_modes, floor(n_total/2))  # Ensure we don't exceed available modes
+  
   plot_list <- list()
   
-  # Note: This function assumes existence of df_hex_combine
-  # This is kept for compatibility with original code
-  if (!exists("df_hex_combine")) {
-    warning("df_hex_combine not found. This function requires specific data structure.")
-    return(NULL)
-  }
-  
-  # Loop through each frequency column and generate plots
-  for (freq in freq_columns) {
-    # Generate the scatter plot
-    p <- ggplot2::ggplot(df_hex_combine, ggplot2::aes_string(x = "x", y = "y")) +
-      ggplot2::geom_point(ggplot2::aes_string(color = freq), size = 1) +
-      ggplot2::guides(color = "none") +
-      ggplot2::theme_void() + 
-      ggplot2::scale_color_viridis_c(option = "magma")
+  # Helper function to create individual Fourier mode plots
+  create_mode_plot <- function(mode_data, mode_name, eigenval) {
+    p <- ggplot2::ggplot(mode_data, ggplot2::aes_string(x = x_col, y = y_col, color = "mode_value")) +
+      ggplot2::geom_point(size = point_size) +
+      ggplot2::scale_color_viridis_c(option = "plasma") +
+      ggplot2::labs(
+        title = mode_name,
+        subtitle = paste("\u03bb =", round(eigenval, 4))
+      ) +
+      ggplot2::theme_void() +
+      ggplot2::theme(
+        legend.position = "none",
+        plot.title = ggplot2::element_text(size = 10, hjust = 0.5, face = "bold"),
+        plot.subtitle = ggplot2::element_text(size = 8, hjust = 0.5)
+      ) +
+      ggplot2::coord_fixed()
     
-    # Add the plot to the list
-    plot_list[[freq]] <- p
+    return(p)
   }
   
-  # Combine all plots into a single layout
-  combined_plot <- ggpubr::ggarrange(plotlist = plot_list, ncol = ncol)
-  # Print the combined plot
+  # Plot low-frequency modes (smallest eigenvalues, skip DC component)
+  if (mode_type %in% c("low", "both")) {
+    low_indices <- 2:(n_modes + 1)  # Skip first mode (DC component), start from 2nd
+    
+    for (i in low_indices) {
+      if (i <= n_total) {
+        mode_data <- data.in
+        mode_data$mode_value <- as.numeric(eigenvectors[, i])
+        
+        mode_name <- paste("Low Freq", i)
+        eigenval <- eigenvalues[i]
+        
+        p <- create_mode_plot(mode_data, mode_name, eigenval)
+        plot_list[[paste0("low_", i)]] <- p
+      }
+    }
+  }
+  
+  # Plot high-frequency modes (largest eigenvalues)
+  if (mode_type %in% c("high", "both")) {
+    high_indices <- (n_total - n_modes + 1):n_total  # Last n_modes (highest frequencies)
+    
+    for (i in high_indices) {
+      if (i >= 1) {
+        mode_data <- data.in
+        mode_data$mode_value <- as.numeric(eigenvectors[, i])
+        
+        mode_name <- paste("High Freq", i)
+        eigenval <- eigenvalues[i]
+        
+        p <- create_mode_plot(mode_data, mode_name, eigenval)
+        plot_list[[paste0("high_", i)]] <- p
+      }
+    }
+  }
+  
+  # Validate that we have plots to combine
+  if (length(plot_list) == 0) {
+    stop("No plots were created. Check your SGWT object and parameters.")
+  }
+  
+  # Create title based on mode_type
+  main_title <- switch(mode_type,
+                      "low" = paste("Low-Frequency Fourier Modes (n =", n_modes, ")"),
+                      "high" = paste("High-Frequency Fourier Modes (n =", n_modes, ")"),
+                      "both" = paste("Fourier Modes: Low &amp; High Frequency (n =", n_modes, "each)"))
+  
+  # Combine plots
+  if (requireNamespace("gridExtra", quietly = TRUE)) {
+    # Calculate appropriate number of rows
+    n_plots <- length(plot_list)
+    nrow <- ceiling(n_plots / ncol)
+    
+    # Add main title
+    title_grob <- grid::textGrob(main_title, 
+                                gp = grid::gpar(fontsize = 14, fontface = "bold"))
+    
+    combined_plot <- gridExtra::grid.arrange(
+      grobs = plot_list, 
+      ncol = ncol, 
+      nrow = nrow,
+      top = title_grob
+    )
+  } else {
+    stop("gridExtra package is required for plot combination. Please install it.")
+  }
+  
   return(combined_plot)
 }
 
@@ -403,7 +553,7 @@ demo_sgwt <- function() {
   
   # New SGWT workflow
   cat("Step 1: Initialize SGWT object\n")
-  SG <- initSGWT(demo_data, signals = c("signal1", "signal2"), k = 8, J = 4)
+  SG <- initSGWT(demo_data, signals = c("signal1", "signal2"), J = 4)
   
   cat("Step 2: Build spectral graph\n")
   SG <- runSpecGraph(SG, verbose = TRUE)

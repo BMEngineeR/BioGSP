@@ -20,7 +20,7 @@ Imports:
     RSpectra,
     ggplot2,
     patchwork,
-    ggpubr,
+    gridExtra,
     viridis,
     methods
 Suggests:
