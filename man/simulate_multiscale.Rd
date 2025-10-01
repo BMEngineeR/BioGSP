@@ -9,7 +9,8 @@ simulate_multiscale(
   n_centers = 3,
   Ra_seq = c(10, 5, 1),
   Rb_seq = c(10, 5, 1),
-  seed = 123
+  seed = 123,
+  verbose = TRUE
 )
 }
 \arguments{
@@ -22,6 +23,8 @@ simulate_multiscale(
 \item{Rb_seq}{Vector of outer ring radii (default: c(10, 5, 1))}
 
 \item{seed}{Random seed for reproducible center placement (default: 123)}
+
+\item{verbose}{Logical; if TRUE, show progress bar and messages (default: TRUE)}
 }
 \value{
 List of data frames, each containing X, Y coordinates and circleA, circleB binary signals

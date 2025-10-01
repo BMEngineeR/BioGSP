@@ -126,6 +126,47 @@ similarity_cross <- runSGCC(SG, SG2)  # Compare first signals from each object
 print(paste("Cross-object SGCC Score:", round(similarity_cross$S, 4)))
 ```
 
+### Visualize Similarity Space
+
+```r
+# Generate multiple patterns for similarity analysis
+patterns <- simulate_multiscale(
+  grid_size = 40,
+  n_centers = 1,
+  Ra_seq = c(1, 5, 10),    # Inner circle radii
+  Rb_seq = c(2, 6, 15),    # Outer ring radii
+  seed = 123
+)
+
+# Process patterns and compute similarities
+similarity_results <- list()
+for (i in seq_along(patterns)) {
+  pattern_name <- names(patterns)[i]
+  pattern_data <- patterns[[i]]
+  
+  # Create and process SGWT object
+  SG_temp <- initSGWT(pattern_data, x_col = "X", y_col = "Y", 
+                     signals = c("signal_1", "signal_2"), J = 4)
+  SG_temp <- runSpecGraph(SG_temp, k = 12, verbose = FALSE)
+  SG_temp <- runSGWT(SG_temp, verbose = FALSE)
+  
+  # Compute within-pattern similarity
+  similarity_results[[pattern_name]] <- runSGCC("signal_1", "signal_2", 
+                                               SG = SG_temp, return_parts = TRUE)
+}
+
+# Visualize similarity space: low-frequency vs non-low-frequency
+similarity_plot <- visualize_similarity_xy(
+  similarity_results,
+  point_size = 4,
+  add_diagonal = TRUE,
+  add_axes_lines = TRUE,
+  title = "SGWT Similarity Space: 9 Pattern Comparisons",
+  show_labels = TRUE
+)
+print(similarity_plot)
+```
+
 ## SGWT Object Structure
 
 The new SGWT object contains:
@@ -155,6 +196,7 @@ The new SGWT object contains:
 | `runSGCC()` | Calculate Fourier domain energy-normalized weighted similarity (excludes DC) |
 | `plot_sgwt_decomposition()` | Visualize SGWT results |
 | `sgwt_energy_analysis()` | Analyze energy distribution across scales in Fourier domain (excludes DC) |
+| `visualize_similarity_xy()` | Plot similarity space: low-frequency vs non-low-frequency |
 | `demo_sgwt()` | Run complete demonstration |
 
 ## Advanced Features

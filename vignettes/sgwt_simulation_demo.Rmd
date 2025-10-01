@@ -326,6 +326,156 @@ ggplot(energy_comparison, aes(x = scale, y = energy_ratio, fill = signal)) +
   theme(axis.text.x = element_text(angle = 45, hjust = 1))
 ```
 
+## Similarity Space Visualization with Multiple Patterns
+
+```{r similarity-visualization, fig.width=12, fig.height=10}
+# Generate 9 paired patterns using simulate_multiscale
+cat("Generating 9 paired patterns for similarity analysis...\n")
+
+patterns_9 <- simulate_multiscale(
+  grid_size = 40,
+  n_centers = 1,
+  Ra_seq = c(1, 5, 10),    # Inner circle radii
+  Rb_seq = c(2, 6, 15),    # Outer ring radii
+  seed = 123
+)
+
+cat("Generated", length(patterns_9), "patterns\n")
+cat("Pattern names:", names(patterns_9), "\n")
+
+# Visualize all 9 patterns first
+pattern_viz <- visualize_multiscale(
+  patterns_9, 
+  Ra_seq = c(1, 5, 10), 
+  Rb_seq = c(2, 6, 15),
+  show_title = TRUE
+)
+print(pattern_viz)
+
+# Create SGWT objects for all 9 patterns and compute similarities
+similarity_results <- list()
+sgwt_objects <- list()
+
+cat("\nProcessing patterns and computing SGWT analysis...\n")
+
+# Process each pattern
+for (i in seq_along(patterns_9)) {
+  pattern_name <- names(patterns_9)[i]
+  pattern_data <- patterns_9[[i]]
+  
+  cat("Processing", pattern_name, "...\n")
+  
+  # Create SGWT object
+  SG_temp <- initSGWT(
+    data.in = pattern_data,
+    x_col = "X", 
+    y_col = "Y", 
+    signals = c("signal_1", "signal_2"),
+    J = 4,
+    kernel_type = "heat"
+  )
+  
+  # Build graph and run SGWT
+  SG_temp <- runSpecGraph(SG_temp, k = 12, laplacian_type = "normalized", 
+                         length_eigenvalue = 50, verbose = FALSE)
+  SG_temp <- runSGWT(SG_temp, verbose = FALSE)
+  
+  sgwt_objects[[pattern_name]] <- SG_temp
+  
+  # Compute within-pattern similarity (signal_1 vs signal_2)
+  sim_within <- runSGCC("signal_1", "signal_2", SG = SG_temp, return_parts = TRUE)
+  similarity_results[[pattern_name]] <- sim_within
+}
+
+# Print similarity results summary
+cat("\nSimilarity Results Summary (signal_1 vs signal_2 within each pattern):\n")
+similarity_df <- data.frame(
+  Pattern = names(similarity_results),
+  S = sapply(similarity_results, function(x) x$S),
+  c_low = sapply(similarity_results, function(x) x$c_low),
+  c_nonlow = sapply(similarity_results, function(x) x$c_nonlow),
+  w_low = sapply(similarity_results, function(x) x$w_low),
+  w_NL = sapply(similarity_results, function(x) x$w_NL),
+  stringsAsFactors = FALSE
+)
+
+print(similarity_df)
+
+# Extract Ra and Rb values for better labeling
+similarity_df$Ra <- as.numeric(gsub(".*Ra_([0-9.]+)_Rb.*", "\\1", similarity_df$Pattern))
+similarity_df$Rb <- as.numeric(gsub(".*Rb_([0-9.]+)$", "\\1", similarity_df$Pattern))
+similarity_df$Label <- paste0("Ra=", similarity_df$Ra, ",Rb=", similarity_df$Rb)
+
+# Create similarity space visualization
+similarity_plot <- visualize_similarity_xy(
+  similarity_results,
+  point_size = 4,
+  point_color = "steelblue",
+  add_diagonal = TRUE,
+  add_axes_lines = TRUE,
+  title = "SGWT Similarity Space: 9 Paired Patterns (signal_1 vs signal_2)",
+  show_labels = TRUE
+)
+
+print(similarity_plot)
+
+# Create enhanced plot with color coding by Ra values
+library(ggplot2)
+plot_data <- data.frame(
+  c_low = similarity_df$c_low,
+  c_nonlow = similarity_df$c_nonlow,
+  Ra = factor(similarity_df$Ra),
+  Rb = factor(similarity_df$Rb),
+  Label = similarity_df$Label,
+  S = similarity_df$S
+)
+
+enhanced_plot <- ggplot(plot_data, aes(x = c_low, y = c_nonlow, color = Ra, shape = Rb)) +
+  geom_point(size = 5, alpha = 0.8) +
+  geom_text(aes(label = Label), vjust = -0.8, hjust = 0.5, size = 3, color = "black") +
+  xlim(-1, 1) + ylim(-1, 1) +
+  geom_hline(yintercept = 0, linetype = "dashed", color = "gray60", alpha = 0.7) +
+  geom_vline(xintercept = 0, linetype = "dashed", color = "gray60", alpha = 0.7) +
+  geom_abline(slope = 1, intercept = 0, linetype = "dotted", color = "gray40", alpha = 0.7) +
+  geom_abline(slope = -1, intercept = 0, linetype = "dotted", color = "gray40", alpha = 0.7) +
+  scale_color_viridis_d(name = "Inner Radius (Ra)") +
+  scale_shape_manual(values = c(16, 17, 15), name = "Outer Radius (Rb)") +
+  labs(
+    title = "Enhanced Similarity Space: Color by Ra, Shape by Rb",
+    x = "Low-frequency Similarity (c_low)",
+    y = "Non-low-frequency Similarity (c_nonlow)"
+  ) +
+  theme_minimal() +
+  theme(
+    plot.title = element_text(hjust = 0.5, size = 14, face = "bold"),
+    legend.position = "right"
+  )
+
+print(enhanced_plot)
+
+# Analysis of patterns
+cat("\nPattern Analysis:\n")
+cat("Ra (Inner Radius) Effect:\n")
+for (ra in unique(similarity_df$Ra)) {
+  subset_data <- similarity_df[similarity_df$Ra == ra, ]
+  cat(sprintf("  Ra=%g: Mean c_low=%.3f, Mean c_nonlow=%.3f, Mean S=%.3f\n", 
+              ra, mean(subset_data$c_low), mean(subset_data$c_nonlow), mean(subset_data$S)))
+}
+
+cat("\nRb (Outer Radius) Effect:\n")
+for (rb in unique(similarity_df$Rb)) {
+  subset_data <- similarity_df[similarity_df$Rb == rb, ]
+  cat(sprintf("  Rb=%g: Mean c_low=%.3f, Mean c_nonlow=%.3f, Mean S=%.3f\n", 
+              rb, mean(subset_data$c_low), mean(subset_data$c_nonlow), mean(subset_data$S)))
+}
+
+cat("\nSimilarity Space Interpretation:\n")
+cat("- Each point represents similarity between signal_1 (inner circle) and signal_2 (outer ring)\n")
+cat("- Color indicates inner radius (Ra): darker = smaller radius\n")
+cat("- Shape indicates outer radius (Rb): circle/triangle/square for different sizes\n")
+cat("- Position shows frequency-domain similarity characteristics\n")
+```
+
 # Advanced Workflow Features
 
 ## Custom Parameters

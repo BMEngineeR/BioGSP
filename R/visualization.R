@@ -513,6 +513,180 @@ visualize_sgwt_kernels <- function(eigenvalues, scales = NULL, J = 4, scaling_fa
   ))
 }
 
+#' Visualize similarity in low vs non-low frequency space
+#'
+#' @description Create a scatter plot with low-frequency similarity (c_low) on x-axis
+#' and non-low-frequency similarity (c_nonlow) on y-axis from runSGCC results
+#'
+#' @param similarity_results List of similarity results from runSGCC function, or a single result
+#' @param point_size Size of points in the plot (default: 2)
+#' @param point_color Color of points (default: "steelblue")
+#' @param add_diagonal Whether to add diagonal reference lines (default: TRUE)
+#' @param add_axes_lines Whether to add x=0 and y=0 reference lines (default: TRUE)
+#' @param title Plot title (default: "Low-frequency vs Non-low-frequency Similarity")
+#' @param show_labels Whether to show point labels if names are available (default: FALSE)
+#' @param show_names Whether to display data point names as text labels using ggrepel (default: FALSE).
+#'   If more than 50 points, randomly samples 50 for labeling. Requires ggrepel package.
+#'
+#' @return ggplot object showing similarity space visualization
+#' @export
+#'
+#' @examples
+#' \dontrun{
+#' # Single similarity result
+#' sim_result <- runSGCC("signal1", "signal2", SG = SG_object)
+#' plot <- visualize_similarity_xy(sim_result)
+#' print(plot)
+#' 
+#' # Multiple similarity results
+#' sim_results <- list(
+#'   pair1 = runSGCC("signal1", "signal2", SG = SG_object1),
+#'   pair2 = runSGCC("signal1", "signal2", SG = SG_object2)
+#' )
+#' plot <- visualize_similarity_xy(sim_results, show_names = TRUE)
+#' print(plot)
+#' 
+#' # Show both labels and names (for comparison)
+#' plot_both <- visualize_similarity_xy(sim_results, show_labels = TRUE, show_names = TRUE)
+#' print(plot_both)
+#' 
+#' # With many data points (>50), names will be randomly sampled
+#' # install.packages("ggrepel")  # Required for show_names = TRUE
+#' plot_many <- visualize_similarity_xy(many_sim_results, show_names = TRUE)
+#' print(plot_many)
+#' }
+visualize_similarity_xy <- function(similarity_results, 
+                                   point_size = 2,
+                                   point_color = "steelblue",
+                                   add_diagonal = TRUE,
+                                   add_axes_lines = TRUE,
+                                   title = "Low-frequency vs Non-low-frequency Similarity",
+                                   show_labels = FALSE,
+                                   show_names = FALSE) {
+  
+  # Check if required packages are available
+  if (!requireNamespace("ggplot2", quietly = TRUE)) {
+    stop("ggplot2 package is required for visualization")
+  }
+  if (show_names && !requireNamespace("ggrepel", quietly = TRUE)) {
+    stop("ggrepel package is required when show_names = TRUE. Please install it with: install.packages('ggrepel')")
+  }
+  
+  # Handle single result vs list of results
+  if (is.list(similarity_results) && !is.null(similarity_results$c_low)) {
+    # Single result - convert to list
+    similarity_results <- list(result = similarity_results)
+  }
+  
+  # Validate input structure
+  if (!is.list(similarity_results)) {
+    stop("similarity_results must be a list or a single runSGCC result")
+  }
+  
+  # Extract c_low and c_nonlow values
+  plot_data <- data.frame(
+    c_low = numeric(0),
+    c_nonlow = numeric(0),
+    label = character(0),
+    stringsAsFactors = FALSE
+  )
+  
+  for (i in seq_along(similarity_results)) {
+    result <- similarity_results[[i]]
+    
+    # Validate that result has required components
+    if (is.null(result$c_low) || is.null(result$c_nonlow)) {
+      warning(paste("Result", i, "missing c_low or c_nonlow components, skipping"))
+      next
+    }
+    
+    # Add to plot data
+    plot_data <- rbind(plot_data, data.frame(
+      c_low = result$c_low,
+      c_nonlow = result$c_nonlow,
+      label = if (is.null(names(similarity_results)[i])) paste("Point", i) else names(similarity_results)[i],
+      stringsAsFactors = FALSE
+    ))
+  }
+  
+  # Check if we have data to plot
+  if (nrow(plot_data) == 0) {
+    stop("No valid similarity results found to plot")
+  }
+  
+  # Create the base plot
+  p <- ggplot2::ggplot(plot_data, ggplot2::aes_string(x = "c_low", y = "c_nonlow")) +
+    ggplot2::geom_point(size = point_size, color = point_color, alpha = 0.7) +
+    ggplot2::xlim(-1, 1) +
+    ggplot2::ylim(-1, 1) +
+    ggplot2::labs(
+      title = title,
+      x = "Low-frequency Similarity (c_low)",
+      y = "Non-low-frequency Similarity (c_nonlow)"
+    ) +
+    ggplot2::theme_minimal() +
+    ggplot2::theme(
+      plot.title = ggplot2::element_text(hjust = 0.5, size = 14, face = "bold"),
+      axis.title = ggplot2::element_text(size = 12),
+      axis.text = ggplot2::element_text(size = 10),
+      panel.grid.minor = ggplot2::element_blank()
+    )
+  
+  # Add reference lines if requested
+  if (add_axes_lines) {
+    p <- p + 
+      ggplot2::geom_hline(yintercept = 0, linetype = "dashed", color = "gray60", alpha = 0.7) +
+      ggplot2::geom_vline(xintercept = 0, linetype = "dashed", color = "gray60", alpha = 0.7)
+  }
+  
+  if (add_diagonal) {
+    p <- p + 
+      ggplot2::geom_abline(slope = 1, intercept = 0, linetype = "dotted", color = "gray40", alpha = 0.7) +
+      ggplot2::geom_abline(slope = -1, intercept = 0, linetype = "dotted", color = "gray40", alpha = 0.7)
+  }
+  
+  # Add labels if requested (backward compatibility)
+  if (show_labels && nrow(plot_data) > 0) {
+    p <- p + ggplot2::geom_text(ggplot2::aes_string(label = "label"), 
+                               vjust = -0.5, hjust = 0.5, size = 3, color = "black")
+  }
+  
+  # Add names if requested (new parameter with ggrepel)
+  if (show_names && nrow(plot_data) > 0) {
+    # Create a subset for labeling if there are too many points
+    label_data <- plot_data
+    n_points <- nrow(plot_data)
+    
+    if (n_points > 50) {
+      # Random sample 50 points for labeling to avoid overcrowding
+      set.seed(123)  # For reproducible sampling
+      sample_indices <- sample(seq_len(n_points), size = 50, replace = FALSE)
+      label_data <- plot_data[sample_indices, ]
+      
+      # Add a note about sampling
+      subtitle_text <- paste("Showing", nrow(label_data), "of", n_points, "labels (random sample)")
+      p <- p + ggplot2::labs(subtitle = subtitle_text)
+    }
+    
+    # Use ggrepel for better text positioning
+    p <- p + ggrepel::geom_text_repel(
+      data = label_data,
+      ggplot2::aes_string(label = "label"),
+      size = 2.5,
+      color = "darkblue",
+      fontface = "bold",
+      box.padding = 0.35,
+      point.padding = 0.3,
+      segment.color = "grey50",
+      segment.size = 0.2,
+      max.overlaps = Inf,
+      min.segment.length = 0.1
+    )
+  }
+  
+  return(p)
+}
+
 #' Demo function for SGWT
 #'
 #' @description Demonstration function showing basic SGWT usage with synthetic data

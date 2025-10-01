@@ -9,6 +9,7 @@
 #' @param Ra_seq Vector of inner circle radii (default: c(10, 5, 1))
 #' @param Rb_seq Vector of outer ring radii (default: c(10, 5, 1))
 #' @param seed Random seed for reproducible center placement (default: 123)
+#' @param verbose Logical; if TRUE, show progress bar and messages (default: TRUE)
 #'
 #' @return List of data frames, each containing X, Y coordinates and circleA, circleB binary signals
 #' @importFrom utils txtProgressBar setTxtProgressBar
@@ -29,7 +30,8 @@ simulate_multiscale <- function(
     n_centers = 3,
     Ra_seq = c(10, 5, 1),   # Ra decreases left to right
     Rb_seq = c(10, 5, 1),   # Rb decreases top to bottom
-    seed = 123
+    seed = 123,
+    verbose = TRUE
 ) {
   grid <- expand.grid(X = 1:grid_size, Y = 1:grid_size)
   
@@ -48,10 +50,15 @@ simulate_multiscale <- function(
   
   # Calculate total iterations for progress bar
   total_iterations <- length(Ra_seq) * length(Rb_seq)
-  cat("Generating", total_iterations, "multiscale patterns...\n")
+  if (verbose) {
+    cat("Generating", total_iterations, "multiscale patterns...\n")
+  }
   
   # Initialize progress bar
-  pb <- txtProgressBar(min = 0, max = total_iterations, style = 3)
+  pb <- NULL
+  if (verbose) {
+    pb <- txtProgressBar(min = 0, max = total_iterations, style = 3)
+  }
   iteration <- 0
   
   for (Ra in Ra_seq) {
@@ -81,104 +88,121 @@ simulate_multiscale <- function(
       
       # Update progress bar
       iteration <- iteration + 1
-      setTxtProgressBar(pb, iteration)
+      if (verbose && !is.null(pb)) {
+        setTxtProgressBar(pb, iteration)
+      }
     }
   }
   
   # Close progress bar
-  close(pb)
-  cat("\nMultiscale simulation completed!\n")
+  if (verbose && !is.null(pb)) {
+    close(pb)
+    cat("\nMultiscale simulation completed!\n")
+  }
   
   return(sim_list)
 }
 
-#' Simulate Concentric Ring Patterns
+#' Simulate Stripe Patterns
 #'
-#' @description Generate concentric ring patterns with dynamic outer ring movement.
-#' Creates a solid inner circle with a moving outer ring that closes in over time.
+#' @description Generate stripe patterns with two parallel stripes separated by a gap.
+#' Creates rotatable stripe patterns with configurable gap, width, and rotation angle.
 #'
-#' @param grid_size Size of the spatial grid (default: 60)
-#' @param radius_seq Vector of inner circle radii to simulate (default: seq(2.5, 20, by = 2.5))
-#' @param n_movements Number of movement steps for the outer ring (default: 10)
-#' @param center_x X coordinate of pattern center (default: grid_size/2)
-#' @param center_y Y coordinate of pattern center (default: grid_size/2)
+#' @param grid_size Size of the spatial grid (default: 100)
+#' @param gap_seq Vector of gap distances between stripe centers (default: c(10))
+#' @param width_seq Vector of stripe widths (default: c(5))
+#' @param theta_seq Vector of rotation angles in degrees (default: c(0))
+#' @param eps Small numeric value for open boundary conditions to avoid overlap at stripe edges (default: 1e-9)
+#' @param verbose Logical; if TRUE, show progress messages (default: TRUE)
 #'
-#' @return List of data frames, each containing X, Y coordinates, movement indicators, 
-#'         and signal_1 (solid circle), signal_2 (concentric ring) binary signals
+#' @return List of data frames, each containing X, Y coordinates and signal_1, signal_2 binary signals
 #' @export
 #'
 #' @examples
 #' \dontrun{
-#' # Generate concentric ring patterns with default parameters
-#' patterns <- simulate_ringpattern()
+#' # Generate stripe patterns with default parameters
+#' patterns <- simulate_stripe_patterns()
 #' 
 #' # Custom parameters
-#' radius_seq <- seq(2.5, 20, by = 2.5)
-#' patterns <- simulate_ringpattern(radius_seq = radius_seq, n_movements = 5)
+#' patterns <- simulate_stripe_patterns(
+#'   grid_size = 80,
+#'   gap_seq = c(10, 20),
+#'   width_seq = c(5, 10, 20),
+#'   theta_seq = c(0, 30, 60),
+#'   eps = 1e-9,
+#'   verbose = TRUE
+#' )
 #' }
-simulate_ringpattern <- function(
-    grid_size = 60,
-    radius_seq = seq(2.5, 20, by = 2.5),
-    n_movements = 10,
-    center_x = NULL,
-    center_y = NULL
+simulate_stripe_patterns <- function(
+    grid_size = 100,
+    gap_seq   = c(10),
+    width_seq = c(5),
+    theta_seq = c(0),
+    verbose = TRUE
 ) {
-  if (is.null(center_x)) center_x <- grid_size/2
-  if (is.null(center_y)) center_y <- grid_size/2
-  
+  # Generate lattice grid
   grid <- expand.grid(X = 1:grid_size, Y = 1:grid_size)
   sim_list <- list()
   
-  # Calculate total iterations for progress bar
-  total_iterations <- length(radius_seq)
-  cat("Generating", total_iterations, "concentric ring patterns...\n")
-  
-  # Initialize progress bar
-  pb <- txtProgressBar(min = 0, max = total_iterations, style = 3)
+  total_iterations <- length(gap_seq) * length(width_seq) * length(theta_seq)
+  if (verbose) cat("Generating", total_iterations, "stripe patterns...\n")
   iteration <- 0
   
-  for (r in radius_seq) {
-    # movement trajectory (outer ring closing in)
-    movements <- data.frame(
-      r_outer = seq(from = 40, to = 1.2 * r, length.out = n_movements)
-    )
-    
-    plot_data <- lapply(seq_len(n_movements), function(i) {
-      r_out <- movements$r_outer[i]
-      
-      # Calculate distances from center
-      distances <- sqrt((grid$X - center_x)^2 + (grid$Y - center_y)^2)
-      
-      # Define regions
-      inside_circle1 <- distances <= r
-      inside_circle2_outer <- distances <= r_out
-      inside_ring <- inside_circle2_outer & !inside_circle1
-      
-      data.frame(
-        X = grid$X,
-        Y = grid$Y,
-        signal_1 = as.numeric(inside_circle1),  # Solid Circle
-        signal_2 = as.numeric(inside_ring),     # Concentric Ring
-        movement = paste("Movement", i),
-        movement_step = i,
-        radius = r,
-        outer_radius = r_out
-      )
-    })
-    
-    # Combine all movements for this radius
-    combined_data <- do.call(rbind, plot_data)
-    sim_list[[paste0("radius_", r)]] <- combined_data
-    
-    # Update progress bar
-    iteration <- iteration + 1
-    setTxtProgressBar(pb, iteration)
+  for (gap in gap_seq) {
+    for (width in width_seq) {
+      for (theta in theta_seq) {
+        
+        # Baseline vertical lines at center ± gap/2
+        x_left_line  <- grid_size/2 - gap/2
+        x_right_line <- grid_size/2 + gap/2
+        y_center     <- grid_size/2
+        
+        # Rotation function
+        rotate <- function(x, y, theta, cx, cy) {
+          th <- theta * pi/180
+          x_shift <- as.numeric(x - cx)
+          y_shift <- as.numeric(y - cy)
+          x_rot <-  cos(th) * x_shift + sin(th) * y_shift
+          y_rot <- -sin(th) * x_shift + cos(th) * y_shift
+          data.frame(x = x_rot, y = y_rot)
+        }
+        
+        if (gap == 0) {
+          # Both stripes meet in the middle
+          coords <- rotate(grid$X, grid$Y, theta, grid_size/2, y_center)
+          signal_1 <- as.integer(coords$x >= -width & coords$x <= 0)
+          signal_2 <- as.integer(coords$x > 0    & coords$x <= width)
+        } else {
+          # Normal case: two separated stripes
+          coords_left  <- rotate(grid$X, grid$Y, theta, x_left_line, y_center)
+          coords_right <- rotate(grid$X, grid$Y, theta, x_right_line, y_center)
+          
+          signal_1 <- as.integer(coords_left$x <= 0 & coords_left$x >= -width)
+          signal_2 <- as.integer(coords_right$x >= 0 & coords_right$x <= width)
+        }
+        
+        df <- data.frame(
+          X = grid$X,
+          Y = grid$Y,
+          signal_1 = signal_1,
+          signal_2 = signal_2,
+          gap_param = gap,
+          width_param = width,
+          theta_param = theta
+        )
+        
+        name <- paste0("gap_", gap, "_w_", width, "_th_", theta)
+        sim_list[[name]] <- df
+        
+        iteration <- iteration + 1
+        if (verbose && iteration %% max(1, floor(total_iterations/10)) == 0) {
+          cat("Completed", iteration, "of", total_iterations, "patterns\n")
+        }
+      }
+    }
   }
   
-  # Close progress bar
-  close(pb)
-  cat("\nConcentric ring simulation completed!\n")
-  
+  if (verbose) cat("Stripe pattern simulation completed!\n")
   return(sim_list)
 }
 
@@ -249,15 +273,19 @@ visualize_multiscale <- function(sim_data, Ra_seq, Rb_seq,
   return(plot_grid)
 }
 
-#' Visualize Concentric Ring Simulation Results
+#' Visualize Stripe Pattern Simulation Results
 #'
-#' @description Create visualization plots for concentric ring simulation patterns
+#' @description Create visualization plots for stripe pattern simulation results
 #'
-#' @param sim_data Output from simulate_ringpattern function
-#' @param radius_seq Vector of radius values used in simulation
+#' @param sim_data Output from simulate_stripe_patterns function
+#' @param gap_seq Vector of gap values used in simulation
+#' @param width_seq Vector of width values used in simulation
+#' @param theta_seq Vector of theta (rotation angle) values used in simulation
 #' @param bg_color Background color for plots (default: "grey")
-#' @param signal1_color Color for signal 1 (default: "#16964a")
-#' @param signal2_color Color for signal 2 (default: "#2958a8")
+#' @param signal1_color Color for signal 1 (default: "#1f6f8b")
+#' @param signal2_color Color for signal 2 (default: "#e67e22")
+#' @param overlap_color Color for overlapping regions (default: "#7a4dbf")
+#' @param show_title Logical; if TRUE (default), add titles to plots with parameter values
 #'
 #' @return Combined ggplot object with all pattern visualizations
 #' @export
@@ -265,15 +293,26 @@ visualize_multiscale <- function(sim_data, Ra_seq, Rb_seq,
 #' @examples
 #' \dontrun{
 #' # Generate and visualize patterns
-#' radius_seq <- seq(2.5, 20, by = 2.5)
-#' sim_data <- simulate_ringpattern(radius_seq = radius_seq)
-#' plot_grid <- visualize_ringpattern(sim_data, radius_seq)
+#' sim_data <- simulate_stripe_patterns(
+#'   grid_size = 80,
+#'   gap_seq = c(10, 20),
+#'   width_seq = c(5, 10, 20),
+#'   theta_seq = c(0, 30, 60)
+#' )
+#' plot_grid <- visualize_stripe_patterns(sim_data, 
+#'                                        gap_seq = c(10, 20),
+#'                                        width_seq = c(5, 10, 20),
+#'                                        theta_seq = c(0, 30, 60))
 #' print(plot_grid)
 #' }
-visualize_ringpattern <- function(sim_data, radius_seq, 
-                                 bg_color = "grey",      
-                                 signal1_color = "#16964a",    
-                                 signal2_color = "#2958a8") {
+visualize_stripe_patterns <- function(
+    sim_data, gap_seq, width_seq, theta_seq,
+    bg_color = "grey",
+    signal1_color = "#1f6f8b",
+    signal2_color = "#e67e22",
+    overlap_color = "#7a4dbf",
+    show_title = TRUE
+) {
   
   if (!requireNamespace("ggplot2", quietly = TRUE)) {
     stop("ggplot2 package is required for visualization")
@@ -283,31 +322,41 @@ visualize_ringpattern <- function(sim_data, radius_seq,
   }
   
   plot_list <- list()
-  for (r in radius_seq) {
-    df <- sim_data[[paste0("radius_", r)]]
-    
-    # Create label column
-    df$label <- "Outside"
-    df$label[df$signal_1 == 1] <- "signal_1"
-    df$label[df$signal_2 == 1] <- "signal_2"
-    
-    p <- ggplot2::ggplot(df, ggplot2::aes_string(x = "X", y = "Y", fill = "label")) +
-      ggplot2::geom_tile(alpha = 0.95) +
-      ggplot2::facet_wrap(~ movement, nrow = 1) +
-      ggplot2::scale_fill_manual(values = c(
-        "signal_1" =signal1_color,
-        "signal_2" = signal2_color,
-        "Outside" = bg_color
-      )) +
-      ggplot2::coord_fixed() +
-      ggplot2::theme_void() +
-      ggplot2::theme(legend.position = "none") +
-      ggplot2::ggtitle(paste("Radius =", r))
-    
-    plot_list[[paste0("radius_", r)]] <- p
+  
+  for (gap in gap_seq) {
+    for (width in width_seq) {
+      for (theta in theta_seq) {
+        df <- sim_data[[paste0("gap_", gap,
+                               "_w_", width,
+                               "_th_", theta)]]
+        
+        # Label background / stripes / overlap
+        df$label <- "Background"
+        df$label[df$signal_1 == 1 & df$signal_2 == 0] <- "signal_1"
+        df$label[df$signal_2 == 1 & df$signal_1 == 0] <- "signal_2"
+        df$label[df$signal_1 == 1 & df$signal_2 == 1] <- "overlap"
+        
+        # Raster-based plot (no seams)
+        p <- ggplot2::ggplot(df, ggplot2::aes(x = X, y = Y, fill = label)) +
+          ggplot2::geom_raster(interpolate = FALSE) +
+          ggplot2::scale_fill_manual(values = c(
+            "Background" = bg_color,
+            "signal_1"   = signal1_color,
+            "signal_2"   = signal2_color,
+            "overlap"    = overlap_color
+          )) +
+          ggplot2::coord_fixed(expand = FALSE) +  # important for no gaps
+          ggplot2::theme_void() +
+          ggplot2::theme(legend.position = "none")
+        
+        if (show_title) {
+          p <- p + ggplot2::ggtitle(paste0("g=", gap, ", w=", width, ", th=", theta))
+        }
+        
+        plot_list[[paste0("gap_", gap, "_w_", width, "_th_", theta)]] <- p
+      }
+    }
   }
   
-  # Arrange plots: each row = one radius
-  plot_grid <- patchwork::wrap_plots(plot_list, ncol = 1)
-  return(plot_grid)
+  patchwork::wrap_plots(plot_list, ncol = length(width_seq))
 }
