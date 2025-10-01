@@ -26,17 +26,11 @@ Imports:
     viridis,
     methods
 Suggests:
-    spdep,
-    spatialEco,
-    sp,
-    gasper,
-    egg,
-    testthat (>= 2.1.0),
     remotes,
     dplyr,
-    tidyr,
     knitr,
-    rmarkdown
+    rmarkdown,
+    ggrepel
 VignetteBuilder: knitr
 Depends: 
     R (>= 3.5.0)

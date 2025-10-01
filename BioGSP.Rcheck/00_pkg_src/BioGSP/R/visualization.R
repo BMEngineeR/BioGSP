@@ -513,10 +513,189 @@ visualize_sgwt_kernels <- function(eigenvalues, scales = NULL, J = 4, scaling_fa
   ))
 }
 
+#' Visualize similarity in low vs non-low frequency space
+#'
+#' @description Create a scatter plot with low-frequency similarity (c_low) on x-axis
+#' and non-low-frequency similarity (c_nonlow) on y-axis from runSGCC results
+#' 
+#' @importFrom stats rnorm
+#' @importFrom grid textGrob gpar
+#'
+#' @param similarity_results List of similarity results from runSGCC function, or a single result
+#' @param point_size Size of points in the plot (default: 2)
+#' @param point_color Color of points (default: "steelblue")
+#' @param add_diagonal Whether to add diagonal reference lines (default: TRUE)
+#' @param add_axes_lines Whether to add x=0 and y=0 reference lines (default: TRUE)
+#' @param title Plot title (default: "Low-frequency vs Non-low-frequency Similarity")
+#' @param show_labels Whether to show point labels if names are available (default: FALSE)
+#' @param show_names Whether to display data point names as text labels using ggrepel (default: FALSE).
+#'   If more than 50 points, randomly samples 50 for labeling. Requires ggrepel package.
+#'
+#' @return ggplot object showing similarity space visualization
+#' @export
+#'
+#' @examples
+#' \dontrun{
+#' # Single similarity result
+#' sim_result <- runSGCC("signal1", "signal2", SG = SG_object)
+#' plot <- visualize_similarity_xy(sim_result)
+#' print(plot)
+#' 
+#' # Multiple similarity results
+#' sim_results <- list(
+#'   pair1 = runSGCC("signal1", "signal2", SG = SG_object1),
+#'   pair2 = runSGCC("signal1", "signal2", SG = SG_object2)
+#' )
+#' plot <- visualize_similarity_xy(sim_results, show_names = TRUE)
+#' print(plot)
+#' 
+#' # Show both labels and names (for comparison)
+#' plot_both <- visualize_similarity_xy(sim_results, show_labels = TRUE, show_names = TRUE)
+#' print(plot_both)
+#' 
+#' # With many data points (>50), names will be randomly sampled
+#' # install.packages("ggrepel")  # Required for show_names = TRUE
+#' plot_many <- visualize_similarity_xy(many_sim_results, show_names = TRUE)
+#' print(plot_many)
+#' }
+visualize_similarity_xy <- function(similarity_results, 
+                                   point_size = 2,
+                                   point_color = "steelblue",
+                                   add_diagonal = TRUE,
+                                   add_axes_lines = TRUE,
+                                   title = "Low-frequency vs Non-low-frequency Similarity",
+                                   show_labels = FALSE,
+                                   show_names = FALSE) {
+  
+  # Check if required packages are available
+  if (!requireNamespace("ggplot2", quietly = TRUE)) {
+    stop("ggplot2 package is required for visualization")
+  }
+  if (show_names && !requireNamespace("ggrepel", quietly = TRUE)) {
+    stop("ggrepel package is required when show_names = TRUE. Please install it with: install.packages('ggrepel')")
+  }
+  
+  # Handle single result vs list of results
+  if (is.list(similarity_results) && !is.null(similarity_results$c_low)) {
+    # Single result - convert to list
+    similarity_results <- list(result = similarity_results)
+  }
+  
+  # Validate input structure
+  if (!is.list(similarity_results)) {
+    stop("similarity_results must be a list or a single runSGCC result")
+  }
+  
+  # Extract c_low and c_nonlow values
+  plot_data <- data.frame(
+    c_low = numeric(0),
+    c_nonlow = numeric(0),
+    label = character(0),
+    stringsAsFactors = FALSE
+  )
+  
+  for (i in seq_along(similarity_results)) {
+    result <- similarity_results[[i]]
+    
+    # Validate that result has required components
+    if (is.null(result$c_low) || is.null(result$c_nonlow)) {
+      warning(paste("Result", i, "missing c_low or c_nonlow components, skipping"))
+      next
+    }
+    
+    # Add to plot data
+    plot_data <- rbind(plot_data, data.frame(
+      c_low = result$c_low,
+      c_nonlow = result$c_nonlow,
+      label = if (is.null(names(similarity_results)[i])) paste("Point", i) else names(similarity_results)[i],
+      stringsAsFactors = FALSE
+    ))
+  }
+  
+  # Check if we have data to plot
+  if (nrow(plot_data) == 0) {
+    stop("No valid similarity results found to plot")
+  }
+  
+  # Create the base plot
+  p <- ggplot2::ggplot(plot_data, ggplot2::aes_string(x = "c_low", y = "c_nonlow")) +
+    ggplot2::geom_point(size = point_size, color = point_color, alpha = 0.7) +
+    ggplot2::xlim(-1, 1) +
+    ggplot2::ylim(-1, 1) +
+    ggplot2::labs(
+      title = title,
+      x = "Low-frequency Similarity (c_low)",
+      y = "Non-low-frequency Similarity (c_nonlow)"
+    ) +
+    ggplot2::theme_minimal() +
+    ggplot2::theme(
+      plot.title = ggplot2::element_text(hjust = 0.5, size = 14, face = "bold"),
+      axis.title = ggplot2::element_text(size = 12),
+      axis.text = ggplot2::element_text(size = 10),
+      panel.grid.minor = ggplot2::element_blank()
+    )
+  
+  # Add reference lines if requested
+  if (add_axes_lines) {
+    p <- p + 
+      ggplot2::geom_hline(yintercept = 0, linetype = "dashed", color = "gray60", alpha = 0.7) +
+      ggplot2::geom_vline(xintercept = 0, linetype = "dashed", color = "gray60", alpha = 0.7)
+  }
+  
+  if (add_diagonal) {
+    p <- p + 
+      ggplot2::geom_abline(slope = 1, intercept = 0, linetype = "dotted", color = "gray40", alpha = 0.7) +
+      ggplot2::geom_abline(slope = -1, intercept = 0, linetype = "dotted", color = "gray40", alpha = 0.7)
+  }
+  
+  # Add labels if requested (backward compatibility)
+  if (show_labels && nrow(plot_data) > 0) {
+    p <- p + ggplot2::geom_text(ggplot2::aes_string(label = "label"), 
+                               vjust = -0.5, hjust = 0.5, size = 3, color = "black")
+  }
+  
+  # Add names if requested (new parameter with ggrepel)
+  if (show_names && nrow(plot_data) > 0) {
+    # Create a subset for labeling if there are too many points
+    label_data <- plot_data
+    n_points <- nrow(plot_data)
+    
+    if (n_points > 50) {
+      # Random sample 50 points for labeling to avoid overcrowding
+      set.seed(123)  # For reproducible sampling
+      sample_indices <- sample(seq_len(n_points), size = 50, replace = FALSE)
+      label_data <- plot_data[sample_indices, ]
+      
+      # Add a note about sampling
+      subtitle_text <- paste("Showing", nrow(label_data), "of", n_points, "labels (random sample)")
+      p <- p + ggplot2::labs(subtitle = subtitle_text)
+    }
+    
+    # Use ggrepel for better text positioning
+    p <- p + ggrepel::geom_text_repel(
+      data = label_data,
+      ggplot2::aes_string(label = "label"),
+      size = 2.5,
+      color = "darkblue",
+      fontface = "bold",
+      box.padding = 0.35,
+      point.padding = 0.3,
+      segment.color = "grey50",
+      segment.size = 0.2,
+      max.overlaps = Inf,
+      min.segment.length = 0.1
+    )
+  }
+  
+  return(p)
+}
+
 #' Demo function for SGWT
 #'
 #' @description Demonstration function showing basic SGWT usage with synthetic data
 #' using the new workflow: initSGWT -> runSpecGraph -> runSGWT
+#'
+#' @param verbose Logical; if TRUE, show progress messages and results (default: TRUE)
 #'
 #' @return SGWT object with complete analysis
 #' @export
@@ -526,8 +705,8 @@ visualize_sgwt_kernels <- function(eigenvalues, scales = NULL, J = 4, scaling_fa
 #' SG <- demo_sgwt()
 #' print(SG)
 #' }
-demo_sgwt <- function() {
-  cat("=== SGWT Demo ===\n")
+demo_sgwt <- function(verbose = TRUE) {
+  if (verbose) cat("=== SGWT Demo ===\n")
   
   # Generate synthetic spatial data
   set.seed(123)
@@ -549,27 +728,101 @@ demo_sgwt <- function() {
     signal2 = signal2
   )
   
-  cat("Generated synthetic data with", n_points, "points and", 2, "signals\n")
+  if (verbose) cat("Generated synthetic data with", n_points, "points and", 2, "signals\n")
   
   # New SGWT workflow
-  cat("Step 1: Initialize SGWT object\n")
+  if (verbose) cat("Step 1: Initialize SGWT object\n")
   SG <- initSGWT(demo_data, signals = c("signal1", "signal2"), J = 4)
   
-  cat("Step 2: Build spectral graph\n")
-  SG <- runSpecGraph(SG, verbose = TRUE)
+  if (verbose) cat("Step 2: Build spectral graph\n")
+  SG <- runSpecGraph(SG, verbose = verbose)
   
-  cat("Step 3: Run SGWT analysis\n")
-  SG <- runSGWT(SG, verbose = TRUE)
+  if (verbose) cat("Step 3: Run SGWT analysis\n")
+  SG <- runSGWT(SG, verbose = verbose)
   
-  cat("Step 4: Display results\n")
-  print(SG)
+  if (verbose) cat("Step 4: Display results\n")
+  if (verbose) print(SG)
   
   # Display energy analysis for first signal
   energy_analysis <- sgwt_energy_analysis(SG, "signal1")
-  cat("\nEnergy analysis for signal1:\n")
-  print(energy_analysis)
+  if (verbose) {
+    cat("\nEnergy analysis for signal1:\n")
+    print(energy_analysis)
+  }
   
-  cat("\n=== SGWT Demo Complete ===\n")
+  if (verbose) cat("\n=== SGWT Demo Complete ===\n")
   
   return(SG)
+}
+
+#' Simulate checkerboard pattern
+#'
+#' @description Generate a checkerboard pattern with alternating signals
+#'
+#' @param grid_size Number of tiles per row/column (default: 8)
+#' @param tile_size Resolution of each tile in pixels per side (default: 1)
+#'
+#' @return Data frame with X, Y coordinates and signal_1, signal_2 patterns
+#' @export
+#'
+#' @examples
+#' \dontrun{
+#' # Generate 8x8 checkerboard with 10x10 pixel tiles
+#' df <- simulate_checkerboard(grid_size = 8, tile_size = 10)
+#' p <- visualize_checkerboard(df)
+#' print(p)
+#' }
+simulate_checkerboard <- function(
+    grid_size = 8,       # number of tiles per row/col
+    tile_size = 1        # resolution of each tile (pixels per side)
+) {
+  # Generate lattice grid
+  xs <- seq(1, grid_size * tile_size)
+  ys <- seq(1, grid_size * tile_size)
+  grid <- expand.grid(X = xs, Y = ys)
+  
+  # Determine tile index for each coordinate
+  grid$tile_x <- (grid$X - 1) %/% tile_size
+  grid$tile_y <- (grid$Y - 1) %/% tile_size
+  
+  # Checkerboard pattern: alternate signals
+  grid$signal_1 <- as.integer((grid$tile_x + grid$tile_y) %% 2 == 0)  # black
+  grid$signal_2 <- as.integer((grid$tile_x + grid$tile_y) %% 2 == 1)  # white
+  
+  # Return dataframe with only necessary columns
+  df <- grid[, c("X","Y","signal_1","signal_2")]
+  return(df)
+}
+
+#' Visualize checkerboard pattern
+#'
+#' @description Create a visualization of checkerboard pattern data
+#'
+#' @param df Data frame with X, Y coordinates and signal_1, signal_2 columns
+#' @param color1 Color for signal_1 tiles (default: "black")
+#' @param color2 Color for signal_2 tiles (default: "white")
+#'
+#' @return ggplot object showing the checkerboard pattern
+#' @export
+#'
+#' @examples
+#' \dontrun{
+#' df <- simulate_checkerboard(grid_size = 6, tile_size = 5)
+#' p <- visualize_checkerboard(df, color1 = "darkblue", color2 = "lightgray")
+#' print(p)
+#' }
+visualize_checkerboard <- function(df,
+                                   color1 = "black",
+                                   color2 = "white") {
+  df$label <- ifelse(df$signal_1 == 1, "signal_1", "signal_2")
+  
+  p <- ggplot2::ggplot(df, ggplot2::aes_string("X", "Y", fill = "label")) +
+    ggplot2::geom_tile() +
+    ggplot2::scale_fill_manual(values = c("signal_1" = color1,
+                                         "signal_2" = color2)) +
+    ggplot2::coord_equal() +
+    ggplot2::theme_void() +
+    ggplot2::theme(legend.position = "none")
+  
+  return(p)
 } 

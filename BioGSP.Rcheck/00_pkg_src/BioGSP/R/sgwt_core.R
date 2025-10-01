@@ -289,6 +289,8 @@ sgwt_auto_scales <- function(lmax, J = 5, scaling_factor = 2) {
 #' Compare different kernel families
 #'
 #' @description Visualize and compare different kernel families (both scaling and wavelet filters)
+#' 
+#' @importFrom graphics par plot lines legend
 #'
 #' @param x_range Range of x values to evaluate (default: c(0, 3))
 #' @param scale_param Scale parameter for all functions (default: 1)

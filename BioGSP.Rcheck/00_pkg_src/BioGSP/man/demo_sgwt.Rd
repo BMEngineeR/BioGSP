@@ -4,7 +4,10 @@
 \alias{demo_sgwt}
 \title{Demo function for SGWT}
 \usage{
-demo_sgwt()
+demo_sgwt(verbose = TRUE)
+}
+\arguments{
+\item{verbose}{Logical; if TRUE, show progress messages and results (default: TRUE)}
 }
 \value{
 SGWT object with complete analysis

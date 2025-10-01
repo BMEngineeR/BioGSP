@@ -11,10 +11,8 @@
 * checking extension type ... Package
 * this is package ‘BioGSP’ version ‘1.0.0’
 * package encoding: UTF-8
-* checking CRAN incoming feasibility ... [4s/12s] NOTE
+* checking CRAN incoming feasibility ... [3s/67s] Note_to_CRAN_maintainers
 Maintainer: ‘Yuzhou Chang <yuzhou.chang@osumc.edu>’
-
-New submission
 * checking package namespace information ... OK
 * checking package dependencies ... OK
 * checking if this is a source package ... OK
@@ -25,9 +23,9 @@ New submission
 * checking for sufficient/correct file permissions ... OK
 * checking whether package ‘BioGSP’ can be installed ... OK
 * checking installed package size ... NOTE
-  installed size is  7.0Mb
+  installed size is  7.7Mb
   sub-directories of 1Mb or more:
-    doc   4.5Mb
+    doc   5.1Mb
 * checking package directory ... OK
 * checking for future file timestamps ... OK
 * checking ‘build’ directory ... OK
@@ -69,10 +67,10 @@ New submission
 * checking examples ... OK
 * checking for unstated dependencies in vignettes ... OK
 * checking package vignettes ... OK
-* checking re-building of vignette outputs ... [56s/15s] OK
+* checking re-building of vignette outputs ... [76s/29s] OK
 * checking PDF version of manual ... OK
 * checking HTML version of manual ... OK
 * checking for non-standard things in the check directory ... OK
 * checking for detritus in the temp directory ... OK
 * DONE
-Status: 1 WARNING, 2 NOTEs
+Status: 1 WARNING, 1 NOTE

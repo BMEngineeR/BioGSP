@@ -499,6 +499,59 @@ cat("Number of scales:", length(SG_advanced$Parameters$scales), "\n")
 cat("Scales:", paste(round(SG_advanced$Parameters$scales, 4), collapse = ", "), "\n")
 cat("Reconstruction error:", round(SG_advanced$Inverse$signal_1$reconstruction_error, 6), "\n")
 ```
+
+## Checkerboard Pattern Analysis
+
+```{r checkerboard-demo, fig.width=12, fig.height=8}
+# Generate checkerboard pattern
+cat("Generating checkerboard pattern...\n")
+checkerboard_data <- simulate_checkerboard(grid_size = 10, tile_size = 1)
+
+cat("Checkerboard dimensions:", nrow(checkerboard_data), "points\n")
+cat("Signal 1 tiles:", sum(checkerboard_data$signal_1), "\n")
+cat("Signal 2 tiles:", sum(checkerboard_data$signal_2), "\n")
+
+# Visualize the checkerboard pattern
+p_checker <- visualize_checkerboard(checkerboard_data, color1 = "black", color2 = "lightgray")
+print(p_checker + ggtitle("Checkerboard Pattern: Alternating Signals"))
+
+# Run SGWT analysis on checkerboard
+cat("\nRunning SGWT analysis on checkerboard pattern...\n")
+
+# Initialize SGWT object
+SG_checker <- initSGWT(
+  data.in = checkerboard_data,
+  x_col = "X", 
+  y_col = "Y", 
+  signals = c("signal_1", "signal_2"),
+  J = 4,
+  kernel_type = "heat"
+)
+
+# Build spectral graph
+SG_checker <- runSpecGraph(SG_checker, k = 12, laplacian_type = "normalized", 
+                          length_eigenvalue = 50, verbose = FALSE)
+
+# Run SGWT transforms
+SG_checker <- runSGWT(SG_checker, verbose = FALSE)
+
+# Calculate similarity between the two checkerboard signals
+similarity_checker <- runSGCC("signal_1", "signal_2", SG = SG_checker, return_parts = TRUE)
+
+cat("\nCheckerboard Pattern Similarity Analysis:\n")
+cat("=====================================\n")
+cat(sprintf("Weighted similarity (S): %.6f\n", similarity_checker$S))
+cat(sprintf("Low-frequency similarity (c_low): %.6f\n", similarity_checker$c_low))
+cat(sprintf("Non-low-frequency similarity (c_nonlow): %.6f\n", similarity_checker$c_nonlow))
+cat(sprintf("Energy weights - Low: %.3f, Non-low: %.3f\n", 
+           similarity_checker$w_low, similarity_checker$w_NL))
+
+cat("\nInterpretation:\n")
+cat("- Checkerboard patterns are spatially complementary (non-overlapping)\n")
+cat("- High-frequency content dominates due to sharp tile boundaries\n")
+cat("- Low similarity values expected due to alternating pattern structure\n")
+```
+
 # Summary
 
 ## Key Takeaways

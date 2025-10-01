@@ -517,6 +517,9 @@ visualize_sgwt_kernels <- function(eigenvalues, scales = NULL, J = 4, scaling_fa
 #'
 #' @description Create a scatter plot with low-frequency similarity (c_low) on x-axis
 #' and non-low-frequency similarity (c_nonlow) on y-axis from runSGCC results
+#' 
+#' @importFrom stats rnorm
+#' @importFrom grid textGrob gpar
 #'
 #' @param similarity_results List of similarity results from runSGCC function, or a single result
 #' @param point_size Size of points in the plot (default: 2)
@@ -692,6 +695,8 @@ visualize_similarity_xy <- function(similarity_results,
 #' @description Demonstration function showing basic SGWT usage with synthetic data
 #' using the new workflow: initSGWT -> runSpecGraph -> runSGWT
 #'
+#' @param verbose Logical; if TRUE, show progress messages and results (default: TRUE)
+#'
 #' @return SGWT object with complete analysis
 #' @export
 #'
@@ -700,8 +705,8 @@ visualize_similarity_xy <- function(similarity_results,
 #' SG <- demo_sgwt()
 #' print(SG)
 #' }
-demo_sgwt <- function() {
-  cat("=== SGWT Demo ===\n")
+demo_sgwt <- function(verbose = TRUE) {
+  if (verbose) cat("=== SGWT Demo ===\n")
   
   # Generate synthetic spatial data
   set.seed(123)
@@ -723,27 +728,101 @@ demo_sgwt <- function() {
     signal2 = signal2
   )
   
-  cat("Generated synthetic data with", n_points, "points and", 2, "signals\n")
+  if (verbose) cat("Generated synthetic data with", n_points, "points and", 2, "signals\n")
   
   # New SGWT workflow
-  cat("Step 1: Initialize SGWT object\n")
+  if (verbose) cat("Step 1: Initialize SGWT object\n")
   SG <- initSGWT(demo_data, signals = c("signal1", "signal2"), J = 4)
   
-  cat("Step 2: Build spectral graph\n")
-  SG <- runSpecGraph(SG, verbose = TRUE)
+  if (verbose) cat("Step 2: Build spectral graph\n")
+  SG <- runSpecGraph(SG, verbose = verbose)
   
-  cat("Step 3: Run SGWT analysis\n")
-  SG <- runSGWT(SG, verbose = TRUE)
+  if (verbose) cat("Step 3: Run SGWT analysis\n")
+  SG <- runSGWT(SG, verbose = verbose)
   
-  cat("Step 4: Display results\n")
-  print(SG)
+  if (verbose) cat("Step 4: Display results\n")
+  if (verbose) print(SG)
   
   # Display energy analysis for first signal
   energy_analysis <- sgwt_energy_analysis(SG, "signal1")
-  cat("\nEnergy analysis for signal1:\n")
-  print(energy_analysis)
+  if (verbose) {
+    cat("\nEnergy analysis for signal1:\n")
+    print(energy_analysis)
+  }
   
-  cat("\n=== SGWT Demo Complete ===\n")
+  if (verbose) cat("\n=== SGWT Demo Complete ===\n")
   
   return(SG)
+}
+
+#' Simulate checkerboard pattern
+#'
+#' @description Generate a checkerboard pattern with alternating signals
+#'
+#' @param grid_size Number of tiles per row/column (default: 8)
+#' @param tile_size Resolution of each tile in pixels per side (default: 1)
+#'
+#' @return Data frame with X, Y coordinates and signal_1, signal_2 patterns
+#' @export
+#'
+#' @examples
+#' \dontrun{
+#' # Generate 8x8 checkerboard with 10x10 pixel tiles
+#' df <- simulate_checkerboard(grid_size = 8, tile_size = 10)
+#' p <- visualize_checkerboard(df)
+#' print(p)
+#' }
+simulate_checkerboard <- function(
+    grid_size = 8,       # number of tiles per row/col
+    tile_size = 1        # resolution of each tile (pixels per side)
+) {
+  # Generate lattice grid
+  xs <- seq(1, grid_size * tile_size)
+  ys <- seq(1, grid_size * tile_size)
+  grid <- expand.grid(X = xs, Y = ys)
+  
+  # Determine tile index for each coordinate
+  grid$tile_x <- (grid$X - 1) %/% tile_size
+  grid$tile_y <- (grid$Y - 1) %/% tile_size
+  
+  # Checkerboard pattern: alternate signals
+  grid$signal_1 <- as.integer((grid$tile_x + grid$tile_y) %% 2 == 0)  # black
+  grid$signal_2 <- as.integer((grid$tile_x + grid$tile_y) %% 2 == 1)  # white
+  
+  # Return dataframe with only necessary columns
+  df <- grid[, c("X","Y","signal_1","signal_2")]
+  return(df)
+}
+
+#' Visualize checkerboard pattern
+#'
+#' @description Create a visualization of checkerboard pattern data
+#'
+#' @param df Data frame with X, Y coordinates and signal_1, signal_2 columns
+#' @param color1 Color for signal_1 tiles (default: "black")
+#' @param color2 Color for signal_2 tiles (default: "white")
+#'
+#' @return ggplot object showing the checkerboard pattern
+#' @export
+#'
+#' @examples
+#' \dontrun{
+#' df <- simulate_checkerboard(grid_size = 6, tile_size = 5)
+#' p <- visualize_checkerboard(df, color1 = "darkblue", color2 = "lightgray")
+#' print(p)
+#' }
+visualize_checkerboard <- function(df,
+                                   color1 = "black",
+                                   color2 = "white") {
+  df$label <- ifelse(df$signal_1 == 1, "signal_1", "signal_2")
+  
+  p <- ggplot2::ggplot(df, ggplot2::aes_string("X", "Y", fill = "label")) +
+    ggplot2::geom_tile() +
+    ggplot2::scale_fill_manual(values = c("signal_1" = color1,
+                                         "signal_2" = color2)) +
+    ggplot2::coord_equal() +
+    ggplot2::theme_void() +
+    ggplot2::theme(legend.position = "none")
+  
+  return(p)
 } 

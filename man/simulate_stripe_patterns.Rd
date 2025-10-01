@@ -9,6 +9,7 @@ simulate_stripe_patterns(
   gap_seq = c(10),
   width_seq = c(5),
   theta_seq = c(0),
+  eps = 1e-09,
   verbose = TRUE
 )
 }
@@ -21,9 +22,9 @@ simulate_stripe_patterns(
 
 \item{theta_seq}{Vector of rotation angles in degrees (default: c(0))}
 
-\item{verbose}{Logical; if TRUE, show progress messages (default: TRUE)}
-
 \item{eps}{Small numeric value for open boundary conditions to avoid overlap at stripe edges (default: 1e-9)}
+
+\item{verbose}{Logical; if TRUE, show progress messages (default: TRUE)}
 }
 \value{
 List of data frames, each containing X, Y coordinates and signal_1, signal_2 binary signals

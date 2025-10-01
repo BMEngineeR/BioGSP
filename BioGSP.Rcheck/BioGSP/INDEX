@@ -31,9 +31,17 @@ sgwt_forward            Forward SGWT transform (single or batch)
 sgwt_get_kernels        Get a unified kernel family (low-pass and
                         band-pass) by kernel_type
 sgwt_inverse            Inverse SGWT transform (single or batch)
+simulate_checkerboard   Simulate checkerboard pattern
 simulate_multiscale     Simulate Multiple Center Patterns
-simulate_ringpattern    Simulate Concentric Ring Patterns
+simulate_stripe_patterns
+                        Simulate Stripe Patterns
+visualize_checkerboard
+                        Visualize checkerboard pattern
 visualize_multiscale    Visualize Multiple Center Simulation Results
-visualize_ringpattern   Visualize Concentric Ring Simulation Results
 visualize_sgwt_kernels
                         Visualize SGWT kernels and scaling functions
+visualize_similarity_xy
+                        Visualize similarity in low vs non-low
+                        frequency space
+visualize_stripe_patterns
+                        Visualize Stripe Pattern Simulation Results

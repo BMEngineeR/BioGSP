@@ -138,6 +138,7 @@ simulate_stripe_patterns <- function(
     gap_seq   = c(10),
     width_seq = c(5),
     theta_seq = c(0),
+    eps = 1e-9,
     verbose = TRUE
 ) {
   # Generate lattice grid

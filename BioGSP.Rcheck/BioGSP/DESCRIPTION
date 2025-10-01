@@ -11,14 +11,15 @@ Description: Implementation of Graph Signal Processing (GSP) methods including S
     including forward and inverse transforms, energy analysis, and visualization functions 
     tailored for biological applications.
 License: GPL-3
+URL: https://github.com/BMEngineeR/BioGSP
+BugReports: https://github.com/BMEngineeR/BioGSP/issues
 Encoding: UTF-8
 RoxygenNote: 7.2.3
 Imports: Matrix, igraph, RANN, RSpectra, ggplot2, patchwork, gridExtra,
         viridis, methods
-Suggests: spdep, spatialEco, sp, gasper, egg, testthat (>= 2.1.0),
-        remotes, dplyr, tidyr, knitr, rmarkdown
+Suggests: remotes, dplyr, knitr, rmarkdown, ggrepel
 VignetteBuilder: knitr
 Depends: R (>= 3.5.0)
 NeedsCompilation: no
-Packaged: 2025-09-29 06:05:56 UTC; cha224
-Built: R 4.4.2; ; 2025-09-29 06:06:24 UTC; unix
+Packaged: 2025-10-01 21:05:19 UTC; cha224
+Built: R 4.4.2; ; 2025-10-01 21:08:37 UTC; unix

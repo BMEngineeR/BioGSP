@@ -607,6 +607,30 @@ base::assign(".ptime", proc.time(), pos = "CheckExEnv")
 base::assign(".dptime", (proc.time() - get(".ptime", pos = "CheckExEnv")), pos = "CheckExEnv")
 base::cat("sgwt_inverse", base::get(".format_ptime", pos = 'CheckExEnv')(get(".dptime", pos = "CheckExEnv")), "\n", file=base::get(".ExTimings", pos = 'CheckExEnv'), append=TRUE, sep="\t")
 cleanEx()
+nameEx("simulate_checkerboard")
+### * simulate_checkerboard
+
+flush(stderr()); flush(stdout())
+
+base::assign(".ptime", proc.time(), pos = "CheckExEnv")
+### Name: simulate_checkerboard
+### Title: Simulate checkerboard pattern
+### Aliases: simulate_checkerboard
+
+### ** Examples
+
+## Not run: 
+##D # Generate 8x8 checkerboard with 10x10 pixel tiles
+##D df <- simulate_checkerboard(grid_size = 8, tile_size = 10)
+##D p <- visualize_checkerboard(df)
+##D print(p)
+## End(Not run)
+
+
+
+base::assign(".dptime", (proc.time() - get(".ptime", pos = "CheckExEnv")), pos = "CheckExEnv")
+base::cat("simulate_checkerboard", base::get(".format_ptime", pos = 'CheckExEnv')(get(".dptime", pos = "CheckExEnv")), "\n", file=base::get(".ExTimings", pos = 'CheckExEnv'), append=TRUE, sep="\t")
+cleanEx()
 nameEx("simulate_multiscale")
 ### * simulate_multiscale
 
@@ -634,31 +658,60 @@ base::assign(".ptime", proc.time(), pos = "CheckExEnv")
 base::assign(".dptime", (proc.time() - get(".ptime", pos = "CheckExEnv")), pos = "CheckExEnv")
 base::cat("simulate_multiscale", base::get(".format_ptime", pos = 'CheckExEnv')(get(".dptime", pos = "CheckExEnv")), "\n", file=base::get(".ExTimings", pos = 'CheckExEnv'), append=TRUE, sep="\t")
 cleanEx()
-nameEx("simulate_ringpattern")
-### * simulate_ringpattern
+nameEx("simulate_stripe_patterns")
+### * simulate_stripe_patterns
 
 flush(stderr()); flush(stdout())
 
 base::assign(".ptime", proc.time(), pos = "CheckExEnv")
-### Name: simulate_ringpattern
-### Title: Simulate Concentric Ring Patterns
-### Aliases: simulate_ringpattern
+### Name: simulate_stripe_patterns
+### Title: Simulate Stripe Patterns
+### Aliases: simulate_stripe_patterns
 
 ### ** Examples
 
 ## Not run: 
-##D # Generate concentric ring patterns with default parameters
-##D patterns <- simulate_ringpattern()
+##D # Generate stripe patterns with default parameters
+##D patterns <- simulate_stripe_patterns()
 ##D 
 ##D # Custom parameters
-##D radius_seq <- seq(2.5, 20, by = 2.5)
-##D patterns <- simulate_ringpattern(radius_seq = radius_seq, n_movements = 5)
+##D patterns <- simulate_stripe_patterns(
+##D   grid_size = 80,
+##D   gap_seq = c(10, 20),
+##D   width_seq = c(5, 10, 20),
+##D   theta_seq = c(0, 30, 60),
+##D   eps = 1e-9,
+##D   verbose = TRUE
+##D )
 ## End(Not run)
 
 
 
 base::assign(".dptime", (proc.time() - get(".ptime", pos = "CheckExEnv")), pos = "CheckExEnv")
-base::cat("simulate_ringpattern", base::get(".format_ptime", pos = 'CheckExEnv')(get(".dptime", pos = "CheckExEnv")), "\n", file=base::get(".ExTimings", pos = 'CheckExEnv'), append=TRUE, sep="\t")
+base::cat("simulate_stripe_patterns", base::get(".format_ptime", pos = 'CheckExEnv')(get(".dptime", pos = "CheckExEnv")), "\n", file=base::get(".ExTimings", pos = 'CheckExEnv'), append=TRUE, sep="\t")
+cleanEx()
+nameEx("visualize_checkerboard")
+### * visualize_checkerboard
+
+flush(stderr()); flush(stdout())
+
+base::assign(".ptime", proc.time(), pos = "CheckExEnv")
+### Name: visualize_checkerboard
+### Title: Visualize checkerboard pattern
+### Aliases: visualize_checkerboard
+
+### ** Examples
+
+## Not run: 
+##D df <- simulate_checkerboard(grid_size = 6, tile_size = 5)
+##D p <- visualize_checkerboard(df, color1 = "darkblue", color2 = "lightgray")
+##D print(p)
+## End(Not run)
+
+
+
+base::assign(".dptime", (proc.time() - get(".ptime", pos = "CheckExEnv")), pos = "CheckExEnv")
+base::cat("visualize_checkerboard", base::get(".format_ptime", pos = 'CheckExEnv')(get(".dptime", pos = "CheckExEnv")), "\n", file=base::get(".ExTimings", pos = 'CheckExEnv'), append=TRUE, sep="\t")
 cleanEx()
 nameEx("visualize_multiscale")
 ### * visualize_multiscale
@@ -685,31 +738,6 @@ base::assign(".ptime", proc.time(), pos = "CheckExEnv")
 
 base::assign(".dptime", (proc.time() - get(".ptime", pos = "CheckExEnv")), pos = "CheckExEnv")
 base::cat("visualize_multiscale", base::get(".format_ptime", pos = 'CheckExEnv')(get(".dptime", pos = "CheckExEnv")), "\n", file=base::get(".ExTimings", pos = 'CheckExEnv'), append=TRUE, sep="\t")
-cleanEx()
-nameEx("visualize_ringpattern")
-### * visualize_ringpattern
-
-flush(stderr()); flush(stdout())
-
-base::assign(".ptime", proc.time(), pos = "CheckExEnv")
-### Name: visualize_ringpattern
-### Title: Visualize Concentric Ring Simulation Results
-### Aliases: visualize_ringpattern
-
-### ** Examples
-
-## Not run: 
-##D # Generate and visualize patterns
-##D radius_seq <- seq(2.5, 20, by = 2.5)
-##D sim_data <- simulate_ringpattern(radius_seq = radius_seq)
-##D plot_grid <- visualize_ringpattern(sim_data, radius_seq)
-##D print(plot_grid)
-## End(Not run)
-
-
-
-base::assign(".dptime", (proc.time() - get(".ptime", pos = "CheckExEnv")), pos = "CheckExEnv")
-base::cat("visualize_ringpattern", base::get(".format_ptime", pos = 'CheckExEnv')(get(".dptime", pos = "CheckExEnv")), "\n", file=base::get(".ExTimings", pos = 'CheckExEnv'), append=TRUE, sep="\t")
 cleanEx()
 nameEx("visualize_sgwt_kernels")
 ### * visualize_sgwt_kernels
@@ -741,6 +769,79 @@ base::assign(".ptime", proc.time(), pos = "CheckExEnv")
 
 base::assign(".dptime", (proc.time() - get(".ptime", pos = "CheckExEnv")), pos = "CheckExEnv")
 base::cat("visualize_sgwt_kernels", base::get(".format_ptime", pos = 'CheckExEnv')(get(".dptime", pos = "CheckExEnv")), "\n", file=base::get(".ExTimings", pos = 'CheckExEnv'), append=TRUE, sep="\t")
+cleanEx()
+nameEx("visualize_similarity_xy")
+### * visualize_similarity_xy
+
+flush(stderr()); flush(stdout())
+
+base::assign(".ptime", proc.time(), pos = "CheckExEnv")
+### Name: visualize_similarity_xy
+### Title: Visualize similarity in low vs non-low frequency space
+### Aliases: visualize_similarity_xy
+
+### ** Examples
+
+## Not run: 
+##D # Single similarity result
+##D sim_result <- runSGCC("signal1", "signal2", SG = SG_object)
+##D plot <- visualize_similarity_xy(sim_result)
+##D print(plot)
+##D 
+##D # Multiple similarity results
+##D sim_results <- list(
+##D   pair1 = runSGCC("signal1", "signal2", SG = SG_object1),
+##D   pair2 = runSGCC("signal1", "signal2", SG = SG_object2)
+##D )
+##D plot <- visualize_similarity_xy(sim_results, show_names = TRUE)
+##D print(plot)
+##D 
+##D # Show both labels and names (for comparison)
+##D plot_both <- visualize_similarity_xy(sim_results, show_labels = TRUE, show_names = TRUE)
+##D print(plot_both)
+##D 
+##D # With many data points (>50), names will be randomly sampled
+##D # install.packages("ggrepel")  # Required for show_names = TRUE
+##D plot_many <- visualize_similarity_xy(many_sim_results, show_names = TRUE)
+##D print(plot_many)
+## End(Not run)
+
+
+
+base::assign(".dptime", (proc.time() - get(".ptime", pos = "CheckExEnv")), pos = "CheckExEnv")
+base::cat("visualize_similarity_xy", base::get(".format_ptime", pos = 'CheckExEnv')(get(".dptime", pos = "CheckExEnv")), "\n", file=base::get(".ExTimings", pos = 'CheckExEnv'), append=TRUE, sep="\t")
+cleanEx()
+nameEx("visualize_stripe_patterns")
+### * visualize_stripe_patterns
+
+flush(stderr()); flush(stdout())
+
+base::assign(".ptime", proc.time(), pos = "CheckExEnv")
+### Name: visualize_stripe_patterns
+### Title: Visualize Stripe Pattern Simulation Results
+### Aliases: visualize_stripe_patterns
+
+### ** Examples
+
+## Not run: 
+##D # Generate and visualize patterns
+##D sim_data <- simulate_stripe_patterns(
+##D   grid_size = 80,
+##D   gap_seq = c(10, 20),
+##D   width_seq = c(5, 10, 20),
+##D   theta_seq = c(0, 30, 60)
+##D )
+##D plot_grid <- visualize_stripe_patterns(sim_data, 
+##D                                        gap_seq = c(10, 20),
+##D                                        width_seq = c(5, 10, 20),
+##D                                        theta_seq = c(0, 30, 60))
+##D print(plot_grid)
+## End(Not run)
+
+
+
+base::assign(".dptime", (proc.time() - get(".ptime", pos = "CheckExEnv")), pos = "CheckExEnv")
+base::cat("visualize_stripe_patterns", base::get(".format_ptime", pos = 'CheckExEnv')(get(".dptime", pos = "CheckExEnv")), "\n", file=base::get(".ExTimings", pos = 'CheckExEnv'), append=TRUE, sep="\t")
 ### * <FOOTER>
 ###
 cleanEx()
