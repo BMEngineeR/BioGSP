@@ -33,6 +33,9 @@ sgwt_get_kernels        Get a unified kernel family (low-pass and
 sgwt_inverse            Inverse SGWT transform (single or batch)
 simulate_checkerboard   Simulate checkerboard pattern
 simulate_multiscale     Simulate Multiple Center Patterns
+simulate_multiscale_overlap
+                        Simulate Multiple Center Patterns with Fixed
+                        Centers
 simulate_stripe_patterns
                         Simulate Stripe Patterns
 visualize_checkerboard

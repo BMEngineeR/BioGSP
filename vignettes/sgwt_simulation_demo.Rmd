@@ -36,12 +36,13 @@ BioGSP provides **Spectral Graph Wavelet Transform (SGWT)** analysis for spatial
 
 ## New Workflow Overview
 
-The new workflow consists of four main steps:
+The new workflow consists of five main steps:
 
 1. **`initSGWT()`**: Initialize SGWT object with data and parameters
-2. **`runSpecGraph()`**: Build spectral graph structure
-3. **`runSGWT()`**: Perform forward and inverse SGWT transforms
-4. **`runSGCC()`**: Calculate energy-normalized weighted similarity
+2. **`checkKband()`**: Analyze k-band limited property of signals (optional)
+3. **`runSpecGraph()`**: Build spectral graph structure
+4. **`runSGWT()`**: Perform forward and inverse SGWT transforms
+5. **`runSGCC()`**: Calculate energy-normalized weighted similarity
 
 # Setup
 
@@ -75,8 +76,8 @@ set.seed(123)
 demo_pattern <- simulate_multiscale(
   grid_size = 40,        # Moderate size for fast computation
   n_centers = 1,         # Single center pattern
-  Ra_seq = 5,            # Inner circle radius
-  Rb_seq = 10,           # Outer ring radius
+  Ra_seq = 1,            # Inner circle radius
+  Rb_seq = 2,           # Outer ring radius
   seed = 123
 )[[1]]
 
@@ -84,6 +85,35 @@ demo_pattern <- simulate_multiscale(
 cat("Generated pattern dimensions:", nrow(demo_pattern), "x", ncol(demo_pattern), "\n")
 cat("Column names:", paste(colnames(demo_pattern), collapse = ", "), "\n")
 cat("Signals available:", sum(demo_pattern$signal_1), "inner pixels,", sum(demo_pattern$signal_2), "outer pixels\n")
+```
+
+## K-band Limited Analysis
+
+```{r kband-analysis}
+# Demonstrate k-band limited property analysis
+cat("=== K-band Limited Property Analysis ===\n")
+
+# Initialize SGWT object for k-band analysis
+SG_kband <- initSGWT(
+  data.in = demo_pattern,
+  x_col = "X",
+  y_col = "Y", 
+  signals = c("signal_1", "signal_2")
+)
+
+# Run k-band analysis (builds graph internally)
+kband_result <- checkKband(
+  SG = SG_kband,
+  signals = c("signal_1", "signal_2"),
+  k = 15,                    # Number of neighbors for graph construction
+  alpha = 0.05,              # Significance level for Wilcoxon test
+  verbose = FALSE
+)
+
+# Display results
+cat("\n=== K-band Analysis Results ===\n")
+cat("All signals are k-band limited:", kband_result$is_kband_limited, "\n")
+cat("Low-frequency knee point:", kband_result$knee_point_low, "\n")
 ```
 
 ## Visualize Input Pattern
@@ -565,11 +595,12 @@ cat("- Low similarity values expected due to alternating pattern structure\n")
 ## New Workflow Benefits
 
 ```r
-# Complete workflow in 4 clear steps:
-SG <- initSGWT(data, signals = c("signal1", "signal2"))  # 1. Initialize
-SG <- runSpecGraph(SG, k = 12, laplacian_type = "normalized")  # 2. Build graph  
-SG <- runSGWT(SG)                                        # 3. Run SGWT
-similarity <- runSGCC("signal1", "signal2", SG = SG)    # 4. Compare patterns
+# Complete workflow in 5 clear steps:
+SG <- initSGWT(data, signals = c("signal1", "signal2"))           # 1. Initialize
+kband <- checkKband(SG, signals = c("signal1", "signal2"))       # 2. Check k-band (optional)
+SG <- runSpecGraph(SG, k = 12, laplacian_type = "normalized")    # 3. Build graph  
+SG <- runSGWT(SG)                                                 # 4. Run SGWT
+similarity <- runSGCC("signal1", "signal2", SG = SG)             # 5. Compare patterns
 ```
 
 ## Parameter Guidelines

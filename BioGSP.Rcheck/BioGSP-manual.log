@@ -1,4 +1,4 @@
-This is pdfTeX, Version 3.14159265-2.6-1.40.19 (TeX Live 2018) (preloaded format=pdflatex 2024.11.11)  1 OCT 2025 17:09
+This is pdfTeX, Version 3.14159265-2.6-1.40.19 (TeX Live 2018) (preloaded format=pdflatex 2024.11.11)  6 OCT 2025 11:34
 entering extended mode
  restricted \write18 enabled.
  %&-line parsing enabled.
@@ -769,7 +769,7 @@ Now handling font encoding PD1 ...
 
 
 Writing index file Rd2.idx
-(/bmbl_data/Rtmp/RtmpxV6Mx8/Rd2pdf1a05b84e7cffbb/Rd2.aux)
+(/bmbl_data/Rtmp/Rtmpv2Zko8/Rd2pdf810644c712e4/Rd2.aux)
 \openout1 = `Rd2.aux'.
 
 LaTeX Font Info:    Checking defaults for OML/cmm/m/it on input line 8.
@@ -826,8 +826,8 @@ LaTeX Info: Redefining \ref on input line 8.
 LaTeX Info: Redefining \pageref on input line 8.
 LaTeX Info: Redefining \nameref on input line 8.
 
-(/bmbl_data/Rtmp/RtmpxV6Mx8/Rd2pdf1a05b84e7cffbb/Rd2.out)
-(/bmbl_data/Rtmp/RtmpxV6Mx8/Rd2pdf1a05b84e7cffbb/Rd2.out)
+(/bmbl_data/Rtmp/Rtmpv2Zko8/Rd2pdf810644c712e4/Rd2.out)
+(/bmbl_data/Rtmp/Rtmpv2Zko8/Rd2pdf810644c712e4/Rd2.out)
 \@outlinefile=\write4
 \openout4 = `Rd2.out'.
 
@@ -865,7 +865,7 @@ File: ursfs.fd 1998/03/24 rsfs font definition file (jk)
 LaTeX Font Info:    Font shape `T1/ptm/bx/n' in size <14.4> not available
 (Font)              Font shape `T1/ptm/b/n' tried instead on input line 40.
 
-(/bmbl_data/Rtmp/RtmpxV6Mx8/Rd2pdf1a05b84e7cffbb/Rd2.toc [1
+(/bmbl_data/Rtmp/Rtmpv2Zko8/Rd2pdf810644c712e4/Rd2.toc [1
 
 
 {/usr/share/texlive/texmf-dist/fonts/map/pdftex/updmap/pdftex.map}])
@@ -991,52 +991,58 @@ Overfull \hbox (36.7804pt too wide) in paragraph at lines 1284--1284
 eq, n_centers = 3)[] 
  []
 
-[23] [24]
-Overfull \hbox (4.38043pt too wide) in paragraph at lines 1378--1378
+
+Overfull \hbox (15.33502pt too wide) in paragraph at lines 1292--1296
+[]\T1/ptm/m/n/10 Generate spa-tial pat-terns with mul-ti-ple cir-cu-lar cen-ter
+s at fixed po-si-tions. Sim-i-lar to sim-u-late_multiscale
+ []
+
+[23] [24] [25]
+Overfull \hbox (4.38043pt too wide) in paragraph at lines 1443--1443
  []\T1/pcr/m/n/9 p <- visualize_checkerboard(df, color1 = "darkblue", color2 = 
 "lightgray")[] 
  []
 
-[25]
-Overfull \hbox (36.7804pt too wide) in paragraph at lines 1432--1432
+[26]
+Overfull \hbox (36.7804pt too wide) in paragraph at lines 1497--1497
  []\T1/pcr/m/n/9 sim_data <- simulate_multiscale(Ra_seq = Ra_seq, Rb_seq = Rb_s
 eq, n_centers = 3)[] 
  []
 
-[26] [27]
-Overfull \hbox (7.21751pt too wide) in paragraph at lines 1541--1543
+[27] [28]
+Overfull \hbox (7.21751pt too wide) in paragraph at lines 1606--1608
 []\T1/ptm/m/n/10 Whether to dis-play data point names as text la-bels us-ing gg
 re-pel (de-fault: FALSE).
  []
 
-
-Overfull \hbox (79.98035pt too wide) in paragraph at lines 1567--1567
+[29]
+Overfull \hbox (79.98035pt too wide) in paragraph at lines 1632--1632
  []\T1/pcr/m/n/9 plot_both <- visualize_similarity_xy(sim_results, show_labels 
 = TRUE, show_names = TRUE)[] 
  []
 
-[28] [29] (/bmbl_data/Rtmp/RtmpxV6Mx8/Rd2pdf1a05b84e7cffbb/Rd2.ind [30]
+[30] (/bmbl_data/Rtmp/Rtmpv2Zko8/Rd2pdf810644c712e4/Rd2.ind [31]
 LaTeX Font Info:    Font shape `T1/pcr/m/it' in size <10> not available
 (Font)              Font shape `T1/pcr/m/sl' tried instead on input line 23.
-
-[31
+ [32
 
 ])
-Package atveryend Info: Empty hook `BeforeClearDocument' on input line 1646.
-Package atveryend Info: Empty hook `AfterLastShipout' on input line 1646.
- (/bmbl_data/Rtmp/RtmpxV6Mx8/Rd2pdf1a05b84e7cffbb/Rd2.aux)
-Package atveryend Info: Executing hook `AtVeryEndDocument' on input line 1646.
-Package atveryend Info: Executing hook `AtEndAfterFileList' on input line 1646.
+Package atveryend Info: Empty hook `BeforeClearDocument' on input line 1711.
+Package atveryend Info: Empty hook `AfterLastShipout' on input line 1711.
+
+(/bmbl_data/Rtmp/Rtmpv2Zko8/Rd2pdf810644c712e4/Rd2.aux)
+Package atveryend Info: Executing hook `AtVeryEndDocument' on input line 1711.
+Package atveryend Info: Executing hook `AtEndAfterFileList' on input line 1711.
 
 Package rerunfilecheck Info: File `Rd2.out' has not changed.
-(rerunfilecheck)             Checksum: 146C5A0E54760389802866A0EEF16684;2455.
-Package atveryend Info: Empty hook `AtVeryVeryEnd' on input line 1646.
+(rerunfilecheck)             Checksum: 03EC6F9E4D04A5E0821CF1D85326CE81;2556.
+Package atveryend Info: Empty hook `AtVeryVeryEnd' on input line 1711.
  ) 
 Here is how much of TeX's memory you used:
- 7503 strings out of 494917
- 104422 string characters out of 6180698
+ 7512 strings out of 494917
+ 104586 string characters out of 6180698
  177489 words of memory out of 5000000
- 10413 multiletter control sequences out of 15000+600000
+ 10414 multiletter control sequences out of 15000+600000
  39456 words of font info for 63 fonts, out of 8000000 for 9000
  14 hyphenation exceptions out of 8191
  37i,6n,34p,262b,593s stack positions out of 5000i,500n,10000p,200000b,80000s
@@ -1047,10 +1053,10 @@ type1/urw/courier/ucrro8a.pfb></usr/share/texlive/texmf-dist/fonts/type1/urw/ti
 mes/utmb8a.pfb></usr/share/texlive/texmf-dist/fonts/type1/urw/times/utmr8a.pfb>
 </usr/share/texlive/texmf-dist/fonts/type1/urw/times/utmr8a.pfb></usr/share/tex
 live/texmf-dist/fonts/type1/urw/times/utmri8a.pfb>
-Output written on Rd2.pdf (31 pages, 148502 bytes).
+Output written on Rd2.pdf (32 pages, 150415 bytes).
 PDF statistics:
- 674 PDF objects out of 1000 (max. 8388607)
- 627 compressed objects within 7 object streams
- 269 named destinations out of 1000 (max. 500000)
- 281 words of extra memory for PDF output out of 10000 (max. 10000000)
+ 692 PDF objects out of 1000 (max. 8388607)
+ 644 compressed objects within 7 object streams
+ 277 named destinations out of 1000 (max. 500000)
+ 289 words of extra memory for PDF output out of 10000 (max. 10000000)
 

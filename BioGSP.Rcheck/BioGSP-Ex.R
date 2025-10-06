@@ -658,6 +658,41 @@ base::assign(".ptime", proc.time(), pos = "CheckExEnv")
 base::assign(".dptime", (proc.time() - get(".ptime", pos = "CheckExEnv")), pos = "CheckExEnv")
 base::cat("simulate_multiscale", base::get(".format_ptime", pos = 'CheckExEnv')(get(".dptime", pos = "CheckExEnv")), "\n", file=base::get(".ExTimings", pos = 'CheckExEnv'), append=TRUE, sep="\t")
 cleanEx()
+nameEx("simulate_multiscale_overlap")
+### * simulate_multiscale_overlap
+
+flush(stderr()); flush(stdout())
+
+base::assign(".ptime", proc.time(), pos = "CheckExEnv")
+### Name: simulate_multiscale_overlap
+### Title: Simulate Multiple Center Patterns with Fixed Centers
+### Aliases: simulate_multiscale_overlap
+
+### ** Examples
+
+## Not run: 
+##D # Generate multi-center patterns with fixed centers
+##D patterns <- simulate_multiscale_overlap()
+##D 
+##D # Single center at grid center
+##D patterns_single <- simulate_multiscale_overlap(n_centers = 1)
+##D 
+##D # Custom parameters with multiple centers
+##D Ra_seq <- seq(from = 10, to = 3, length.out = 4)
+##D Rb_seq <- seq(from = 15, to = 2, length.out = 4)
+##D patterns <- simulate_multiscale_overlap(
+##D   Ra_seq = Ra_seq, 
+##D   Rb_seq = Rb_seq, 
+##D   n_centers = 2,
+##D   seed = 456
+##D )
+## End(Not run)
+
+
+
+base::assign(".dptime", (proc.time() - get(".ptime", pos = "CheckExEnv")), pos = "CheckExEnv")
+base::cat("simulate_multiscale_overlap", base::get(".format_ptime", pos = 'CheckExEnv')(get(".dptime", pos = "CheckExEnv")), "\n", file=base::get(".ExTimings", pos = 'CheckExEnv'), append=TRUE, sep="\t")
+cleanEx()
 nameEx("simulate_stripe_patterns")
 ### * simulate_stripe_patterns
 

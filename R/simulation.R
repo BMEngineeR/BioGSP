@@ -274,6 +274,118 @@ visualize_multiscale <- function(sim_data, Ra_seq, Rb_seq,
   return(plot_grid)
 }
 
+#' Simulate Multiple Center Patterns with Fixed Centers
+#'
+#' @description Generate spatial patterns with multiple circular centers at fixed positions.
+#' Similar to simulate_multiscale but with centers placed at fixed locations for reproducible
+#' pattern generation. Creates concentric circle patterns with inner circle A and outer ring B
+#' at various radius combinations.
+#'
+#' @param grid_size Size of the spatial grid (default: 60)
+#' @param n_centers Number of pattern centers to generate. If 1, center is placed at grid center.
+#'   If > 1, centers are randomly placed but fixed by seed (default: 3)
+#' @param Ra_seq Vector of inner circle radii (default: c(10, 5, 1))
+#' @param Rb_seq Vector of outer ring radii (default: c(10, 5, 1))
+#' @param seed Random seed for reproducible center placement (default: 123)
+#' @param verbose Logical; if TRUE, show progress bar and messages (default: TRUE)
+#'
+#' @return List of data frames, each containing X, Y coordinates and signal_1, signal_2 binary signals
+#' @importFrom utils txtProgressBar setTxtProgressBar
+#' @export
+#'
+#' @examples
+#' \dontrun{
+#' # Generate multi-center patterns with fixed centers
+#' patterns <- simulate_multiscale_overlap()
+#' 
+#' # Single center at grid center
+#' patterns_single <- simulate_multiscale_overlap(n_centers = 1)
+#' 
+#' # Custom parameters with multiple centers
+#' Ra_seq <- seq(from = 10, to = 3, length.out = 4)
+#' Rb_seq <- seq(from = 15, to = 2, length.out = 4)
+#' patterns <- simulate_multiscale_overlap(
+#'   Ra_seq = Ra_seq, 
+#'   Rb_seq = Rb_seq, 
+#'   n_centers = 2,
+#'   seed = 456
+#' )
+#' }
+simulate_multiscale_overlap <- function(
+    grid_size = 60,
+    n_centers = 3,
+    Ra_seq = c(10, 5, 1),   # inner radius sequence
+    Rb_seq = c(10, 5, 1),   # outer ring thickness sequence
+    seed = 123,
+    verbose = TRUE
+) {
+  # Create coordinate grid
+  grid <- expand.grid(X = 1:grid_size, Y = 1:grid_size)
+  
+  set.seed(seed)
+  
+  # Define circle centers
+  if (n_centers == 1) {
+    # If only one center, fix at center of grid
+    centers <- list(c(grid_size / 2, grid_size / 2))
+  } else {
+    # Otherwise randomly place multiple centers
+    centers <- lapply(1:n_centers, function(i) {
+      c(sample(10:(grid_size - 10), 1), sample(10:(grid_size - 10), 1))
+    })
+  }
+  
+  sim_list <- list()
+  total_iterations <- length(Ra_seq) * length(Rb_seq)
+  
+  if (verbose) cat("Generating", total_iterations, "multiscale patterns...\n")
+  
+  pb <- if (verbose) txtProgressBar(min = 0, max = total_iterations, style = 3) else NULL
+  iteration <- 0
+  
+  for (Ra in Ra_seq) {
+    for (Rb in Rb_seq) {
+      circleA <- rep(FALSE, nrow(grid))
+      circleB <- rep(FALSE, nrow(grid))
+      
+      for (center in centers) {
+        cx <- center[1]; cy <- center[2]
+        dists <- sqrt((grid$X - cx)^2 + (grid$Y - cy)^2)
+        
+        # Inner circle (signal_1)
+        circleA <- circleA | (dists <= Ra)
+        # Outer ring (signal_2)
+        circleB <- circleB | (dists > Ra & dists <= (Ra + Rb))
+      }
+      
+      # Convert logicals to numeric signals
+      signal_1 <- as.numeric(circleA)
+      signal_2 <- as.numeric(circleB & !circleA)
+      
+      df <- data.frame(
+        X = grid$X,
+        Y = grid$Y,
+        signal_1 = signal_1,
+        signal_2 = signal_2
+      )
+      
+      name <- paste0("simulated_Ra_", Ra, "_Rb_", Rb)
+      sim_list[[name]] <- df
+      
+      iteration <- iteration + 1
+      if (verbose && !is.null(pb)) setTxtProgressBar(pb, iteration)
+    }
+  }
+  
+  if (verbose && !is.null(pb)) {
+    close(pb)
+    cat("\nMultiscale (fixed-center) simulation completed!\n")
+  }
+  
+  return(sim_list)
+}
+
+
 #' Visualize Stripe Pattern Simulation Results
 #'
 #' @description Create visualization plots for stripe pattern simulation results

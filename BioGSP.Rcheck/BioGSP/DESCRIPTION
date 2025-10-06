@@ -21,5 +21,5 @@ Suggests: remotes, dplyr, knitr, rmarkdown, ggrepel
 VignetteBuilder: knitr
 Depends: R (>= 3.5.0)
 NeedsCompilation: no
-Packaged: 2025-10-01 21:05:19 UTC; cha224
-Built: R 4.4.2; ; 2025-10-01 21:08:37 UTC; unix
+Packaged: 2025-10-06 15:31:46 UTC; cha224
+Built: R 4.4.2; ; 2025-10-06 15:33:52 UTC; unix
