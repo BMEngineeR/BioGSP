@@ -110,6 +110,34 @@ base::assign(".ptime", proc.time(), pos = "CheckExEnv")
 base::assign(".dptime", (proc.time() - get(".ptime", pos = "CheckExEnv")), pos = "CheckExEnv")
 base::cat("cal_laplacian", base::get(".format_ptime", pos = 'CheckExEnv')(get(".dptime", pos = "CheckExEnv")), "\n", file=base::get(".ExTimings", pos = 'CheckExEnv'), append=TRUE, sep="\t")
 cleanEx()
+nameEx("checkKband")
+### * checkKband
+
+flush(stderr()); flush(stdout())
+
+base::assign(".ptime", proc.time(), pos = "CheckExEnv")
+### Name: checkKband
+### Title: Check K-band limited property of signals
+### Aliases: checkKband
+
+### ** Examples
+
+## Not run: 
+##D # Initialize SGWT object (no need to run runSpecGraph)
+##D SG <- initSGWT(data, signals = c("signal1", "signal2"))
+##D 
+##D # Check k-band limited property
+##D result <- checkKband(SG, signals = c("signal1", "signal2"), k = 30)
+##D if (result$is_kband_limited) {
+##D   cat("All signals are k-band limited")
+##D }
+## End(Not run)
+
+
+
+base::assign(".dptime", (proc.time() - get(".ptime", pos = "CheckExEnv")), pos = "CheckExEnv")
+base::cat("checkKband", base::get(".format_ptime", pos = 'CheckExEnv')(get(".dptime", pos = "CheckExEnv")), "\n", file=base::get(".ExTimings", pos = 'CheckExEnv'), append=TRUE, sep="\t")
+cleanEx()
 nameEx("codex_toy_data")
 ### * codex_toy_data
 
@@ -631,6 +659,37 @@ base::assign(".ptime", proc.time(), pos = "CheckExEnv")
 base::assign(".dptime", (proc.time() - get(".ptime", pos = "CheckExEnv")), pos = "CheckExEnv")
 base::cat("simulate_checkerboard", base::get(".format_ptime", pos = 'CheckExEnv')(get(".dptime", pos = "CheckExEnv")), "\n", file=base::get(".ExTimings", pos = 'CheckExEnv'), append=TRUE, sep="\t")
 cleanEx()
+nameEx("simulate_moving_circles")
+### * simulate_moving_circles
+
+flush(stderr()); flush(stdout())
+
+base::assign(".ptime", proc.time(), pos = "CheckExEnv")
+### Name: simulate_moving_circles
+### Title: Simulate Moving Circles Pattern
+### Aliases: simulate_moving_circles
+
+### ** Examples
+
+## Not run: 
+##D # Generate moving circles patterns with default parameters
+##D patterns <- simulate_moving_circles()
+##D 
+##D # Custom parameters
+##D patterns <- simulate_moving_circles(
+##D   grid_size = 80,
+##D   radius_seq = c(8, 12, 16),
+##D   n_steps = 8,
+##D   center_distance = 35,
+##D   radius2_factor = 1.2
+##D )
+## End(Not run)
+
+
+
+base::assign(".dptime", (proc.time() - get(".ptime", pos = "CheckExEnv")), pos = "CheckExEnv")
+base::cat("simulate_moving_circles", base::get(".format_ptime", pos = 'CheckExEnv')(get(".dptime", pos = "CheckExEnv")), "\n", file=base::get(".ExTimings", pos = 'CheckExEnv'), append=TRUE, sep="\t")
+cleanEx()
 nameEx("simulate_multiscale")
 ### * simulate_multiscale
 
@@ -638,7 +697,7 @@ flush(stderr()); flush(stdout())
 
 base::assign(".ptime", proc.time(), pos = "CheckExEnv")
 ### Name: simulate_multiscale
-### Title: Simulate Multiple Center Patterns
+### Title: Simulate Multi-center Multi-scale Concentric Ring Patterns
 ### Aliases: simulate_multiscale
 
 ### ** Examples
@@ -648,9 +707,13 @@ base::assign(".ptime", proc.time(), pos = "CheckExEnv")
 ##D patterns <- simulate_multiscale()
 ##D 
 ##D # Custom parameters
-##D Ra_seq <- seq(from = 10, to = 3, length.out = 6)
-##D Rb_seq <- seq(from = 20, to = 3, length.out = 6)
-##D patterns <- simulate_multiscale(Ra_seq = Ra_seq, Rb_seq = Rb_seq, n_centers = 3)
+##D patterns <- simulate_multiscale(
+##D   grid_size = 80,
+##D   Ra_seq = seq(5, 25, by = 5),
+##D   n_steps = 8,
+##D   n_centers = 2,
+##D   outer_start = 50
+##D )
 ## End(Not run)
 
 
@@ -748,6 +811,33 @@ base::assign(".ptime", proc.time(), pos = "CheckExEnv")
 base::assign(".dptime", (proc.time() - get(".ptime", pos = "CheckExEnv")), pos = "CheckExEnv")
 base::cat("visualize_checkerboard", base::get(".format_ptime", pos = 'CheckExEnv')(get(".dptime", pos = "CheckExEnv")), "\n", file=base::get(".ExTimings", pos = 'CheckExEnv'), append=TRUE, sep="\t")
 cleanEx()
+nameEx("visualize_moving_circles")
+### * visualize_moving_circles
+
+flush(stderr()); flush(stdout())
+
+base::assign(".ptime", proc.time(), pos = "CheckExEnv")
+### Name: visualize_moving_circles
+### Title: Visualize Moving Circles Pattern
+### Aliases: visualize_moving_circles
+
+### ** Examples
+
+## Not run: 
+##D # Generate and visualize patterns
+##D sim_data <- simulate_moving_circles(
+##D   radius_seq = 6:14,
+##D   n_steps = 10
+##D )
+##D plot_grid <- visualize_moving_circles(sim_data)
+##D print(plot_grid)
+## End(Not run)
+
+
+
+base::assign(".dptime", (proc.time() - get(".ptime", pos = "CheckExEnv")), pos = "CheckExEnv")
+base::cat("visualize_moving_circles", base::get(".format_ptime", pos = 'CheckExEnv')(get(".dptime", pos = "CheckExEnv")), "\n", file=base::get(".ExTimings", pos = 'CheckExEnv'), append=TRUE, sep="\t")
+cleanEx()
 nameEx("visualize_multiscale")
 ### * visualize_multiscale
 
@@ -755,17 +845,20 @@ flush(stderr()); flush(stdout())
 
 base::assign(".ptime", proc.time(), pos = "CheckExEnv")
 ### Name: visualize_multiscale
-### Title: Visualize Multiple Center Simulation Results
+### Title: Visualize Multi-center Multi-scale Concentric Ring Patterns
 ### Aliases: visualize_multiscale
 
 ### ** Examples
 
 ## Not run: 
 ##D # Generate and visualize patterns
-##D Ra_seq <- seq(from = 10, to = 3, length.out = 6)
-##D Rb_seq <- seq(from = 20, to = 3, length.out = 6)
-##D sim_data <- simulate_multiscale(Ra_seq = Ra_seq, Rb_seq = Rb_seq, n_centers = 3)
-##D plot_grid <- visualize_multiscale(sim_data, Ra_seq, Rb_seq)
+##D sim_data <- simulate_multiscale(
+##D   Ra_seq = seq(2.5, 20, by = 2.5),
+##D   n_steps = 10
+##D )
+##D plot_grid <- visualize_multiscale(sim_data, 
+##D                                  Ra_seq = seq(2.5, 20, by = 2.5), 
+##D                                  n_steps = 10)
 ##D print(plot_grid)
 ## End(Not run)
 

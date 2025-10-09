@@ -24,10 +24,10 @@ Imports:
     patchwork,
     gridExtra,
     viridis,
-    methods
+    methods,
+    dplyr
 Suggests:
     remotes,
-    dplyr,
     knitr,
     rmarkdown,
     ggrepel

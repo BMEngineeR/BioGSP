@@ -1,4 +1,4 @@
-This is pdfTeX, Version 3.14159265-2.6-1.40.19 (TeX Live 2018) (preloaded format=pdflatex 2024.11.11)  6 OCT 2025 11:34
+This is pdfTeX, Version 3.14159265-2.6-1.40.19 (TeX Live 2018) (preloaded format=pdflatex 2024.11.11)  8 OCT 2025 22:00
 entering extended mode
  restricted \write18 enabled.
  %&-line parsing enabled.
@@ -769,7 +769,7 @@ Now handling font encoding PD1 ...
 
 
 Writing index file Rd2.idx
-(/bmbl_data/Rtmp/Rtmpv2Zko8/Rd2pdf810644c712e4/Rd2.aux)
+(/bmbl_data/Rtmp/RtmpCKXIpz/Rd2pdf12b84764df417b/Rd2.aux)
 \openout1 = `Rd2.aux'.
 
 LaTeX Font Info:    Checking defaults for OML/cmm/m/it on input line 8.
@@ -826,8 +826,8 @@ LaTeX Info: Redefining \ref on input line 8.
 LaTeX Info: Redefining \pageref on input line 8.
 LaTeX Info: Redefining \nameref on input line 8.
 
-(/bmbl_data/Rtmp/Rtmpv2Zko8/Rd2pdf810644c712e4/Rd2.out)
-(/bmbl_data/Rtmp/Rtmpv2Zko8/Rd2pdf810644c712e4/Rd2.out)
+(/bmbl_data/Rtmp/RtmpCKXIpz/Rd2pdf12b84764df417b/Rd2.out)
+(/bmbl_data/Rtmp/RtmpCKXIpz/Rd2pdf12b84764df417b/Rd2.out)
 \@outlinefile=\write4
 \openout4 = `Rd2.out'.
 
@@ -865,7 +865,7 @@ File: ursfs.fd 1998/03/24 rsfs font definition file (jk)
 LaTeX Font Info:    Font shape `T1/ptm/bx/n' in size <14.4> not available
 (Font)              Font shape `T1/ptm/b/n' tried instead on input line 40.
 
-(/bmbl_data/Rtmp/Rtmpv2Zko8/Rd2pdf810644c712e4/Rd2.toc [1
+(/bmbl_data/Rtmp/RtmpCKXIpz/Rd2pdf12b84764df417b/Rd2.toc [1
 
 
 {/usr/share/texlive/texmf-dist/fonts/map/pdftex/updmap/pdftex.map}])
@@ -890,159 +890,153 @@ Overfull \hbox (1.07816pt too wide) in paragraph at lines 174--175
 ed", or "ran-domwalk". 
  []
 
-[4] [5]
-Overfull \hbox (15.18042pt too wide) in paragraph at lines 299--299
+
+Overfull \hbox (2.65787pt too wide) in paragraph at lines 194--197
+[]\T1/ptm/m/n/10 Analyze whether sig-nals are k-band lim-ited by com-par-ing lo
+w-frequency and high-frequency Fourier
+ []
+
+[4] [5] [6]
+Overfull \hbox (15.18042pt too wide) in paragraph at lines 364--364
  []  \T1/pcr/m/n/9 ggplot(codex_toy_data, aes(x = X_cent, y = Y_cent, color = A
 nnotation5)) +[] 
  []
 
 
-Overfull \hbox (15.18042pt too wide) in paragraph at lines 311--311
+Overfull \hbox (15.18042pt too wide) in paragraph at lines 376--376
  []\T1/pcr/m/n/9 bcl6nb_data <- codex_toy_data[codex_toy_data$Annotation5 == "B
 CL6- B Cell" &[] 
  []
 
-[6]
-LaTeX Font Info:    Try loading font information for TS1+pcr on input line 323.
+[7]
+LaTeX Font Info:    Try loading font information for TS1+pcr on input line 388.
 
  (/usr/share/texlive/texmf-dist/tex/latex/psnfss/ts1pcr.fd
 File: ts1pcr.fd 2001/06/04 font definitions for TS1/pcr.
-) [7]
-Overfull \hbox (9.78043pt too wide) in paragraph at lines 381--381
+) [8]
+Overfull \hbox (9.78043pt too wide) in paragraph at lines 446--446
  []\T1/pcr/m/n/9 comparison <- compare_kernel_families(x_range = c(0, 5), scale
 _param = 1.5)[] 
  []
 
 
-Overfull \hbox (60.78088pt too wide) in paragraph at lines 392--392
+Overfull \hbox (60.78088pt too wide) in paragraph at lines 457--457
  []\T1/pcr/m/n/10 compute_sgwt_filters(eigenvalues, scales, lmax = NULL, kernel
 _type = "heat")[] 
  []
 
 
-Overfull \hbox (7.61737pt too wide) in paragraph at lines 404--405
+Overfull \hbox (7.61737pt too wide) in paragraph at lines 469--470
 []\T1/ptm/m/n/10 Kernel fam-ily that de-fines both scal-ing and wavelet fil-ter
 s (de-fault: "mex-i-can_hat",
  []
 
 
-Overfull \hbox (31.3804pt too wide) in paragraph at lines 417--417
+Overfull \hbox (31.3804pt too wide) in paragraph at lines 482--482
  []\T1/pcr/m/n/9 filters_meyer <- compute_sgwt_filters(eigenvals, scales, kerne
 l_type = "meyer")[] 
  []
 
 
-Overfull \hbox (20.58041pt too wide) in paragraph at lines 418--418
+Overfull \hbox (20.58041pt too wide) in paragraph at lines 483--483
  []\T1/pcr/m/n/9 filters_heat <- compute_sgwt_filters(eigenvals, scales, kernel
 _type = "heat")[] 
  []
 
-[8] [9] [10] [11] [12]
-Overfull \hbox (2.60802pt too wide) in paragraph at lines 679--680
+[9] [10] [11] [12] [13]
+Overfull \hbox (2.60802pt too wide) in paragraph at lines 744--745
 []\T1/ptm/m/n/10 Character vec-tor of sig-nal col-umn names to an-a-lyze. If NU
 LL, all non-coordinate
  []
 
-[13]
-Overfull \hbox (36.78088pt too wide) in paragraph at lines 746--746
+[14]
+Overfull \hbox (36.78088pt too wide) in paragraph at lines 811--811
  []\T1/pcr/m/n/10 plot_FM(SG, mode_type = "both", n_modes = 6, ncol = 3, point_
 size = 1.5)[] 
  []
 
-[14]
-Overfull \hbox (66.78088pt too wide) in paragraph at lines 790--790
+[15]
+Overfull \hbox (66.78088pt too wide) in paragraph at lines 855--855
  []\T1/pcr/m/n/10 plot_sgwt_decomposition(SG, signal_name = NULL, plot_scales =
  NULL, ncol = 3)[] 
  []
 
-[15] [16] [17]
-Overfull \hbox (5.07787pt too wide) in paragraph at lines 962--963
+[16] [17] [18]
+Overfull \hbox (5.07787pt too wide) in paragraph at lines 1027--1028
 []\T1/ptm/m/n/10 Number of eigen-val-ues/eigenvectors to com-pute (de-fault: NU
 LL, uses full length) 
  []
 
-[18] [19]
-Overfull \hbox (9.78043pt too wide) in paragraph at lines 1053--1053
+[19] [20]
+Overfull \hbox (9.78043pt too wide) in paragraph at lines 1118--1118
  []\T1/pcr/m/n/9 energy_analysis <- sgwt_energy_analysis(SG_object, signal_name
  = "signal1")[] 
  []
 
-[20]
-Overfull \hbox (7.55559pt too wide) in paragraph at lines 1141--1142
+[21]
+Overfull \hbox (7.55559pt too wide) in paragraph at lines 1206--1207
 []\T1/ptm/m/n/10 A list with two func-tions: list(scaling = func-tion(x, scale_
 param), wavelet = func-tion(x, scale_param)) 
  []
 
-[21]
-Overfull \hbox (4.38043pt too wide) in paragraph at lines 1191--1191
+[22]
+Overfull \hbox (4.38043pt too wide) in paragraph at lines 1256--1256
  []\T1/pcr/m/n/9 inverse_result <- sgwt_inverse(sgwt_decomp, eigenvectors, orig
 inal_signal)[] 
  []
 
 
-Overfull \hbox (47.58038pt too wide) in paragraph at lines 1194--1194
+Overfull \hbox (47.58038pt too wide) in paragraph at lines 1259--1259
  []\T1/pcr/m/n/9 inverse_result <- sgwt_inverse(sgwt_decomp, eigenvectors, orig
 inal_signals_matrix)[] 
  []
 
-[22]
-Overfull \hbox (36.7804pt too wide) in paragraph at lines 1284--1284
- []\T1/pcr/m/n/9 patterns <- simulate_multiscale(Ra_seq = Ra_seq, Rb_seq = Rb_s
-eq, n_centers = 3)[] 
- []
-
-
-Overfull \hbox (15.33502pt too wide) in paragraph at lines 1292--1296
+[23] [24] [25]
+Overfull \hbox (15.33502pt too wide) in paragraph at lines 1429--1433
 []\T1/ptm/m/n/10 Generate spa-tial pat-terns with mul-ti-ple cir-cu-lar cen-ter
 s at fixed po-si-tions. Sim-i-lar to sim-u-late_multiscale
  []
 
-[23] [24] [25]
-Overfull \hbox (4.38043pt too wide) in paragraph at lines 1443--1443
+[26] [27]
+Overfull \hbox (4.38043pt too wide) in paragraph at lines 1580--1580
  []\T1/pcr/m/n/9 p <- visualize_checkerboard(df, color1 = "darkblue", color2 = 
 "lightgray")[] 
  []
 
-[26]
-Overfull \hbox (36.7804pt too wide) in paragraph at lines 1497--1497
- []\T1/pcr/m/n/9 sim_data <- simulate_multiscale(Ra_seq = Ra_seq, Rb_seq = Rb_s
-eq, n_centers = 3)[] 
- []
-
-[27] [28]
-Overfull \hbox (7.21751pt too wide) in paragraph at lines 1606--1608
+[28] [29] [30] [31]
+Overfull \hbox (7.21751pt too wide) in paragraph at lines 1814--1816
 []\T1/ptm/m/n/10 Whether to dis-play data point names as text la-bels us-ing gg
 re-pel (de-fault: FALSE).
  []
 
-[29]
-Overfull \hbox (79.98035pt too wide) in paragraph at lines 1632--1632
+[32]
+Overfull \hbox (79.98035pt too wide) in paragraph at lines 1840--1840
  []\T1/pcr/m/n/9 plot_both <- visualize_similarity_xy(sim_results, show_labels 
 = TRUE, show_names = TRUE)[] 
  []
 
-[30] (/bmbl_data/Rtmp/Rtmpv2Zko8/Rd2pdf810644c712e4/Rd2.ind [31]
+[33] (/bmbl_data/Rtmp/RtmpCKXIpz/Rd2pdf12b84764df417b/Rd2.ind [34]
 LaTeX Font Info:    Font shape `T1/pcr/m/it' in size <10> not available
 (Font)              Font shape `T1/pcr/m/sl' tried instead on input line 23.
- [32
+ [35
 
 ])
-Package atveryend Info: Empty hook `BeforeClearDocument' on input line 1711.
-Package atveryend Info: Empty hook `AfterLastShipout' on input line 1711.
+Package atveryend Info: Empty hook `BeforeClearDocument' on input line 1919.
+Package atveryend Info: Empty hook `AfterLastShipout' on input line 1919.
 
-(/bmbl_data/Rtmp/Rtmpv2Zko8/Rd2pdf810644c712e4/Rd2.aux)
-Package atveryend Info: Executing hook `AtVeryEndDocument' on input line 1711.
-Package atveryend Info: Executing hook `AtEndAfterFileList' on input line 1711.
+(/bmbl_data/Rtmp/RtmpCKXIpz/Rd2pdf12b84764df417b/Rd2.aux)
+Package atveryend Info: Executing hook `AtVeryEndDocument' on input line 1919.
+Package atveryend Info: Executing hook `AtEndAfterFileList' on input line 1919.
 
 Package rerunfilecheck Info: File `Rd2.out' has not changed.
-(rerunfilecheck)             Checksum: 03EC6F9E4D04A5E0821CF1D85326CE81;2556.
-Package atveryend Info: Empty hook `AtVeryVeryEnd' on input line 1711.
+(rerunfilecheck)             Checksum: 5C289CF776F47F3FC8360B26B70F1036;2797.
+Package atveryend Info: Empty hook `AtVeryVeryEnd' on input line 1919.
  ) 
 Here is how much of TeX's memory you used:
- 7512 strings out of 494917
- 104586 string characters out of 6180698
- 177489 words of memory out of 5000000
- 10414 multiletter control sequences out of 15000+600000
+ 7540 strings out of 494917
+ 105098 string characters out of 6180698
+ 178489 words of memory out of 5000000
+ 10418 multiletter control sequences out of 15000+600000
  39456 words of font info for 63 fonts, out of 8000000 for 9000
  14 hyphenation exceptions out of 8191
  37i,6n,34p,262b,593s stack positions out of 5000i,500n,10000p,200000b,80000s
@@ -1053,10 +1047,10 @@ type1/urw/courier/ucrro8a.pfb></usr/share/texlive/texmf-dist/fonts/type1/urw/ti
 mes/utmb8a.pfb></usr/share/texlive/texmf-dist/fonts/type1/urw/times/utmr8a.pfb>
 </usr/share/texlive/texmf-dist/fonts/type1/urw/times/utmr8a.pfb></usr/share/tex
 live/texmf-dist/fonts/type1/urw/times/utmri8a.pfb>
-Output written on Rd2.pdf (32 pages, 150415 bytes).
+Output written on Rd2.pdf (35 pages, 156339 bytes).
 PDF statistics:
- 692 PDF objects out of 1000 (max. 8388607)
- 644 compressed objects within 7 object streams
- 277 named destinations out of 1000 (max. 500000)
- 289 words of extra memory for PDF output out of 10000 (max. 10000000)
+ 745 PDF objects out of 1000 (max. 8388607)
+ 694 compressed objects within 7 object streams
+ 301 named destinations out of 1000 (max. 500000)
+ 313 words of extra memory for PDF output out of 10000 (max. 10000000)
 

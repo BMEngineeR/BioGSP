@@ -288,5 +288,216 @@ hello_sgwt <- function() {
   if (!is.null(x$decomposition)) x$decomposition else x
 }
 
+#' Check K-band limited property of signals
+#'
+#' @description Analyze whether signals are k-band limited by comparing low-frequency 
+#' and high-frequency Fourier coefficients using eigendecomposition and statistical testing.
+#' Builds graph and computes Laplacian directly from SGWT data.
+#'
+#' @param SG SGWT object with Data slot (from initSGWT)
+#' @param signals Character vector of signal names to analyze. If NULL, uses all signals from SG$Data$signals
+#' @param alpha Significance level for Wilcoxon test (default: 0.05)
+#' @param verbose Logical; if TRUE, print progress messages (default: TRUE)
+#' @param k Number of nearest neighbors for graph construction (default: 25)
+#' @param laplacian_type Type of Laplacian ("unnormalized", "normalized", or "randomwalk") (default: "normalized")
+#' @return List containing:
+#'   \describe{
+#'     \item{is_kband_limited}{Logical; TRUE if all signals are k-band limited}
+#'     \item{knee_point_low}{Integer; knee point index for low-frequency eigenvalues}
+#'     \item{knee_point_high}{Integer; knee point index for high-frequency eigenvalues}
+#'     \item{signal_results}{List with per-signal test results including p-values and Fourier coefficients}
+#'   }
+#' @export
+#' @importFrom stats median wilcox.test
+#' @importFrom igraph graph_from_edgelist as_adjacency_matrix
+#'
+#' @examples
+#' \dontrun{
+#' # Initialize SGWT object (no need to run runSpecGraph)
+#' SG <- initSGWT(data, signals = c("signal1", "signal2"))
+#' 
+#' # Check k-band limited property
+#' result <- checkKband(SG, signals = c("signal1", "signal2"), k = 30)
+#' if (result$is_kband_limited) {
+#'   cat("All signals are k-band limited")
+#' }
+#' }
+checkKband <- function(SG, signals = NULL, alpha = 0.05, verbose = TRUE, k = 25, laplacian_type = "normalized") {
+  
+  # Input validation
+  if (!inherits(SG, "SGWT")) {
+    stop("SG must be an SGWT object")
+  }
+  
+  if (is.null(SG$Data)) {
+    stop("Data slot not found in SGWT object")
+  }
+  
+  # Use all signals if not specified
+  if (is.null(signals)) {
+    signals <- SG$Data$signals
+  }
+  
+  # Validate signal names
+  missing_signals <- setdiff(signals, SG$Data$signals)
+  if (length(missing_signals) > 0) {
+    stop(paste("Signals not found in SGWT object:", paste(missing_signals, collapse = ", ")))
+  }
+  
+  # Extract coordinates and build graph directly
+  data.in <- SG$Data$data
+  x_col <- SG$Data$x_col
+  y_col <- SG$Data$y_col
+  
+  coords <- data.in[, c(x_col, y_col)]
+  n_nodes <- nrow(coords)
+  k_eigen <- floor(4*sqrt(n_nodes))
+  
+  if (verbose) {
+    cat("Analyzing k-band limited property for", length(signals), "signals\n")
+    cat("Number of nodes:", n_nodes, "\n")
+    cat("Building graph with k =", k, "neighbors...\n")
+  }
+  
+  # Build k-nearest neighbor graph (same as runSpecGraph)
+  if (!requireNamespace("RANN", quietly = TRUE)) {
+    stop("RANN package is required for k-nearest neighbor graph construction")
+  }
+  
+  # Build k-nearest neighbor graph (unweighted connectivity)
+  nn <- RANN::nn2(coords, k = k + 1)
+  adj_list <- lapply(seq_len(n_nodes), function(i) setdiff(nn$nn.idx[i, ], i))
+  edges <- do.call(rbind, lapply(seq_along(adj_list), function(i) cbind(i, adj_list[[i]])))
+  edges <- unique(t(apply(edges, 1, sort)))
+  g <- igraph::graph_from_edgelist(edges, directed = FALSE)
+  adjacency_matrix <- igraph::as_adjacency_matrix(g, sparse = TRUE)
+  
+  # Compute Laplacian matrix
+  if (verbose) cat("Computing Laplacian matrix...\n")
+  laplacian_matrix <- cal_laplacian(adjacency_matrix, type = laplacian_type)
+  
+  if (verbose) {
+    cat("Computing", k_eigen, "low and high frequency eigenvalues/eigenvectors\n")
+  }
+  
+  # Compute low-frequency eigendecomposition (smallest eigenvalues)
+  if (verbose) cat("Computing low-frequency eigendecomposition...\n")
+  low_decomp <- FastDecompositionLap(
+    laplacianMat = laplacian_matrix,
+    k_eigen = k_eigen,
+    which = "SM",
+    lower = TRUE
+  )
+  
+  # Compute high-frequency eigendecomposition (largest eigenvalues)  
+  if (verbose) cat("Computing high-frequency eigendecomposition...\n")
+  high_decomp <- FastDecompositionLap(
+    laplacianMat = laplacian_matrix,
+    k_eigen = k_eigen,
+    which = "LM",
+    lower = FALSE
+  )
+  
+  # Find knee points
+  if (verbose) cat("Finding knee points in eigenvalue spectra...\n")
+  knee_point_low <- find_knee_point(low_decomp$evalues)
+  knee_point_high <- find_knee_point(high_decomp$evalues)
+  
+  if (verbose) {
+    cat("Low-frequency knee point at index:", knee_point_low, "\n")
+    cat("High-frequency knee point at index:", knee_point_high, "\n")
+  }
+  
+  # Select eigenvectors up to knee points
+  low_freq_eigenvecs <- low_decomp$evectors[, 1:knee_point_low, drop = FALSE]
+  high_freq_eigenvecs <- high_decomp$evectors[, 1:knee_point_high, drop = FALSE]
+  
+  # Concatenate low and high frequency eigenvectors
+  combined_eigenvecs <- cbind(low_freq_eigenvecs, high_freq_eigenvecs)
+  
+  if (verbose) {
+    cat("Selected", knee_point_low, "low-frequency and", knee_point_high, "high-frequency components\n")
+  }
+  
+  # Analyze each signal
+  signal_results <- list()
+  p_values <- numeric(length(signals))
+  names(p_values) <- signals
+  all_kband_limited <- TRUE
+  
+  for (sig in signals) {
+    if (verbose) cat("Analyzing signal:", sig, "\n")
+    
+    # Extract signal vector
+    signal_vec <- as.numeric(SG$Data$data[[sig]])
+    
+    # Compute Fourier coefficients using GFT
+    fourier_coeffs <- gft(signal_vec, combined_eigenvecs)
+    
+    # Split into low and high frequency components
+    low_freq_fc <- fourier_coeffs[1:knee_point_low]
+    high_freq_fc <- fourier_coeffs[(knee_point_low + 1):(knee_point_low + knee_point_high)]
+    
+    # Remove DC component from low-frequency FC (first component)
+    if (length(low_freq_fc) > 1) {
+      low_freq_fc_no_dc <- low_freq_fc[-1]
+    } else {
+      warning(paste("Signal", sig, "has only DC component in low-frequency band"))
+      low_freq_fc_no_dc <- numeric(0)
+    }
+    
+    # Perform Wilcoxon test (one-sided: low > high)
+    if (length(low_freq_fc_no_dc) > 0 && length(high_freq_fc) > 0) {
+      # Test if low-frequency FC magnitudes are significantly greater than high-frequency FC magnitudes
+      low_freq_fc_no_dc_filtered <- abs(low_freq_fc_no_dc)[abs(low_freq_fc_no_dc) > mean(abs(low_freq_fc_no_dc))]
+      high_freq_fc_filtered <- abs(high_freq_fc)[abs(high_freq_fc) > mean(abs(high_freq_fc))]
+      # wilcox test with Wilcoxon rank sum test with continuity correction
+      wilcox_result <- wilcox.test(
+        low_freq_fc_no_dc_filtered, 
+        high_freq_fc_filtered, 
+        alternative = "greater"
+      )
+      # adjust the p-value for multiple testing (Bonferroni correction)
+      p_value_adjusted <- wilcox_result$p.value *length(signals)
+      is_significant <- p_value_adjusted < alpha
+    } else {
+      p_value_adjusted <- NA
+      is_significant <- FALSE
+      warning(paste("Cannot perform Wilcoxon test for signal", sig, "due to insufficient data"))
+    }
+    
+    p_values[sig] <- p_value_adjusted
+    
+    signal_results[[sig]] <- list(
+      low_freq_fc = low_freq_fc,
+      high_freq_fc = high_freq_fc,
+      low_freq_fc_no_dc = low_freq_fc_no_dc,
+      p_value_adjusted = p_value_adjusted,
+      is_kband_limited = is_significant
+    )
+    
+    if (!is_significant) {
+      all_kband_limited <- FALSE
+    }
+    
+    if (verbose) {
+      cat("  Wilcoxon test p-value:", round(p_value_adjusted, 6), "\n")
+      cat("  K-band limited:", is_significant, "\n")
+    }
+  }
+  
+  if (verbose) {
+    cat("\n=== Summary ===\n")
+    cat("All signals k-band limited:", all_kband_limited, "\n")
+  }
+  
+  return(list(
+    is_kband_limited = all_kband_limited,
+    knee_point_low = knee_point_low,
+    knee_point_high = knee_point_high,
+    signal_results = signal_results
+  ))
+}
+
 
 

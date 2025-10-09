@@ -1,14 +1,14 @@
 Hmm ... looks like a package
 Converting parsed Rd's to LaTeX ...
 Creating pdf output from LaTeX ...
-tar: Rd2.idx: time stamp 2025-10-06 11:34:54 is 3.384361738 s in the future
-tar: Rd2.aux: time stamp 2025-10-06 11:34:54 is 3.376680691 s in the future
-tar: Rd2.out: time stamp 2025-10-06 11:34:54 is 3.369730475 s in the future
-tar: Rd2.toc: time stamp 2025-10-06 11:34:54 is 3.360112928 s in the future
-tar: Rd2.idx: time stamp 2025-10-06 11:34:54 is 2.775730224 s in the future
-tar: Rd2.aux: time stamp 2025-10-06 11:34:54 is 2.763677327 s in the future
-tar: Rd2.out: time stamp 2025-10-06 11:34:54 is 2.740652188 s in the future
-tar: Rd2.toc: time stamp 2025-10-06 11:34:54 is 2.728609661 s in the future
+tar: Rd2.idx: time stamp 2025-10-08 22:00:17 is 3.21731416 s in the future
+tar: Rd2.aux: time stamp 2025-10-08 22:00:17 is 3.208770041 s in the future
+tar: Rd2.out: time stamp 2025-10-08 22:00:17 is 3.201678221 s in the future
+tar: Rd2.toc: time stamp 2025-10-08 22:00:17 is 3.194376261 s in the future
+tar: Rd2.idx: time stamp 2025-10-08 22:00:17 is 2.586249793 s in the future
+tar: Rd2.aux: time stamp 2025-10-08 22:00:17 is 2.574294394 s in the future
+tar: Rd2.out: time stamp 2025-10-08 22:00:17 is 2.559323622 s in the future
+tar: Rd2.toc: time stamp 2025-10-08 22:00:17 is 2.546242421 s in the future
 This is pdfTeX, Version 3.14159265-2.6-1.40.19 (TeX Live 2018) (preloaded format=pdflatex)
  restricted \write18 enabled.
 entering extended mode
@@ -89,94 +89,90 @@ omwalk"))[]
 Overfull \hbox (1.07816pt too wide) in paragraph at lines 174--175
 []\T1/ptm/m/n/10 Type of Lapla-cian to com-pute: "un-nor-mal-ized", "nor-mal-iz
 ed", or "ran-domwalk". 
-[4] [5]
-Overfull \hbox (15.18042pt too wide) in paragraph at lines 299--299
+
+Overfull \hbox (2.65787pt too wide) in paragraph at lines 194--197
+[]\T1/ptm/m/n/10 Analyze whether sig-nals are k-band lim-ited by com-par-ing lo
+w-frequency and high-frequency Fourier
+[4] [5] [6]
+Overfull \hbox (15.18042pt too wide) in paragraph at lines 364--364
  []  \T1/pcr/m/n/9 ggplot(codex_toy_data, aes(x = X_cent, y = Y_cent, color = A
 nnotation5)) +[] 
 
-Overfull \hbox (15.18042pt too wide) in paragraph at lines 311--311
+Overfull \hbox (15.18042pt too wide) in paragraph at lines 376--376
  []\T1/pcr/m/n/9 bcl6nb_data <- codex_toy_data[codex_toy_data$Annotation5 == "B
 CL6- B Cell" &[] 
 (/usr/share/texlive/texmf-dist/tex/latex/psnfss/ts1pcr.fd)
-Underfull \vbox (badness 10000) has occurred while \output is active [6]
-Overfull \hbox (9.78043pt too wide) in paragraph at lines 381--381
+Underfull \vbox (badness 10000) has occurred while \output is active [7]
+Overfull \hbox (9.78043pt too wide) in paragraph at lines 446--446
  []\T1/pcr/m/n/9 comparison <- compare_kernel_families(x_range = c(0, 5), scale
 _param = 1.5)[] 
 
-Overfull \hbox (60.78088pt too wide) in paragraph at lines 392--392
+Overfull \hbox (60.78088pt too wide) in paragraph at lines 457--457
  []\T1/pcr/m/n/10 compute_sgwt_filters(eigenvalues, scales, lmax = NULL, kernel
 _type = "heat")[] 
-[7]
-Overfull \hbox (7.61737pt too wide) in paragraph at lines 404--405
+[8]
+Overfull \hbox (7.61737pt too wide) in paragraph at lines 469--470
 []\T1/ptm/m/n/10 Kernel fam-ily that de-fines both scal-ing and wavelet fil-ter
 s (de-fault: "mex-i-can_hat",
 
-Overfull \hbox (31.3804pt too wide) in paragraph at lines 417--417
+Overfull \hbox (31.3804pt too wide) in paragraph at lines 482--482
  []\T1/pcr/m/n/9 filters_meyer <- compute_sgwt_filters(eigenvals, scales, kerne
 l_type = "meyer")[] 
 
-Overfull \hbox (20.58041pt too wide) in paragraph at lines 418--418
+Overfull \hbox (20.58041pt too wide) in paragraph at lines 483--483
  []\T1/pcr/m/n/9 filters_heat <- compute_sgwt_filters(eigenvals, scales, kernel
 _type = "heat")[] 
-[8] [9] [10] [11] [12]
-Overfull \hbox (2.60802pt too wide) in paragraph at lines 679--680
+[9] [10] [11] [12] [13]
+Overfull \hbox (2.60802pt too wide) in paragraph at lines 744--745
 []\T1/ptm/m/n/10 Character vec-tor of sig-nal col-umn names to an-a-lyze. If NU
 LL, all non-coordinate
-[13]
-Overfull \hbox (36.78088pt too wide) in paragraph at lines 746--746
+[14]
+Overfull \hbox (36.78088pt too wide) in paragraph at lines 811--811
  []\T1/pcr/m/n/10 plot_FM(SG, mode_type = "both", n_modes = 6, ncol = 3, point_
 size = 1.5)[] 
 
-Overfull \hbox (66.78088pt too wide) in paragraph at lines 790--790
+Overfull \hbox (66.78088pt too wide) in paragraph at lines 855--855
  []\T1/pcr/m/n/10 plot_sgwt_decomposition(SG, signal_name = NULL, plot_scales =
  NULL, ncol = 3)[] 
-[14] [15] [16]
-Overfull \hbox (5.07787pt too wide) in paragraph at lines 962--963
+[15] [16] [17]
+Overfull \hbox (5.07787pt too wide) in paragraph at lines 1027--1028
 []\T1/ptm/m/n/10 Number of eigen-val-ues/eigenvectors to com-pute (de-fault: NU
 LL, uses full length) 
-[17] [18]
-Overfull \hbox (9.78043pt too wide) in paragraph at lines 1053--1053
+[18] [19]
+Overfull \hbox (9.78043pt too wide) in paragraph at lines 1118--1118
  []\T1/pcr/m/n/9 energy_analysis <- sgwt_energy_analysis(SG_object, signal_name
  = "signal1")[] 
-[19]
-Overfull \hbox (7.55559pt too wide) in paragraph at lines 1141--1142
+[20]
+Overfull \hbox (7.55559pt too wide) in paragraph at lines 1206--1207
 []\T1/ptm/m/n/10 A list with two func-tions: list(scaling = func-tion(x, scale_
 param), wavelet = func-tion(x, scale_param)) 
-[20]
-Overfull \hbox (4.38043pt too wide) in paragraph at lines 1191--1191
+[21]
+Overfull \hbox (4.38043pt too wide) in paragraph at lines 1256--1256
  []\T1/pcr/m/n/9 inverse_result <- sgwt_inverse(sgwt_decomp, eigenvectors, orig
 inal_signal)[] 
 
-Overfull \hbox (47.58038pt too wide) in paragraph at lines 1194--1194
+Overfull \hbox (47.58038pt too wide) in paragraph at lines 1259--1259
  []\T1/pcr/m/n/9 inverse_result <- sgwt_inverse(sgwt_decomp, eigenvectors, orig
 inal_signals_matrix)[] 
-[21] [22]
-Overfull \hbox (36.7804pt too wide) in paragraph at lines 1284--1284
- []\T1/pcr/m/n/9 patterns <- simulate_multiscale(Ra_seq = Ra_seq, Rb_seq = Rb_s
-eq, n_centers = 3)[] 
-
-Overfull \hbox (15.33502pt too wide) in paragraph at lines 1292--1296
+[22] [23] [24]
+Overfull \hbox (15.33502pt too wide) in paragraph at lines 1429--1433
 []\T1/ptm/m/n/10 Generate spa-tial pat-terns with mul-ti-ple cir-cu-lar cen-ter
 s at fixed po-si-tions. Sim-i-lar to sim-u-late_multiscale
-[23] [24] [25]
-Overfull \hbox (4.38043pt too wide) in paragraph at lines 1443--1443
+[25] [26] [27]
+Overfull \hbox (4.38043pt too wide) in paragraph at lines 1580--1580
  []\T1/pcr/m/n/9 p <- visualize_checkerboard(df, color1 = "darkblue", color2 = 
 "lightgray")[] 
-[26]
-Overfull \hbox (36.7804pt too wide) in paragraph at lines 1497--1497
- []\T1/pcr/m/n/9 sim_data <- simulate_multiscale(Ra_seq = Ra_seq, Rb_seq = Rb_s
-eq, n_centers = 3)[] 
-[27]
-Overfull \hbox (7.21751pt too wide) in paragraph at lines 1606--1608
+[28] [29] [30] [31]
+Overfull \hbox (7.21751pt too wide) in paragraph at lines 1814--1816
 []\T1/ptm/m/n/10 Whether to dis-play data point names as text la-bels us-ing gg
 re-pel (de-fault: FALSE).
-[28]
-Overfull \hbox (79.98035pt too wide) in paragraph at lines 1632--1632
+[32]
+Overfull \hbox (79.98035pt too wide) in paragraph at lines 1840--1840
  []\T1/pcr/m/n/9 plot_both <- visualize_similarity_xy(sim_results, show_labels 
 = TRUE, show_names = TRUE)[] 
-[29]
+[33]
 No file Rd2.ind.
-[30] (/bmbl_data/Rtmp/Rtmpv2Zko8/Rd2pdf810644c712e4/Rd2.aux)
+[34] (/bmbl_data/Rtmp/RtmpCKXIpz/Rd2pdf12b84764df417b/Rd2.aux)
 
 Package rerunfilecheck Warning: File `Rd2.out' has changed.
 (rerunfilecheck)                Rerun to get outlines right
@@ -189,7 +185,7 @@ courier/ucrr8a.pfb></usr/share/texlive/texmf-dist/fonts/type1/urw/times/utmb8a.
 pfb></usr/share/texlive/texmf-dist/fonts/type1/urw/times/utmr8a.pfb></usr/share
 /texlive/texmf-dist/fonts/type1/urw/times/utmr8a.pfb></usr/share/texlive/texmf-
 dist/fonts/type1/urw/times/utmri8a.pfb>
-Output written on Rd2.pdf (30 pages, 126923 bytes).
+Output written on Rd2.pdf (34 pages, 134345 bytes).
 Transcript written on Rd2.log.
 This is pdfTeX, Version 3.14159265-2.6-1.40.19 (TeX Live 2018) (preloaded format=pdflatex)
  restricted \write18 enabled.
@@ -247,22 +243,22 @@ Package hyperref Message: Driver (autodetected): hpdftex.
 (/usr/share/texlive/texmf-dist/tex/latex/base/omsenc.dfu)
 (/usr/share/texlive/texmf-dist/tex/latex/base/ts1enc.dfu)))
 Writing index file Rd2.idx
-(/bmbl_data/Rtmp/Rtmpv2Zko8/Rd2pdf810644c712e4/Rd2.aux)
+(/bmbl_data/Rtmp/RtmpCKXIpz/Rd2pdf12b84764df417b/Rd2.aux)
 (/usr/share/texlive/texmf-dist/tex/latex/base/ts1cmr.fd)
 (/usr/share/texlive/texmf-dist/tex/latex/psnfss/t1ptm.fd)
 (/usr/share/texlive/texmf-dist/tex/context/base/mkii/supp-pdf.mkii
 [Loading MPS to PDF converter (version 2006.09.02).]
 ) (/usr/share/texlive/texmf-dist/tex/latex/hyperref/nameref.sty
 (/usr/share/texlive/texmf-dist/tex/generic/oberdiek/gettitlestring.sty))
-(/bmbl_data/Rtmp/Rtmpv2Zko8/Rd2pdf810644c712e4/Rd2.out)
-(/bmbl_data/Rtmp/Rtmpv2Zko8/Rd2pdf810644c712e4/Rd2.out)
+(/bmbl_data/Rtmp/RtmpCKXIpz/Rd2pdf12b84764df417b/Rd2.out)
+(/bmbl_data/Rtmp/RtmpCKXIpz/Rd2pdf12b84764df417b/Rd2.out)
 (/usr/share/texlive/texmf-dist/tex/latex/psnfss/t1pcr.fd)
 (/usr/share/texlive/texmf-dist/tex/latex/psnfss/ts1ptm.fd)
 (/usr/share/texlive/texmf-dist/tex/latex/amsfonts/umsa.fd)
 (/usr/share/texlive/texmf-dist/tex/latex/amsfonts/umsb.fd)
 (/usr/share/texlive/texmf-dist/tex/latex/jknapltx/ursfs.fd)
-(/bmbl_data/Rtmp/Rtmpv2Zko8/Rd2pdf810644c712e4/Rd2.toc [1{/usr/share/texlive/te
-xmf-dist/fonts/map/pdftex/updmap/pdftex.map}]) [2] [3]
+(/bmbl_data/Rtmp/RtmpCKXIpz/Rd2pdf12b84764df417b/Rd2.toc [1{/usr/share/texlive/
+texmf-dist/fonts/map/pdftex/updmap/pdftex.map}]) [2] [3]
 Overfull \hbox (15.18042pt too wide) in paragraph at lines 146--146
  []\T1/pcr/m/n/9 SG <- initSGWT(data, signals = "signal", k = 8, J = 4, kernel_
 type = "heat")[] 
@@ -274,105 +270,101 @@ omwalk"))[]
 Overfull \hbox (1.07816pt too wide) in paragraph at lines 174--175
 []\T1/ptm/m/n/10 Type of Lapla-cian to com-pute: "un-nor-mal-ized", "nor-mal-iz
 ed", or "ran-domwalk". 
-[4] [5]
-Overfull \hbox (15.18042pt too wide) in paragraph at lines 299--299
+
+Overfull \hbox (2.65787pt too wide) in paragraph at lines 194--197
+[]\T1/ptm/m/n/10 Analyze whether sig-nals are k-band lim-ited by com-par-ing lo
+w-frequency and high-frequency Fourier
+[4] [5] [6]
+Overfull \hbox (15.18042pt too wide) in paragraph at lines 364--364
  []  \T1/pcr/m/n/9 ggplot(codex_toy_data, aes(x = X_cent, y = Y_cent, color = A
 nnotation5)) +[] 
 
-Overfull \hbox (15.18042pt too wide) in paragraph at lines 311--311
+Overfull \hbox (15.18042pt too wide) in paragraph at lines 376--376
  []\T1/pcr/m/n/9 bcl6nb_data <- codex_toy_data[codex_toy_data$Annotation5 == "B
 CL6- B Cell" &[] 
-[6] (/usr/share/texlive/texmf-dist/tex/latex/psnfss/ts1pcr.fd) [7]
-Overfull \hbox (9.78043pt too wide) in paragraph at lines 381--381
+[7] (/usr/share/texlive/texmf-dist/tex/latex/psnfss/ts1pcr.fd) [8]
+Overfull \hbox (9.78043pt too wide) in paragraph at lines 446--446
  []\T1/pcr/m/n/9 comparison <- compare_kernel_families(x_range = c(0, 5), scale
 _param = 1.5)[] 
 
-Overfull \hbox (60.78088pt too wide) in paragraph at lines 392--392
+Overfull \hbox (60.78088pt too wide) in paragraph at lines 457--457
  []\T1/pcr/m/n/10 compute_sgwt_filters(eigenvalues, scales, lmax = NULL, kernel
 _type = "heat")[] 
 
-Overfull \hbox (7.61737pt too wide) in paragraph at lines 404--405
+Overfull \hbox (7.61737pt too wide) in paragraph at lines 469--470
 []\T1/ptm/m/n/10 Kernel fam-ily that de-fines both scal-ing and wavelet fil-ter
 s (de-fault: "mex-i-can_hat",
 
-Overfull \hbox (31.3804pt too wide) in paragraph at lines 417--417
+Overfull \hbox (31.3804pt too wide) in paragraph at lines 482--482
  []\T1/pcr/m/n/9 filters_meyer <- compute_sgwt_filters(eigenvals, scales, kerne
 l_type = "meyer")[] 
 
-Overfull \hbox (20.58041pt too wide) in paragraph at lines 418--418
+Overfull \hbox (20.58041pt too wide) in paragraph at lines 483--483
  []\T1/pcr/m/n/9 filters_heat <- compute_sgwt_filters(eigenvals, scales, kernel
 _type = "heat")[] 
-[8] [9] [10] [11] [12]
-Overfull \hbox (2.60802pt too wide) in paragraph at lines 679--680
+[9] [10] [11] [12] [13]
+Overfull \hbox (2.60802pt too wide) in paragraph at lines 744--745
 []\T1/ptm/m/n/10 Character vec-tor of sig-nal col-umn names to an-a-lyze. If NU
 LL, all non-coordinate
-[13]
-Overfull \hbox (36.78088pt too wide) in paragraph at lines 746--746
+[14]
+Overfull \hbox (36.78088pt too wide) in paragraph at lines 811--811
  []\T1/pcr/m/n/10 plot_FM(SG, mode_type = "both", n_modes = 6, ncol = 3, point_
 size = 1.5)[] 
-[14]
-Overfull \hbox (66.78088pt too wide) in paragraph at lines 790--790
+[15]
+Overfull \hbox (66.78088pt too wide) in paragraph at lines 855--855
  []\T1/pcr/m/n/10 plot_sgwt_decomposition(SG, signal_name = NULL, plot_scales =
  NULL, ncol = 3)[] 
-[15] [16] [17]
-Overfull \hbox (5.07787pt too wide) in paragraph at lines 962--963
+[16] [17] [18]
+Overfull \hbox (5.07787pt too wide) in paragraph at lines 1027--1028
 []\T1/ptm/m/n/10 Number of eigen-val-ues/eigenvectors to com-pute (de-fault: NU
 LL, uses full length) 
-[18] [19]
-Overfull \hbox (9.78043pt too wide) in paragraph at lines 1053--1053
+[19] [20]
+Overfull \hbox (9.78043pt too wide) in paragraph at lines 1118--1118
  []\T1/pcr/m/n/9 energy_analysis <- sgwt_energy_analysis(SG_object, signal_name
  = "signal1")[] 
-[20]
-Overfull \hbox (7.55559pt too wide) in paragraph at lines 1141--1142
+[21]
+Overfull \hbox (7.55559pt too wide) in paragraph at lines 1206--1207
 []\T1/ptm/m/n/10 A list with two func-tions: list(scaling = func-tion(x, scale_
 param), wavelet = func-tion(x, scale_param)) 
-[21]
-Overfull \hbox (4.38043pt too wide) in paragraph at lines 1191--1191
+[22]
+Overfull \hbox (4.38043pt too wide) in paragraph at lines 1256--1256
  []\T1/pcr/m/n/9 inverse_result <- sgwt_inverse(sgwt_decomp, eigenvectors, orig
 inal_signal)[] 
 
-Overfull \hbox (47.58038pt too wide) in paragraph at lines 1194--1194
+Overfull \hbox (47.58038pt too wide) in paragraph at lines 1259--1259
  []\T1/pcr/m/n/9 inverse_result <- sgwt_inverse(sgwt_decomp, eigenvectors, orig
 inal_signals_matrix)[] 
-[22]
-Overfull \hbox (36.7804pt too wide) in paragraph at lines 1284--1284
- []\T1/pcr/m/n/9 patterns <- simulate_multiscale(Ra_seq = Ra_seq, Rb_seq = Rb_s
-eq, n_centers = 3)[] 
-
-Overfull \hbox (15.33502pt too wide) in paragraph at lines 1292--1296
+[23] [24] [25]
+Overfull \hbox (15.33502pt too wide) in paragraph at lines 1429--1433
 []\T1/ptm/m/n/10 Generate spa-tial pat-terns with mul-ti-ple cir-cu-lar cen-ter
 s at fixed po-si-tions. Sim-i-lar to sim-u-late_multiscale
-[23] [24] [25]
-Overfull \hbox (4.38043pt too wide) in paragraph at lines 1443--1443
+[26] [27]
+Overfull \hbox (4.38043pt too wide) in paragraph at lines 1580--1580
  []\T1/pcr/m/n/9 p <- visualize_checkerboard(df, color1 = "darkblue", color2 = 
 "lightgray")[] 
-[26]
-Overfull \hbox (36.7804pt too wide) in paragraph at lines 1497--1497
- []\T1/pcr/m/n/9 sim_data <- simulate_multiscale(Ra_seq = Ra_seq, Rb_seq = Rb_s
-eq, n_centers = 3)[] 
-[27] [28]
-Overfull \hbox (7.21751pt too wide) in paragraph at lines 1606--1608
+[28] [29] [30] [31]
+Overfull \hbox (7.21751pt too wide) in paragraph at lines 1814--1816
 []\T1/ptm/m/n/10 Whether to dis-play data point names as text la-bels us-ing gg
 re-pel (de-fault: FALSE).
-[29]
-Overfull \hbox (79.98035pt too wide) in paragraph at lines 1632--1632
+[32]
+Overfull \hbox (79.98035pt too wide) in paragraph at lines 1840--1840
  []\T1/pcr/m/n/9 plot_both <- visualize_similarity_xy(sim_results, show_labels 
 = TRUE, show_names = TRUE)[] 
-[30]
+[33]
 No file Rd2.ind.
-[31] (/bmbl_data/Rtmp/Rtmpv2Zko8/Rd2pdf810644c712e4/Rd2.aux) )
+[34] (/bmbl_data/Rtmp/RtmpCKXIpz/Rd2pdf12b84764df417b/Rd2.aux) )
 (see the transcript file for additional information){/usr/share/texlive/texmf-d
 ist/fonts/enc/dvips/base/8r.enc}</usr/share/texlive/texmf-dist/fonts/type1/urw/
 courier/ucrr8a.pfb></usr/share/texlive/texmf-dist/fonts/type1/urw/times/utmb8a.
 pfb></usr/share/texlive/texmf-dist/fonts/type1/urw/times/utmr8a.pfb></usr/share
 /texlive/texmf-dist/fonts/type1/urw/times/utmr8a.pfb></usr/share/texlive/texmf-
 dist/fonts/type1/urw/times/utmri8a.pfb>
-Output written on Rd2.pdf (31 pages, 131933 bytes).
+Output written on Rd2.pdf (34 pages, 138263 bytes).
 Transcript written on Rd2.log.
 This is makeindex, version 2.15 [TeX Live 2018] (kpathsea + Thai support).
-Scanning input file Rd2.idx....done (55 entries accepted, 0 rejected).
-Sorting entries....done (305 comparisons).
-Generating output file Rd2.ind....done (103 lines written, 0 warnings).
+Scanning input file Rd2.idx....done (58 entries accepted, 0 rejected).
+Sorting entries....done (324 comparisons).
+Generating output file Rd2.ind....done (106 lines written, 0 warnings).
 Output written in Rd2.ind.
 Transcript written in Rd2.ilg.
 This is pdfTeX, Version 3.14159265-2.6-1.40.19 (TeX Live 2018) (preloaded format=pdflatex)
@@ -431,22 +423,22 @@ Package hyperref Message: Driver (autodetected): hpdftex.
 (/usr/share/texlive/texmf-dist/tex/latex/base/omsenc.dfu)
 (/usr/share/texlive/texmf-dist/tex/latex/base/ts1enc.dfu)))
 Writing index file Rd2.idx
-(/bmbl_data/Rtmp/Rtmpv2Zko8/Rd2pdf810644c712e4/Rd2.aux)
+(/bmbl_data/Rtmp/RtmpCKXIpz/Rd2pdf12b84764df417b/Rd2.aux)
 (/usr/share/texlive/texmf-dist/tex/latex/base/ts1cmr.fd)
 (/usr/share/texlive/texmf-dist/tex/latex/psnfss/t1ptm.fd)
 (/usr/share/texlive/texmf-dist/tex/context/base/mkii/supp-pdf.mkii
 [Loading MPS to PDF converter (version 2006.09.02).]
 ) (/usr/share/texlive/texmf-dist/tex/latex/hyperref/nameref.sty
 (/usr/share/texlive/texmf-dist/tex/generic/oberdiek/gettitlestring.sty))
-(/bmbl_data/Rtmp/Rtmpv2Zko8/Rd2pdf810644c712e4/Rd2.out)
-(/bmbl_data/Rtmp/Rtmpv2Zko8/Rd2pdf810644c712e4/Rd2.out)
+(/bmbl_data/Rtmp/RtmpCKXIpz/Rd2pdf12b84764df417b/Rd2.out)
+(/bmbl_data/Rtmp/RtmpCKXIpz/Rd2pdf12b84764df417b/Rd2.out)
 (/usr/share/texlive/texmf-dist/tex/latex/psnfss/t1pcr.fd)
 (/usr/share/texlive/texmf-dist/tex/latex/psnfss/ts1ptm.fd)
 (/usr/share/texlive/texmf-dist/tex/latex/amsfonts/umsa.fd)
 (/usr/share/texlive/texmf-dist/tex/latex/amsfonts/umsb.fd)
 (/usr/share/texlive/texmf-dist/tex/latex/jknapltx/ursfs.fd)
-(/bmbl_data/Rtmp/Rtmpv2Zko8/Rd2pdf810644c712e4/Rd2.toc [1{/usr/share/texlive/te
-xmf-dist/fonts/map/pdftex/updmap/pdftex.map}]) [2] [3]
+(/bmbl_data/Rtmp/RtmpCKXIpz/Rd2pdf12b84764df417b/Rd2.toc [1{/usr/share/texlive/
+texmf-dist/fonts/map/pdftex/updmap/pdftex.map}]) [2] [3]
 Overfull \hbox (15.18042pt too wide) in paragraph at lines 146--146
  []\T1/pcr/m/n/9 SG <- initSGWT(data, signals = "signal", k = 8, J = 4, kernel_
 type = "heat")[] 
@@ -458,92 +450,88 @@ omwalk"))[]
 Overfull \hbox (1.07816pt too wide) in paragraph at lines 174--175
 []\T1/ptm/m/n/10 Type of Lapla-cian to com-pute: "un-nor-mal-ized", "nor-mal-iz
 ed", or "ran-domwalk". 
-[4] [5]
-Overfull \hbox (15.18042pt too wide) in paragraph at lines 299--299
+
+Overfull \hbox (2.65787pt too wide) in paragraph at lines 194--197
+[]\T1/ptm/m/n/10 Analyze whether sig-nals are k-band lim-ited by com-par-ing lo
+w-frequency and high-frequency Fourier
+[4] [5] [6]
+Overfull \hbox (15.18042pt too wide) in paragraph at lines 364--364
  []  \T1/pcr/m/n/9 ggplot(codex_toy_data, aes(x = X_cent, y = Y_cent, color = A
 nnotation5)) +[] 
 
-Overfull \hbox (15.18042pt too wide) in paragraph at lines 311--311
+Overfull \hbox (15.18042pt too wide) in paragraph at lines 376--376
  []\T1/pcr/m/n/9 bcl6nb_data <- codex_toy_data[codex_toy_data$Annotation5 == "B
 CL6- B Cell" &[] 
-[6] (/usr/share/texlive/texmf-dist/tex/latex/psnfss/ts1pcr.fd) [7]
-Overfull \hbox (9.78043pt too wide) in paragraph at lines 381--381
+[7] (/usr/share/texlive/texmf-dist/tex/latex/psnfss/ts1pcr.fd) [8]
+Overfull \hbox (9.78043pt too wide) in paragraph at lines 446--446
  []\T1/pcr/m/n/9 comparison <- compare_kernel_families(x_range = c(0, 5), scale
 _param = 1.5)[] 
 
-Overfull \hbox (60.78088pt too wide) in paragraph at lines 392--392
+Overfull \hbox (60.78088pt too wide) in paragraph at lines 457--457
  []\T1/pcr/m/n/10 compute_sgwt_filters(eigenvalues, scales, lmax = NULL, kernel
 _type = "heat")[] 
 
-Overfull \hbox (7.61737pt too wide) in paragraph at lines 404--405
+Overfull \hbox (7.61737pt too wide) in paragraph at lines 469--470
 []\T1/ptm/m/n/10 Kernel fam-ily that de-fines both scal-ing and wavelet fil-ter
 s (de-fault: "mex-i-can_hat",
 
-Overfull \hbox (31.3804pt too wide) in paragraph at lines 417--417
+Overfull \hbox (31.3804pt too wide) in paragraph at lines 482--482
  []\T1/pcr/m/n/9 filters_meyer <- compute_sgwt_filters(eigenvals, scales, kerne
 l_type = "meyer")[] 
 
-Overfull \hbox (20.58041pt too wide) in paragraph at lines 418--418
+Overfull \hbox (20.58041pt too wide) in paragraph at lines 483--483
  []\T1/pcr/m/n/9 filters_heat <- compute_sgwt_filters(eigenvals, scales, kernel
 _type = "heat")[] 
-[8] [9] [10] [11] [12]
-Overfull \hbox (2.60802pt too wide) in paragraph at lines 679--680
+[9] [10] [11] [12] [13]
+Overfull \hbox (2.60802pt too wide) in paragraph at lines 744--745
 []\T1/ptm/m/n/10 Character vec-tor of sig-nal col-umn names to an-a-lyze. If NU
 LL, all non-coordinate
-[13]
-Overfull \hbox (36.78088pt too wide) in paragraph at lines 746--746
+[14]
+Overfull \hbox (36.78088pt too wide) in paragraph at lines 811--811
  []\T1/pcr/m/n/10 plot_FM(SG, mode_type = "both", n_modes = 6, ncol = 3, point_
 size = 1.5)[] 
-[14]
-Overfull \hbox (66.78088pt too wide) in paragraph at lines 790--790
+[15]
+Overfull \hbox (66.78088pt too wide) in paragraph at lines 855--855
  []\T1/pcr/m/n/10 plot_sgwt_decomposition(SG, signal_name = NULL, plot_scales =
  NULL, ncol = 3)[] 
-[15] [16] [17]
-Overfull \hbox (5.07787pt too wide) in paragraph at lines 962--963
+[16] [17] [18]
+Overfull \hbox (5.07787pt too wide) in paragraph at lines 1027--1028
 []\T1/ptm/m/n/10 Number of eigen-val-ues/eigenvectors to com-pute (de-fault: NU
 LL, uses full length) 
-[18] [19]
-Overfull \hbox (9.78043pt too wide) in paragraph at lines 1053--1053
+[19] [20]
+Overfull \hbox (9.78043pt too wide) in paragraph at lines 1118--1118
  []\T1/pcr/m/n/9 energy_analysis <- sgwt_energy_analysis(SG_object, signal_name
  = "signal1")[] 
-[20]
-Overfull \hbox (7.55559pt too wide) in paragraph at lines 1141--1142
+[21]
+Overfull \hbox (7.55559pt too wide) in paragraph at lines 1206--1207
 []\T1/ptm/m/n/10 A list with two func-tions: list(scaling = func-tion(x, scale_
 param), wavelet = func-tion(x, scale_param)) 
-[21]
-Overfull \hbox (4.38043pt too wide) in paragraph at lines 1191--1191
+[22]
+Overfull \hbox (4.38043pt too wide) in paragraph at lines 1256--1256
  []\T1/pcr/m/n/9 inverse_result <- sgwt_inverse(sgwt_decomp, eigenvectors, orig
 inal_signal)[] 
 
-Overfull \hbox (47.58038pt too wide) in paragraph at lines 1194--1194
+Overfull \hbox (47.58038pt too wide) in paragraph at lines 1259--1259
  []\T1/pcr/m/n/9 inverse_result <- sgwt_inverse(sgwt_decomp, eigenvectors, orig
 inal_signals_matrix)[] 
-[22]
-Overfull \hbox (36.7804pt too wide) in paragraph at lines 1284--1284
- []\T1/pcr/m/n/9 patterns <- simulate_multiscale(Ra_seq = Ra_seq, Rb_seq = Rb_s
-eq, n_centers = 3)[] 
-
-Overfull \hbox (15.33502pt too wide) in paragraph at lines 1292--1296
+[23] [24] [25]
+Overfull \hbox (15.33502pt too wide) in paragraph at lines 1429--1433
 []\T1/ptm/m/n/10 Generate spa-tial pat-terns with mul-ti-ple cir-cu-lar cen-ter
 s at fixed po-si-tions. Sim-i-lar to sim-u-late_multiscale
-[23] [24] [25]
-Overfull \hbox (4.38043pt too wide) in paragraph at lines 1443--1443
+[26] [27]
+Overfull \hbox (4.38043pt too wide) in paragraph at lines 1580--1580
  []\T1/pcr/m/n/9 p <- visualize_checkerboard(df, color1 = "darkblue", color2 = 
 "lightgray")[] 
-[26]
-Overfull \hbox (36.7804pt too wide) in paragraph at lines 1497--1497
- []\T1/pcr/m/n/9 sim_data <- simulate_multiscale(Ra_seq = Ra_seq, Rb_seq = Rb_s
-eq, n_centers = 3)[] 
-[27] [28]
-Overfull \hbox (7.21751pt too wide) in paragraph at lines 1606--1608
+[28] [29] [30] [31]
+Overfull \hbox (7.21751pt too wide) in paragraph at lines 1814--1816
 []\T1/ptm/m/n/10 Whether to dis-play data point names as text la-bels us-ing gg
 re-pel (de-fault: FALSE).
-[29]
-Overfull \hbox (79.98035pt too wide) in paragraph at lines 1632--1632
+[32]
+Overfull \hbox (79.98035pt too wide) in paragraph at lines 1840--1840
  []\T1/pcr/m/n/9 plot_both <- visualize_similarity_xy(sim_results, show_labels 
 = TRUE, show_names = TRUE)[] 
-[30] (/bmbl_data/Rtmp/Rtmpv2Zko8/Rd2pdf810644c712e4/Rd2.ind [31] [32])
-(/bmbl_data/Rtmp/Rtmpv2Zko8/Rd2pdf810644c712e4/Rd2.aux)
+[33] (/bmbl_data/Rtmp/RtmpCKXIpz/Rd2pdf12b84764df417b/Rd2.ind [34] [35])
+(/bmbl_data/Rtmp/RtmpCKXIpz/Rd2pdf12b84764df417b/Rd2.aux)
 
 Package rerunfilecheck Warning: File `Rd2.out' has changed.
 (rerunfilecheck)                Rerun to get outlines right
@@ -558,12 +546,12 @@ r/ucrr8a.pfb></usr/share/texlive/texmf-dist/fonts/type1/urw/courier/ucrro8a.pfb
 xlive/texmf-dist/fonts/type1/urw/times/utmr8a.pfb></usr/share/texlive/texmf-dis
 t/fonts/type1/urw/times/utmr8a.pfb></usr/share/texlive/texmf-dist/fonts/type1/u
 rw/times/utmri8a.pfb>
-Output written on Rd2.pdf (32 pages, 150318 bytes).
+Output written on Rd2.pdf (35 pages, 156252 bytes).
 Transcript written on Rd2.log.
 This is makeindex, version 2.15 [TeX Live 2018] (kpathsea + Thai support).
-Scanning input file Rd2.idx....done (55 entries accepted, 0 rejected).
-Sorting entries....done (305 comparisons).
-Generating output file Rd2.ind....done (103 lines written, 0 warnings).
+Scanning input file Rd2.idx....done (58 entries accepted, 0 rejected).
+Sorting entries....done (324 comparisons).
+Generating output file Rd2.ind....done (106 lines written, 0 warnings).
 Output written in Rd2.ind.
 Transcript written in Rd2.ilg.
 This is pdfTeX, Version 3.14159265-2.6-1.40.19 (TeX Live 2018) (preloaded format=pdflatex)
@@ -622,22 +610,22 @@ Package hyperref Message: Driver (autodetected): hpdftex.
 (/usr/share/texlive/texmf-dist/tex/latex/base/omsenc.dfu)
 (/usr/share/texlive/texmf-dist/tex/latex/base/ts1enc.dfu)))
 Writing index file Rd2.idx
-(/bmbl_data/Rtmp/Rtmpv2Zko8/Rd2pdf810644c712e4/Rd2.aux)
+(/bmbl_data/Rtmp/RtmpCKXIpz/Rd2pdf12b84764df417b/Rd2.aux)
 (/usr/share/texlive/texmf-dist/tex/latex/base/ts1cmr.fd)
 (/usr/share/texlive/texmf-dist/tex/latex/psnfss/t1ptm.fd)
 (/usr/share/texlive/texmf-dist/tex/context/base/mkii/supp-pdf.mkii
 [Loading MPS to PDF converter (version 2006.09.02).]
 ) (/usr/share/texlive/texmf-dist/tex/latex/hyperref/nameref.sty
 (/usr/share/texlive/texmf-dist/tex/generic/oberdiek/gettitlestring.sty))
-(/bmbl_data/Rtmp/Rtmpv2Zko8/Rd2pdf810644c712e4/Rd2.out)
-(/bmbl_data/Rtmp/Rtmpv2Zko8/Rd2pdf810644c712e4/Rd2.out)
+(/bmbl_data/Rtmp/RtmpCKXIpz/Rd2pdf12b84764df417b/Rd2.out)
+(/bmbl_data/Rtmp/RtmpCKXIpz/Rd2pdf12b84764df417b/Rd2.out)
 (/usr/share/texlive/texmf-dist/tex/latex/psnfss/t1pcr.fd)
 (/usr/share/texlive/texmf-dist/tex/latex/psnfss/ts1ptm.fd)
 (/usr/share/texlive/texmf-dist/tex/latex/amsfonts/umsa.fd)
 (/usr/share/texlive/texmf-dist/tex/latex/amsfonts/umsb.fd)
 (/usr/share/texlive/texmf-dist/tex/latex/jknapltx/ursfs.fd)
-(/bmbl_data/Rtmp/Rtmpv2Zko8/Rd2pdf810644c712e4/Rd2.toc [1{/usr/share/texlive/te
-xmf-dist/fonts/map/pdftex/updmap/pdftex.map}]) [2] [3]
+(/bmbl_data/Rtmp/RtmpCKXIpz/Rd2pdf12b84764df417b/Rd2.toc [1{/usr/share/texlive/
+texmf-dist/fonts/map/pdftex/updmap/pdftex.map}]) [2] [3]
 Overfull \hbox (15.18042pt too wide) in paragraph at lines 146--146
  []\T1/pcr/m/n/9 SG <- initSGWT(data, signals = "signal", k = 8, J = 4, kernel_
 type = "heat")[] 
@@ -649,92 +637,88 @@ omwalk"))[]
 Overfull \hbox (1.07816pt too wide) in paragraph at lines 174--175
 []\T1/ptm/m/n/10 Type of Lapla-cian to com-pute: "un-nor-mal-ized", "nor-mal-iz
 ed", or "ran-domwalk". 
-[4] [5]
-Overfull \hbox (15.18042pt too wide) in paragraph at lines 299--299
+
+Overfull \hbox (2.65787pt too wide) in paragraph at lines 194--197
+[]\T1/ptm/m/n/10 Analyze whether sig-nals are k-band lim-ited by com-par-ing lo
+w-frequency and high-frequency Fourier
+[4] [5] [6]
+Overfull \hbox (15.18042pt too wide) in paragraph at lines 364--364
  []  \T1/pcr/m/n/9 ggplot(codex_toy_data, aes(x = X_cent, y = Y_cent, color = A
 nnotation5)) +[] 
 
-Overfull \hbox (15.18042pt too wide) in paragraph at lines 311--311
+Overfull \hbox (15.18042pt too wide) in paragraph at lines 376--376
  []\T1/pcr/m/n/9 bcl6nb_data <- codex_toy_data[codex_toy_data$Annotation5 == "B
 CL6- B Cell" &[] 
-[6] (/usr/share/texlive/texmf-dist/tex/latex/psnfss/ts1pcr.fd) [7]
-Overfull \hbox (9.78043pt too wide) in paragraph at lines 381--381
+[7] (/usr/share/texlive/texmf-dist/tex/latex/psnfss/ts1pcr.fd) [8]
+Overfull \hbox (9.78043pt too wide) in paragraph at lines 446--446
  []\T1/pcr/m/n/9 comparison <- compare_kernel_families(x_range = c(0, 5), scale
 _param = 1.5)[] 
 
-Overfull \hbox (60.78088pt too wide) in paragraph at lines 392--392
+Overfull \hbox (60.78088pt too wide) in paragraph at lines 457--457
  []\T1/pcr/m/n/10 compute_sgwt_filters(eigenvalues, scales, lmax = NULL, kernel
 _type = "heat")[] 
 
-Overfull \hbox (7.61737pt too wide) in paragraph at lines 404--405
+Overfull \hbox (7.61737pt too wide) in paragraph at lines 469--470
 []\T1/ptm/m/n/10 Kernel fam-ily that de-fines both scal-ing and wavelet fil-ter
 s (de-fault: "mex-i-can_hat",
 
-Overfull \hbox (31.3804pt too wide) in paragraph at lines 417--417
+Overfull \hbox (31.3804pt too wide) in paragraph at lines 482--482
  []\T1/pcr/m/n/9 filters_meyer <- compute_sgwt_filters(eigenvals, scales, kerne
 l_type = "meyer")[] 
 
-Overfull \hbox (20.58041pt too wide) in paragraph at lines 418--418
+Overfull \hbox (20.58041pt too wide) in paragraph at lines 483--483
  []\T1/pcr/m/n/9 filters_heat <- compute_sgwt_filters(eigenvals, scales, kernel
 _type = "heat")[] 
-[8] [9] [10] [11] [12]
-Overfull \hbox (2.60802pt too wide) in paragraph at lines 679--680
+[9] [10] [11] [12] [13]
+Overfull \hbox (2.60802pt too wide) in paragraph at lines 744--745
 []\T1/ptm/m/n/10 Character vec-tor of sig-nal col-umn names to an-a-lyze. If NU
 LL, all non-coordinate
-[13]
-Overfull \hbox (36.78088pt too wide) in paragraph at lines 746--746
+[14]
+Overfull \hbox (36.78088pt too wide) in paragraph at lines 811--811
  []\T1/pcr/m/n/10 plot_FM(SG, mode_type = "both", n_modes = 6, ncol = 3, point_
 size = 1.5)[] 
-[14]
-Overfull \hbox (66.78088pt too wide) in paragraph at lines 790--790
+[15]
+Overfull \hbox (66.78088pt too wide) in paragraph at lines 855--855
  []\T1/pcr/m/n/10 plot_sgwt_decomposition(SG, signal_name = NULL, plot_scales =
  NULL, ncol = 3)[] 
-[15] [16] [17]
-Overfull \hbox (5.07787pt too wide) in paragraph at lines 962--963
+[16] [17] [18]
+Overfull \hbox (5.07787pt too wide) in paragraph at lines 1027--1028
 []\T1/ptm/m/n/10 Number of eigen-val-ues/eigenvectors to com-pute (de-fault: NU
 LL, uses full length) 
-[18] [19]
-Overfull \hbox (9.78043pt too wide) in paragraph at lines 1053--1053
+[19] [20]
+Overfull \hbox (9.78043pt too wide) in paragraph at lines 1118--1118
  []\T1/pcr/m/n/9 energy_analysis <- sgwt_energy_analysis(SG_object, signal_name
  = "signal1")[] 
-[20]
-Overfull \hbox (7.55559pt too wide) in paragraph at lines 1141--1142
+[21]
+Overfull \hbox (7.55559pt too wide) in paragraph at lines 1206--1207
 []\T1/ptm/m/n/10 A list with two func-tions: list(scaling = func-tion(x, scale_
 param), wavelet = func-tion(x, scale_param)) 
-[21]
-Overfull \hbox (4.38043pt too wide) in paragraph at lines 1191--1191
+[22]
+Overfull \hbox (4.38043pt too wide) in paragraph at lines 1256--1256
  []\T1/pcr/m/n/9 inverse_result <- sgwt_inverse(sgwt_decomp, eigenvectors, orig
 inal_signal)[] 
 
-Overfull \hbox (47.58038pt too wide) in paragraph at lines 1194--1194
+Overfull \hbox (47.58038pt too wide) in paragraph at lines 1259--1259
  []\T1/pcr/m/n/9 inverse_result <- sgwt_inverse(sgwt_decomp, eigenvectors, orig
 inal_signals_matrix)[] 
-[22]
-Overfull \hbox (36.7804pt too wide) in paragraph at lines 1284--1284
- []\T1/pcr/m/n/9 patterns <- simulate_multiscale(Ra_seq = Ra_seq, Rb_seq = Rb_s
-eq, n_centers = 3)[] 
-
-Overfull \hbox (15.33502pt too wide) in paragraph at lines 1292--1296
+[23] [24] [25]
+Overfull \hbox (15.33502pt too wide) in paragraph at lines 1429--1433
 []\T1/ptm/m/n/10 Generate spa-tial pat-terns with mul-ti-ple cir-cu-lar cen-ter
 s at fixed po-si-tions. Sim-i-lar to sim-u-late_multiscale
-[23] [24] [25]
-Overfull \hbox (4.38043pt too wide) in paragraph at lines 1443--1443
+[26] [27]
+Overfull \hbox (4.38043pt too wide) in paragraph at lines 1580--1580
  []\T1/pcr/m/n/9 p <- visualize_checkerboard(df, color1 = "darkblue", color2 = 
 "lightgray")[] 
-[26]
-Overfull \hbox (36.7804pt too wide) in paragraph at lines 1497--1497
- []\T1/pcr/m/n/9 sim_data <- simulate_multiscale(Ra_seq = Ra_seq, Rb_seq = Rb_s
-eq, n_centers = 3)[] 
-[27] [28]
-Overfull \hbox (7.21751pt too wide) in paragraph at lines 1606--1608
+[28] [29] [30] [31]
+Overfull \hbox (7.21751pt too wide) in paragraph at lines 1814--1816
 []\T1/ptm/m/n/10 Whether to dis-play data point names as text la-bels us-ing gg
 re-pel (de-fault: FALSE).
-[29]
-Overfull \hbox (79.98035pt too wide) in paragraph at lines 1632--1632
+[32]
+Overfull \hbox (79.98035pt too wide) in paragraph at lines 1840--1840
  []\T1/pcr/m/n/9 plot_both <- visualize_similarity_xy(sim_results, show_labels 
 = TRUE, show_names = TRUE)[] 
-[30] (/bmbl_data/Rtmp/Rtmpv2Zko8/Rd2pdf810644c712e4/Rd2.ind [31] [32])
-(/bmbl_data/Rtmp/Rtmpv2Zko8/Rd2pdf810644c712e4/Rd2.aux) )
+[33] (/bmbl_data/Rtmp/RtmpCKXIpz/Rd2pdf12b84764df417b/Rd2.ind [34] [35])
+(/bmbl_data/Rtmp/RtmpCKXIpz/Rd2pdf12b84764df417b/Rd2.aux) )
 (see the transcript file for additional information){/usr/share/texlive/texmf-d
 ist/fonts/enc/dvips/base/8r.enc}</usr/share/texlive/texmf-dist/fonts/type1/publ
 ic/amsfonts/cm/cmsy10.pfb></usr/share/texlive/texmf-dist/fonts/type1/urw/courie
@@ -743,8 +727,8 @@ r/ucrr8a.pfb></usr/share/texlive/texmf-dist/fonts/type1/urw/courier/ucrro8a.pfb
 xlive/texmf-dist/fonts/type1/urw/times/utmr8a.pfb></usr/share/texlive/texmf-dis
 t/fonts/type1/urw/times/utmr8a.pfb></usr/share/texlive/texmf-dist/fonts/type1/u
 rw/times/utmri8a.pfb>
-Output written on Rd2.pdf (32 pages, 150415 bytes).
+Output written on Rd2.pdf (35 pages, 156339 bytes).
 Transcript written on Rd2.log.
 Saving output to ‘BioGSP-manual.pdf’ ...
 Done
-You may want to clean up by 'rm -Rf /bmbl_data/Rtmp/Rtmpv2Zko8/Rd2pdf810644c712e4'
+You may want to clean up by 'rm -Rf /bmbl_data/Rtmp/RtmpCKXIpz/Rd2pdf12b84764df417b'

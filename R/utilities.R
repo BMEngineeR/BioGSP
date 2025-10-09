@@ -309,6 +309,7 @@ hello_sgwt <- function() {
 #'   }
 #' @export
 #' @importFrom stats median wilcox.test
+#' @importFrom igraph graph_from_edgelist as_adjacency_matrix
 #'
 #' @examples
 #' \dontrun{
@@ -350,7 +351,7 @@ checkKband <- function(SG, signals = NULL, alpha = 0.05, verbose = TRUE, k = 25,
   
   coords <- data.in[, c(x_col, y_col)]
   n_nodes <- nrow(coords)
-  k_eigen <- floor(5*sqrt(n_nodes))
+  k_eigen <- floor(4*sqrt(n_nodes))
   
   if (verbose) {
     cat("Analyzing k-band limited property for", length(signals), "signals\n")
@@ -358,34 +359,18 @@ checkKband <- function(SG, signals = NULL, alpha = 0.05, verbose = TRUE, k = 25,
     cat("Building graph with k =", k, "neighbors...\n")
   }
   
-  # Build adjacency matrix using k-nearest neighbors
+  # Build k-nearest neighbor graph (same as runSpecGraph)
   if (!requireNamespace("RANN", quietly = TRUE)) {
     stop("RANN package is required for k-nearest neighbor graph construction")
   }
   
-  # Find k-nearest neighbors
-  knn_result <- RANN::nn2(coords, k = k + 1)  # +1 because first neighbor is the point itself
-  knn_indices <- knn_result$nn.idx[, -1]  # Remove self-neighbors
-  knn_distances <- knn_result$nn.dists[, -1]
-  
-  # Build adjacency matrix
-  adjacency_matrix <- Matrix::Matrix(0, nrow = n_nodes, ncol = n_nodes, sparse = TRUE)
-  
-  for (i in 1:n_nodes) {
-    neighbors <- knn_indices[i, ]
-    distances <- knn_distances[i, ]
-    
-    # Use Gaussian weights based on distances
-    weights <- exp(-distances^2 / (2 * median(distances)^2))
-    
-    for (j in seq_along(neighbors)) {
-      neighbor_idx <- neighbors[j]
-      if (neighbor_idx <= n_nodes) {  # Safety check
-        adjacency_matrix[i, neighbor_idx] <- weights[j]
-        adjacency_matrix[neighbor_idx, i] <- weights[j]  # Make symmetric
-      }
-    }
-  }
+  # Build k-nearest neighbor graph (unweighted connectivity)
+  nn <- RANN::nn2(coords, k = k + 1)
+  adj_list <- lapply(seq_len(n_nodes), function(i) setdiff(nn$nn.idx[i, ], i))
+  edges <- do.call(rbind, lapply(seq_along(adj_list), function(i) cbind(i, adj_list[[i]])))
+  edges <- unique(t(apply(edges, 1, sort)))
+  g <- igraph::graph_from_edgelist(edges, directed = FALSE)
+  adjacency_matrix <- igraph::as_adjacency_matrix(g, sparse = TRUE)
   
   # Compute Laplacian matrix
   if (verbose) cat("Computing Laplacian matrix...\n")
@@ -415,8 +400,8 @@ checkKband <- function(SG, signals = NULL, alpha = 0.05, verbose = TRUE, k = 25,
   
   # Find knee points
   if (verbose) cat("Finding knee points in eigenvalue spectra...\n")
-  knee_point_low <- find_knee_point(low_decomp$evalues, sensitivity = sensitivity)
-  knee_point_high <- find_knee_point(high_decomp$evalues, sensitivity = sensitivity)
+  knee_point_low <- find_knee_point(low_decomp$evalues)
+  knee_point_high <- find_knee_point(high_decomp$evalues)
   
   if (verbose) {
     cat("Low-frequency knee point at index:", knee_point_low, "\n")
@@ -464,26 +449,30 @@ checkKband <- function(SG, signals = NULL, alpha = 0.05, verbose = TRUE, k = 25,
     # Perform Wilcoxon test (one-sided: low > high)
     if (length(low_freq_fc_no_dc) > 0 && length(high_freq_fc) > 0) {
       # Test if low-frequency FC magnitudes are significantly greater than high-frequency FC magnitudes
+      low_freq_fc_no_dc_filtered <- abs(low_freq_fc_no_dc)[abs(low_freq_fc_no_dc) > mean(abs(low_freq_fc_no_dc))]
+      high_freq_fc_filtered <- abs(high_freq_fc)[abs(high_freq_fc) > mean(abs(high_freq_fc))]
+      # wilcox test with Wilcoxon rank sum test with continuity correction
       wilcox_result <- wilcox.test(
-        abs(low_freq_fc_no_dc), 
-        abs(high_freq_fc), 
+        low_freq_fc_no_dc_filtered, 
+        high_freq_fc_filtered, 
         alternative = "greater"
       )
-      p_value <- wilcox_result$p.value
-      is_significant <- p_value < alpha
+      # adjust the p-value for multiple testing (Bonferroni correction)
+      p_value_adjusted <- wilcox_result$p.value *length(signals)
+      is_significant <- p_value_adjusted < alpha
     } else {
-      p_value <- NA
+      p_value_adjusted <- NA
       is_significant <- FALSE
       warning(paste("Cannot perform Wilcoxon test for signal", sig, "due to insufficient data"))
     }
     
-    p_values[sig] <- p_value
+    p_values[sig] <- p_value_adjusted
     
     signal_results[[sig]] <- list(
       low_freq_fc = low_freq_fc,
       high_freq_fc = high_freq_fc,
       low_freq_fc_no_dc = low_freq_fc_no_dc,
-      p_value = p_value,
+      p_value_adjusted = p_value_adjusted,
       is_kband_limited = is_significant
     )
     
@@ -492,7 +481,7 @@ checkKband <- function(SG, signals = NULL, alpha = 0.05, verbose = TRUE, k = 25,
     }
     
     if (verbose) {
-      cat("  Wilcoxon test p-value:", round(p_value, 6), "\n")
+      cat("  Wilcoxon test p-value:", round(p_value_adjusted, 6), "\n")
       cat("  K-band limited:", is_significant, "\n")
     }
   }

@@ -2,6 +2,7 @@ BioGSP-package          BioGSP: Biological Graph Signal Processing for
                         Spatial Data Analysis
 FastDecompositionLap    Fast eigendecomposition of Laplacian matrix
 cal_laplacian           Calculate Graph Laplacian Matrix
+checkKband              Check K-band limited property of signals
 codex_toy_data          Toy CODEX Spatial Cell Type Data
 compare_kernel_families
                         Compare different kernel families
@@ -32,7 +33,10 @@ sgwt_get_kernels        Get a unified kernel family (low-pass and
                         band-pass) by kernel_type
 sgwt_inverse            Inverse SGWT transform (single or batch)
 simulate_checkerboard   Simulate checkerboard pattern
-simulate_multiscale     Simulate Multiple Center Patterns
+simulate_moving_circles
+                        Simulate Moving Circles Pattern
+simulate_multiscale     Simulate Multi-center Multi-scale Concentric
+                        Ring Patterns
 simulate_multiscale_overlap
                         Simulate Multiple Center Patterns with Fixed
                         Centers
@@ -40,7 +44,10 @@ simulate_stripe_patterns
                         Simulate Stripe Patterns
 visualize_checkerboard
                         Visualize checkerboard pattern
-visualize_multiscale    Visualize Multiple Center Simulation Results
+visualize_moving_circles
+                        Visualize Moving Circles Pattern
+visualize_multiscale    Visualize Multi-center Multi-scale Concentric
+                        Ring Patterns
 visualize_sgwt_kernels
                         Visualize SGWT kernels and scaling functions
 visualize_similarity_xy

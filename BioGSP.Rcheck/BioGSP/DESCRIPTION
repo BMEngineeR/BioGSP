@@ -16,10 +16,10 @@ BugReports: https://github.com/BMEngineeR/BioGSP/issues
 Encoding: UTF-8
 RoxygenNote: 7.2.3
 Imports: Matrix, igraph, RANN, RSpectra, ggplot2, patchwork, gridExtra,
-        viridis, methods
-Suggests: remotes, dplyr, knitr, rmarkdown, ggrepel
+        viridis, methods, dplyr
+Suggests: remotes, knitr, rmarkdown, ggrepel
 VignetteBuilder: knitr
 Depends: R (>= 3.5.0)
 NeedsCompilation: no
-Packaged: 2025-10-06 15:31:46 UTC; cha224
-Built: R 4.4.2; ; 2025-10-06 15:33:52 UTC; unix
+Packaged: 2025-10-09 01:57:59 UTC; cha224
+Built: R 4.4.2; ; 2025-10-09 01:58:47 UTC; unix

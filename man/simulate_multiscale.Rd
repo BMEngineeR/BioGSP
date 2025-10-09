@@ -2,13 +2,15 @@
 % Please edit documentation in R/simulation.R
 \name{simulate_multiscale}
 \alias{simulate_multiscale}
-\title{Simulate Multiple Center Patterns}
+\title{Simulate Multi-center Multi-scale Concentric Ring Patterns}
 \usage{
 simulate_multiscale(
   grid_size = 60,
-  n_centers = 3,
-  Ra_seq = c(10, 5, 1),
-  Rb_seq = c(10, 5, 1),
+  Ra_seq = seq(2.5, 20, by = 2.5),
+  n_steps = 10,
+  n_centers = 1,
+  outer_start = 40,
+  outer_end_factor = 1.2,
   seed = 123,
   verbose = TRUE
 )
@@ -16,23 +18,27 @@ simulate_multiscale(
 \arguments{
 \item{grid_size}{Size of the spatial grid (default: 60)}
 
-\item{n_centers}{Number of pattern centers to generate (default: 3)}
+\item{Ra_seq}{Vector of inner circle radii (default: seq(2.5, 20, by = 2.5))}
 
-\item{Ra_seq}{Vector of inner circle radii (default: c(10, 5, 1))}
+\item{n_steps}{Number of outer radius shrinkage steps (default: 10)}
 
-\item{Rb_seq}{Vector of outer ring radii (default: c(10, 5, 1))}
+\item{n_centers}{Number of circle centers (default: 1)}
+
+\item{outer_start}{Fixed starting outer radius (default: 40)}
+
+\item{outer_end_factor}{Outer radius shrinks to this factor × Ra (default: 1.2)}
 
 \item{seed}{Random seed for reproducible center placement (default: 123)}
 
 \item{verbose}{Logical; if TRUE, show progress bar and messages (default: TRUE)}
 }
 \value{
-List of data frames, each containing X, Y coordinates and circleA, circleB binary signals
+List of data frames, each containing X, Y coordinates and signal_1, signal_2 binary signals
 }
 \description{
-Generate spatial patterns with multiple circular centers at different scales.
-Creates concentric circle patterns with inner circle A and outer ring B at various
-radius combinations.
+Generate multi-center, multi-scale concentric ring simulation data.
+Creates patterns with inner circles and outer rings where the outer radius shrinks
+from a fixed starting point to a factor of the inner radius across multiple steps.
 }
 \examples{
 \dontrun{
@@ -40,8 +46,12 @@ radius combinations.
 patterns <- simulate_multiscale()
 
 # Custom parameters
-Ra_seq <- seq(from = 10, to = 3, length.out = 6)
-Rb_seq <- seq(from = 20, to = 3, length.out = 6)
-patterns <- simulate_multiscale(Ra_seq = Ra_seq, Rb_seq = Rb_seq, n_centers = 3)
+patterns <- simulate_multiscale(
+  grid_size = 80,
+  Ra_seq = seq(5, 25, by = 5),
+  n_steps = 8,
+  n_centers = 2,
+  outer_start = 50
+)
 }
 }

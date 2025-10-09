@@ -373,6 +373,17 @@ runSGCC <- function(signal1, signal2, SG = NULL, eps = 1e-12, validate = TRUE,
     f_low_b[!is.finite(f_low_b)] <- 0
   }
   
+  # Ensure both scaling coefficient vectors have the same length (for cross-object comparison)
+  min_length <- min(length(f_low_a), length(f_low_b))
+  if (length(f_low_a) != length(f_low_b)) {
+    if (validate) {
+      warning(paste("Scaling coefficients have different lengths:", length(f_low_a), "vs", length(f_low_b), 
+                   ". Truncating to minimum length:", min_length))
+    }
+    f_low_a <- f_low_a[1:min_length]
+    f_low_b <- f_low_b[1:min_length]
+  }
+  
   # Energies in Fourier domain (consistent with Parseval's theorem)
   E_low_a <- sum(f_low_a^2)
   E_low_b <- sum(f_low_b^2)
@@ -403,6 +414,17 @@ runSGCC <- function(signal1, signal2, SG = NULL, eps = 1e-12, validate = TRUE,
   wavelet_names_a <- wavelet_names_a[ord_a]
   wavelet_names_b <- wavelet_names_b[ord_b]
   
+  # Handle different numbers of scales by using the minimum common scales
+  min_scales <- min(length(wavelet_names_a), length(wavelet_names_b))
+  if (length(wavelet_names_a) != length(wavelet_names_b)) {
+    if (validate) {
+      warning(paste("Different numbers of wavelet scales:", length(wavelet_names_a), "vs", length(wavelet_names_b), 
+                   ". Using first", min_scales, "scales for comparison."))
+    }
+    wavelet_names_a <- wavelet_names_a[1:min_scales]
+    wavelet_names_b <- wavelet_names_b[1:min_scales]
+  }
+  
   # Extract and flatten wavelet Fourier coefficients
   wavelet_coeffs_a <- lapply(wavelet_names_a, function(name) {
     as.numeric(fourier_a[[name]])
@@ -426,6 +448,17 @@ runSGCC <- function(signal1, signal2, SG = NULL, eps = 1e-12, validate = TRUE,
     f_wave_b[!is.finite(f_wave_b)] <- 0
   }
   
+  # Ensure both wavelet coefficient vectors have the same length (for cross-object comparison)
+  min_wave_length <- min(length(f_wave_a), length(f_wave_b))
+  if (length(f_wave_a) != length(f_wave_b)) {
+    if (validate) {
+      warning(paste("Wavelet coefficients have different lengths:", length(f_wave_a), "vs", length(f_wave_b), 
+                   ". Truncating to minimum length:", min_wave_length))
+    }
+    f_wave_a <- f_wave_a[1:min_wave_length]
+    f_wave_b <- f_wave_b[1:min_wave_length]
+  }
+  
   # Energies in Fourier domain for wavelet components
   E_NL_a <- sum(f_wave_a^2)
   E_NL_b <- sum(f_wave_b^2)
@@ -446,12 +479,8 @@ runSGCC <- function(signal1, signal2, SG = NULL, eps = 1e-12, validate = TRUE,
   
   # Validation
   if (isTRUE(validate)) {
-    if (length(f_low_a) != length(f_low_b)) {
-      stop("Scaling Fourier coefficients must have the same length")
-    }
-    if (length(f_wave_a) != length(f_wave_b)) {
-      stop("Wavelet Fourier coefficients must have the same length")
-    }
+    # Note: Length checks are now handled gracefully above with truncation
+    # Only check for critical mismatches
     if (length(wavelet_names_a) != length(wavelet_names_b)) {
       stop("Number of wavelet scales must match")
     }

@@ -2,16 +2,19 @@
 % Please edit documentation in R/simulation.R
 \name{visualize_multiscale}
 \alias{visualize_multiscale}
-\title{Visualize Multiple Center Simulation Results}
+\title{Visualize Multi-center Multi-scale Concentric Ring Patterns}
 \usage{
 visualize_multiscale(
   sim_data,
   Ra_seq,
-  Rb_seq,
-  bg_color = "grey",
-  signal1_color = "red",
-  signal2_color = "blue",
-  show_title = TRUE
+  n_steps,
+  bg_color = "grey90",
+  signal1_color = "#16964a",
+  signal2_color = "#2958a8",
+  show_subtitle = TRUE,
+  sort_order = c("ascending", "descending"),
+  panel_spacing = 0.1,
+  title_size = 12
 )
 }
 \arguments{
@@ -19,29 +22,38 @@ visualize_multiscale(
 
 \item{Ra_seq}{Vector of Ra values used in simulation}
 
-\item{Rb_seq}{Vector of Rb values used in simulation}
+\item{n_steps}{Number of steps used in simulation}
 
-\item{bg_color}{Background color for plots (default: "grey")}
+\item{bg_color}{Background color for plots (default: "grey90")}
 
-\item{signal1_color}{Color for signal 1 (default: "red")}
+\item{signal1_color}{Color for signal 1 (default: "#16964a")}
 
-\item{signal2_color}{Color for signal 2 (default: "blue")}
+\item{signal2_color}{Color for signal 2 (default: "#2958a8")}
 
-\item{show_title}{Logical; if TRUE (default), add titles to plots with Ra and Rb values}
+\item{show_subtitle}{Logical; if TRUE (default), show parameter values in facet labels}
+
+\item{sort_order}{Order for sorting ("ascending" or "descending", default: "ascending")}
+
+\item{panel_spacing}{Control spacing between panels in lines (default: 0.1)}
+
+\item{title_size}{Size of title text (default: 12)}
 }
 \value{
-Combined ggplot object with all pattern visualizations
+ggplot object with faceted visualization
 }
 \description{
-Create visualization plots for multiple center simulation patterns
+Visualize the simulated concentric ring patterns from simulate_multiscale
 }
 \examples{
 \dontrun{
 # Generate and visualize patterns
-Ra_seq <- seq(from = 10, to = 3, length.out = 6)
-Rb_seq <- seq(from = 20, to = 3, length.out = 6)
-sim_data <- simulate_multiscale(Ra_seq = Ra_seq, Rb_seq = Rb_seq, n_centers = 3)
-plot_grid <- visualize_multiscale(sim_data, Ra_seq, Rb_seq)
+sim_data <- simulate_multiscale(
+  Ra_seq = seq(2.5, 20, by = 2.5),
+  n_steps = 10
+)
+plot_grid <- visualize_multiscale(sim_data, 
+                                 Ra_seq = seq(2.5, 20, by = 2.5), 
+                                 n_steps = 10)
 print(plot_grid)
 }
 }

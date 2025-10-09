@@ -115,15 +115,6 @@ print(paste("SGCC Score:", round(similarity$S, 4)))
 print(paste("Low-frequency similarity:", round(similarity$c_low, 4)))
 print(paste("High-frequency similarity:", round(similarity$c_nonlow, 4)))
 print(paste("Energy weights - Low:", round(similarity$w_low, 4), "High:", round(similarity$w_NL, 4)))
-
-# Or compare between different SGWT objects
-SG2 <- initSGWT(demo_data, signals = "signal2", J = 4)
-# Scales auto-generated during graph construction
-SG2 <- runSpecGraph(SG2, k = 8, laplacian_type = "normalized", length_eigenvalue = 30)
-SG2 <- runSGWT(SG2)
-
-similarity_cross <- runSGCC(SG, SG2)  # Compare first signals from each object
-print(paste("Cross-object SGCC Score:", round(similarity_cross$S, 4)))
 ```
 
 ### Visualize Similarity Space
@@ -132,9 +123,10 @@ print(paste("Cross-object SGCC Score:", round(similarity_cross$S, 4)))
 # Generate multiple patterns for similarity analysis
 patterns <- simulate_multiscale(
   grid_size = 40,
+  Ra_seq = c(5, 10, 15),   # Inner circle radii
+  n_steps = 5,             # Number of shrinkage steps
   n_centers = 1,
-  Ra_seq = c(1, 5, 10),    # Inner circle radii
-  Rb_seq = c(2, 6, 15),    # Outer ring radii
+  outer_start = 25,        # Fixed starting outer radius
   seed = 123
 )
 
@@ -167,6 +159,34 @@ similarity_plot <- visualize_similarity_xy(
 print(similarity_plot)
 ```
 
+### Moving Circles Pattern Analysis
+
+```r
+# Generate moving circles patterns with mutual exclusion
+moving_patterns <- simulate_moving_circles(
+  grid_size = 40,
+  radius_seq = c(6, 10, 14),  # Three different radii
+  n_steps = 5,                # Five movement steps
+  center_distance = 20,       # Initial distance from center
+  radius2_factor = 1.3        # Second circle is 1.3x larger
+)
+
+# Visualize the patterns
+moving_viz <- visualize_moving_circles(moving_patterns)
+print(moving_viz)
+
+# Analyze one pattern with SGWT
+selected_pattern <- moving_patterns[["Ra_10_Step_3"]]
+SG_moving <- initSGWT(selected_pattern, x_col = "X", y_col = "Y", 
+                     signals = c("signal_1", "signal_2"), J = 4)
+SG_moving <- runSpecGraph(SG_moving, k = 12, verbose = FALSE)
+SG_moving <- runSGWT(SG_moving, verbose = FALSE)
+
+# Calculate similarity between moving circles
+similarity <- runSGCC("signal_1", "signal_2", SG = SG_moving, return_parts = TRUE)
+print(paste("Moving circles similarity:", round(similarity$S, 4)))
+```
+
 ## SGWT Object Structure
 
 The new SGWT object contains:
@@ -197,6 +217,10 @@ The new SGWT object contains:
 | `plot_sgwt_decomposition()` | Visualize SGWT results |
 | `sgwt_energy_analysis()` | Analyze energy distribution across scales in Fourier domain (excludes DC) |
 | `visualize_similarity_xy()` | Plot similarity space: low-frequency vs non-low-frequency |
+| `simulate_multiscale()` | Generate concentric ring patterns with varying radii |
+| `simulate_moving_circles()` | Generate moving circles patterns with mutual exclusion |
+| `visualize_multiscale()` | Visualize concentric ring patterns |
+| `visualize_moving_circles()` | Visualize moving circles patterns |
 | `demo_sgwt()` | Run complete demonstration |
 
 ## Advanced Features

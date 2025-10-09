@@ -1,5 +1,6 @@
 BioGSP-package	BioGSP-package
 cal_laplacian	cal_laplacian
+checkKband	checkKband
 codex_toy_data	codex_toy_data
 compare_kernel_families	compare_kernel_families
 compute_sgwt_filters	compute_sgwt_filters
@@ -25,10 +26,12 @@ sgwt_forward	sgwt_forward
 sgwt_get_kernels	sgwt_get_kernels
 sgwt_inverse	sgwt_inverse
 simulate_checkerboard	simulate_checkerboard
+simulate_moving_circles	simulate_moving_circles
 simulate_multiscale	simulate_multiscale
 simulate_multiscale_overlap	simulate_multiscale_overlap
 simulate_stripe_patterns	simulate_stripe_patterns
 visualize_checkerboard	visualize_checkerboard
+visualize_moving_circles	visualize_moving_circles
 visualize_multiscale	visualize_multiscale
 visualize_sgwt_kernels	visualize_sgwt_kernels
 visualize_similarity_xy	visualize_similarity_xy
