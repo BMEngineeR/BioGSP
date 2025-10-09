@@ -247,9 +247,6 @@ visualize_multiscale <- function(
     panel_spacing = 0.1,
     title_size = 12
 ) {
-  # Avoid R CMD check notes for global variables
-  name <- Ra <- Step <- signal_1 <- signal_2 <- NULL
-  
   sort_order <- match.arg(sort_order)
   
   if (!requireNamespace("dplyr", quietly = TRUE)) {
@@ -646,9 +643,6 @@ visualize_moving_circles <- function(
     panel_spacing  = 0.1,
     title_size     = 12
 ) {
-  # Avoid R CMD check notes for global variables
-  name <- Ra <- Step <- signal_1 <- signal_2 <- NULL
-  
   sort_order <- match.arg(sort_order)
   if (!requireNamespace("dplyr", quietly = TRUE))   stop("Please install 'dplyr'.")
   if (!requireNamespace("ggplot2", quietly = TRUE)) stop("Please install 'ggplot2'.")

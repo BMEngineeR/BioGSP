@@ -1,0 +1,695 @@
+---
+title: "BioGSP: Spectral Graph Wavelet Transform for Spatial Data (New Workflow)"
+author: "Yuzhou"
+date: "`r Sys.Date()`"
+output: 
+  html_document:
+    toc: true
+    toc_float: true
+    code_folding: show
+    theme: flatly
+vignette: >
+  %\VignetteIndexEntry{BioGSP: Spectral Graph Wavelet Transform for Spatial Data}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE, warning = FALSE, message = FALSE, 
+                      fig.width = 10, fig.height = 6)
+```
+
+# Introduction
+
+BioGSP provides **Spectral Graph Wavelet Transform (SGWT)** analysis for spatial biological data. This package enables multi-scale analysis of spatial patterns using graph signal processing techniques.
+
+
+## Key Capabilities
+
+- **Object-oriented SGWT workflow** with clear separation of concerns
+- **Multi-scale spatial analysis** using spectral graph wavelets
+- **Flexible data input** with custom column naming
+- **Energy-normalized similarity analysis** with comprehensive metrics
+- **Multiple wavelet kernels** (Mexican Hat, Meyer, Heat)
+- **Comprehensive visualization** tools
+- **Detailed inverse transform results** (low-pass, band-pass approximations)
+
+## New Workflow Overview
+
+The new workflow consists of five main steps:
+
+1. **`initSGWT()`**: Initialize SGWT object with data and parameters
+2. **`checkKband()`**: Analyze k-band limited property of signals (optional)
+3. **`runSpecGraph()`**: Build spectral graph structure
+4. **`runSGWT()`**: Perform forward and inverse SGWT transforms
+5. **`runSGCC()`**: Calculate energy-normalized weighted similarity
+
+# Setup
+
+```{r load-libraries}
+# Load required packages
+library(ggplot2)
+library(patchwork)
+library(viridis)
+library(Matrix)
+library(igraph)
+library(RANN)
+library(RSpectra)
+
+# Load BioGSP functions
+source('../R/simulation.R')
+source('../R/sgwt_core.R')
+source('../R/sgwt_main.R')
+source('../R/utilities.R')
+source('../R/visualization.R')
+
+# Set random seed for reproducibility
+set.seed(123)
+```
+
+# New SGWT Workflow Demonstration
+
+## Generate Example Pattern
+
+```{r generate-pattern}
+# Create a spatial pattern with concentric circles
+demo_pattern <- simulate_multiscale(
+  grid_size = 40,        # Moderate size for fast computation
+  n_centers = 1,         # Single center pattern
+  Ra_seq = 5,            # Inner circle radius
+  n_steps = 1,           # Single step (one pattern)
+  outer_start = 10,      # Outer ring radius
+  seed = 123
+)[[1]]
+
+# Display pattern structure
+cat("Generated pattern dimensions:", nrow(demo_pattern), "x", ncol(demo_pattern), "\n")
+cat("Column names:", paste(colnames(demo_pattern), collapse = ", "), "\n")
+cat("Signals available:", sum(demo_pattern$signal_1), "inner pixels,", sum(demo_pattern$signal_2), "outer pixels\n")
+```
+
+## K-band Limited Analysis
+
+```{r kband-analysis}
+# Demonstrate k-band limited property analysis
+cat("=== K-band Limited Property Analysis ===\n")
+
+# Initialize SGWT object for k-band analysis
+SG_kband <- initSGWT(
+  data.in = demo_pattern,
+  x_col = "X",
+  y_col = "Y", 
+  signals = c("signal_1", "signal_2")
+)
+
+# Run k-band analysis (builds graph internally)
+kband_result <- checkKband(
+  SG = SG_kband,
+  signals = c("signal_1", "signal_2"),
+  k = 15,                    # Number of neighbors for graph construction
+  alpha = 0.05,              # Significance level for Wilcoxon test
+  verbose = FALSE
+)
+
+# Display results
+cat("\n=== K-band Analysis Results ===\n")
+cat("All signals are k-band limited:", kband_result$is_kband_limited, "\n")
+cat("Low-frequency knee point:", kband_result$knee_point_low, "\n")
+```
+
+## Visualize Input Pattern
+
+```{r visualize-pattern, fig.width=10, fig.height=4}
+# Create visualizations for both signals
+p1 <- ggplot(demo_pattern, aes(X, Y, fill = factor(signal_1))) +
+  geom_tile() +
+  scale_fill_manual(values = c("0" = "white", "1" = "#e31a1c"), 
+                    name = "Signal", labels = c("Background", "Inner Circle")) +
+  coord_fixed() + theme_void() + ggtitle("Signal 1: Inner Circles")
+
+p2 <- ggplot(demo_pattern, aes(X, Y, fill = factor(signal_2))) +
+  geom_tile() +
+  scale_fill_manual(values = c("0" = "white", "1" = "#1f78b4"), 
+                    name = "Signal", labels = c("Background", "Outer Ring")) +
+  coord_fixed() + theme_void() + ggtitle("Signal 2: Outer Rings")
+
+print(p1 + p2)
+```
+
+## Step 1: Initialize SGWT Object
+
+```{r init-sgwt}
+# Initialize SGWT object with custom column names
+SG <- initSGWT(
+  data.in = demo_pattern,
+  x_col = "X",           # Custom X coordinate column name
+  y_col = "Y",           # Custom Y coordinate column name
+  signals = c("signal_1", "signal_2"),  # Analyze both signals
+  J = 2,                 # Number of wavelet scales
+  scaling_factor = 1,    # Scale progression factor
+  kernel_type = "mexican_hat"
+)
+
+# Display initialized object
+print(SG)
+```
+
+## Step 2: Build Spectral Graph
+
+```{r build-graph}
+# Build spectral graph structure
+SG <- runSpecGraph(SG, k = 12, laplacian_type = "normalized", length_eigenvalue = 200, verbose = TRUE)
+
+# Check updated object
+cat("Graph construction completed!\n")
+cat("Adjacency matrix dimensions:", dim(SG$Graph$adjacency_matrix), "\n")
+cat("Number of eigenvalues computed:", length(SG$Graph$eigenvalues), "\n")
+```
+
+## Visualize Fourier Modes (Eigenvectors)
+
+```{r fourier-modes, fig.width=12, fig.height=8}
+# Visualize Fourier modes (eigenvectors) - 5 low and 5 high frequency modes
+fourier_modes <- plot_FM(SG, mode_type = "both", n_modes = 5, ncol = 5)
+
+cat("Fourier Modes Visualization:\n")
+cat("- Low-frequency modes (2-6): Smooth spatial patterns, excluding DC component\n")
+cat("- High-frequency modes (96-100): Fine-detailed spatial patterns\n")
+cat("- Each mode shows its eigenvalue (λ) indicating frequency content\n")
+```
+
+## Step 3: Run SGWT Analysis
+
+```{r run-sgwt}
+# Perform SGWT forward and inverse transforms
+SG <- runSGWT(SG, verbose = TRUE)
+
+# Display final object with all results
+print(SG)
+```
+
+## Visualize SGWT Decomposition
+
+```{r plot-decomposition, fig.width=12, fig.height=8}
+# Plot SGWT decomposition results for signal_1
+decomp_plots <- plot_sgwt_decomposition(
+  SG = SG,
+  signal_name = "signal_1",
+  plot_scales = 1:3,     # Show first 3 scales
+  ncol = 3
+)
+
+```
+
+## Energy Analysis
+
+```{r energy-analysis}
+# Analyze energy distribution across scales for signal_1
+energy_analysis <- sgwt_energy_analysis(SG, "signal_1")
+print(energy_analysis)
+
+# Create energy distribution plot
+energy_plot <- ggplot(energy_analysis, aes(x = scale, y = energy_ratio)) +
+  geom_bar(stat = "identity", fill = "steelblue", alpha = 0.7) +
+  geom_text(aes(label = paste0(round(energy_ratio * 100, 1), "%")), 
+            vjust = -0.5, size = 3) +
+  labs(title = "Energy Distribution Across SGWT Scales (Signal 1)",
+       x = "Scale", y = "Energy Ratio") +
+  theme_minimal() +
+  theme(axis.text.x = element_text(angle = 45, hjust = 1))
+
+print(energy_plot)
+```
+
+# Advanced Features Demonstration
+
+## Different Wavelet Kernels
+
+```{r kernel-comparison}
+# Compare different kernel types
+kernels <- c("mexican_hat", "meyer", "heat")
+kernel_results <- list()
+
+for (kn in kernels) {
+  # Initialize with different kernel
+  SG_temp <- initSGWT(
+    data.in = demo_pattern,
+    x_col = "X", y_col = "Y",
+    signals = "signal_1",
+    J = 3,                    # Reduced for faster computation
+    kernel_type = kn
+  )
+  
+  # Run full workflow
+  SG_temp <- runSpecGraph(SG_temp, k = 12, laplacian_type = "normalized", length_eigenvalue = 100,verbose = FALSE)
+  SG_temp <- runSGWT(SG_temp, verbose = FALSE)
+  
+  kernel_results[[kn]] <- SG_temp
+}
+
+# Compare reconstruction errors
+comparison_df <- data.frame(
+  Kernel = kernels,
+  RMSE = sapply(kernel_results, function(x) x$Inverse$signal_1$reconstruction_error),
+  stringsAsFactors = FALSE
+)
+
+print("Kernel Performance Comparison:")
+print(comparison_df)
+
+# Plot comparison
+ggplot(comparison_df, aes(x = Kernel, y = RMSE, fill = Kernel)) +
+  geom_bar(stat = "identity", alpha = 0.7) +
+  geom_text(aes(label = round(RMSE, 6)), vjust = -0.5) +
+  scale_fill_viridis_d() +
+  labs(title = "SGWT Reconstruction Error by Kernel Type",
+       x = "Kernel Type", y = "RMSE") +
+  theme_minimal()
+```
+
+## Step 4: Pattern Similarity Analysis
+
+```{r similarity-analysis}
+# Calculate similarity between signal_1 and signal_2 in same object
+similarity_within <- runSGCC("signal_1", "signal_2", SG = SG, return_parts = TRUE)
+
+cat("Pattern Similarity Analysis (within same graph):\n")
+cat(sprintf("Overall similarity: %.4f\n", similarity_within$S))
+cat(sprintf("Low-frequency similarity: %.4f\n", similarity_within$c_low))
+cat(sprintf("Non-low-frequency similarity: %.4f\n", similarity_within$c_nonlow))
+cat(sprintf("Energy weights - Low: %.3f, Non-low: %.3f\n", 
+           similarity_within$w_low, similarity_within$w_NL))
+
+# Generate a second pattern for cross-comparison
+pattern_2 <- simulate_multiscale(
+  grid_size = 40,
+  n_centers = 1,
+  Ra_seq = 8,            # Different inner radius
+  n_steps = 1,           # Single step
+  outer_start = 15,      # Different outer radius
+  seed = 456
+)[[1]]
+
+# Create second SGWT object
+SG2 <- initSGWT(pattern_2, x_col = "X", y_col = "Y", signals = "signal_1", 
+                J = 4)
+SG2 <- runSpecGraph(SG2, k = 12, laplacian_type = "normalized",length_eigenvalue = 100, verbose = FALSE)
+SG2 <- runSGWT(SG2, verbose = FALSE)
+
+# Note: Cross-object similarity comparison removed due to different eigenvalue counts
+# between SG (200 eigenvalues) and SG2 (100 eigenvalues) causing dimension mismatch
+
+# Visualize both patterns for comparison
+p_comp1 <- ggplot(demo_pattern, aes(X, Y, fill = factor(signal_1))) +
+  geom_tile() + scale_fill_manual(values = c("0" = "white", "1" = "#e31a1c")) +
+  coord_fixed() + theme_void() + theme(legend.position = "none") +
+
+    ggtitle("Pattern A (R_in=5, R_out=10)")
+
+p_comp2 <- ggplot(pattern_2, aes(X, Y, fill = factor(signal_1))) +
+  geom_tile() + scale_fill_manual(values = c("0" = "white", "1" = "#1f78b4")) +
+  coord_fixed() + theme_void() + theme(legend.position = "none") +
+  ggtitle("Pattern B (R_in=7, R_out=12)")
+
+print(p_comp1 + p_comp2)
+```
+
+## Low-frequency Only Analysis
+
+```{r low-frequency-analysis}
+# Compare using only low-frequency components
+similarity_low <- runSGCC("signal_1", "signal_2", SG = SG, low_only = TRUE, return_parts = TRUE)
+
+cat("Low-frequency Only Similarity Analysis:\n")
+cat(sprintf("Low-frequency similarity: %.4f\n", similarity_low$c_low))
+cat(sprintf("Overall score (same as low-freq): %.4f\n", similarity_low$S))
+cat("Note: Non-low-frequency components are ignored (c_nonlow = NA)\n")
+
+# Compare with full analysis
+cat("\nComparison:\n")
+cat(sprintf("Full analysis similarity: %.4f\n", similarity_within$S))
+cat(sprintf("Low-only similarity: %.4f\n", similarity_low$S))
+cat(sprintf("Difference: %.4f\n", abs(similarity_within$S - similarity_low$S)))
+```
+
+## Multiple Signal Analysis
+
+```{r multiple-signals}
+# Analyze energy distribution for both signals
+energy_signal1 <- sgwt_energy_analysis(SG, "signal_1")
+energy_signal2 <- sgwt_energy_analysis(SG, "signal_2")
+
+# Combine for comparison
+energy_comparison <- rbind(energy_signal1, energy_signal2)
+
+# Plot comparison
+ggplot(energy_comparison, aes(x = scale, y = energy_ratio, fill = signal)) +
+  geom_bar(stat = "identity", position = "dodge", alpha = 0.7) +
+  geom_text(aes(label = paste0(round(energy_ratio * 100, 1), "%")), 
+            position = position_dodge(width = 0.9), vjust = -0.5, size = 3) +
+  scale_fill_viridis_d() +
+  labs(title = "Energy Distribution Comparison: Signal 1 vs Signal 2",
+       x = "Scale", y = "Energy Ratio", fill = "Signal") +
+  theme_minimal() +
+  theme(axis.text.x = element_text(angle = 45, hjust = 1))
+```
+
+## Similarity Space Visualization with Multiple Patterns
+
+```{r similarity-visualization, fig.width=12, fig.height=10}
+# Generate 9 paired patterns using simulate_multiscale
+cat("Generating 9 paired patterns for similarity analysis...\n")
+
+patterns_9 <- simulate_multiscale(
+  grid_size = 40,
+  n_centers = 1,
+  Ra_seq = c(3, 6, 9),     # Inner circle radii
+  n_steps = 3,             # 3 shrinkage steps
+  outer_start = 20,        # Fixed starting outer radius
+  seed = 123
+)
+
+cat("Generated", length(patterns_9), "patterns\n")
+cat("Pattern names:", names(patterns_9), "\n")
+
+# Visualize all 9 patterns first
+pattern_viz <- visualize_multiscale(
+  patterns_9, 
+  Ra_seq = c(3, 6, 9), 
+  n_steps = 3,
+  show_subtitle = TRUE
+)
+print(pattern_viz)
+
+# Create SGWT objects for all 9 patterns and compute similarities
+similarity_results <- list()
+sgwt_objects <- list()
+
+cat("\nProcessing patterns and computing SGWT analysis...\n")
+
+# Process each pattern
+for (i in seq_along(patterns_9)) {
+  pattern_name <- names(patterns_9)[i]
+  pattern_data <- patterns_9[[i]]
+  
+  cat("Processing", pattern_name, "...\n")
+  
+  # Create SGWT object
+  SG_temp <- initSGWT(
+    data.in = pattern_data,
+    x_col = "X", 
+    y_col = "Y", 
+    signals = c("signal_1", "signal_2"),
+    J = 4,
+    kernel_type = "heat"
+  )
+  
+  # Build graph and run SGWT
+  SG_temp <- runSpecGraph(SG_temp, k = 12, laplacian_type = "normalized", 
+                         length_eigenvalue = 50, verbose = FALSE)
+  SG_temp <- runSGWT(SG_temp, verbose = FALSE)
+  
+  sgwt_objects[[pattern_name]] <- SG_temp
+  
+  # Compute within-pattern similarity (signal_1 vs signal_2)
+  sim_within <- runSGCC("signal_1", "signal_2", SG = SG_temp, return_parts = TRUE)
+  similarity_results[[pattern_name]] <- sim_within
+}
+
+# Print similarity results summary
+cat("\nSimilarity Results Summary (signal_1 vs signal_2 within each pattern):\n")
+similarity_df <- data.frame(
+  Pattern = names(similarity_results),
+  S = sapply(similarity_results, function(x) x$S),
+  c_low = sapply(similarity_results, function(x) x$c_low),
+  c_nonlow = sapply(similarity_results, function(x) x$c_nonlow),
+  w_low = sapply(similarity_results, function(x) x$w_low),
+  w_NL = sapply(similarity_results, function(x) x$w_NL),
+  stringsAsFactors = FALSE
+)
+
+print(similarity_df)
+
+# Extract Ra and Step values for better labeling
+similarity_df$Ra <- as.numeric(gsub(".*Ra_([0-9.]+)_Step.*", "\\1", similarity_df$Pattern))
+similarity_df$Step <- as.numeric(gsub(".*Step_([0-9]+)$", "\\1", similarity_df$Pattern))
+similarity_df$Label <- paste0("Ra=", similarity_df$Ra, ",Step=", similarity_df$Step)
+
+# Create similarity space visualization
+similarity_plot <- visualize_similarity_xy(
+  similarity_results,
+  point_size = 4,
+  point_color = "steelblue",
+  add_diagonal = TRUE,
+  add_axes_lines = TRUE,
+  title = "SGWT Similarity Space: 9 Paired Patterns (signal_1 vs signal_2)",
+  show_labels = TRUE
+)
+
+print(similarity_plot)
+
+# Create enhanced plot with color coding by Ra values
+library(ggplot2)
+plot_data <- data.frame(
+  c_low = similarity_df$c_low,
+  c_nonlow = similarity_df$c_nonlow,
+  Ra = factor(similarity_df$Ra),
+  Step = factor(similarity_df$Step),
+  Label = similarity_df$Label,
+  S = similarity_df$S
+)
+
+enhanced_plot <- ggplot(plot_data, aes(x = c_low, y = c_nonlow, color = Ra, shape = Step)) +
+  geom_point(size = 5, alpha = 0.8) +
+  geom_text(aes(label = Label), vjust = -0.8, hjust = 0.5, size = 3, color = "black") +
+  xlim(-1, 1) + ylim(-1, 1) +
+  geom_hline(yintercept = 0, linetype = "dashed", color = "gray60", alpha = 0.7) +
+  geom_vline(xintercept = 0, linetype = "dashed", color = "gray60", alpha = 0.7) +
+  geom_abline(slope = 1, intercept = 0, linetype = "dotted", color = "gray40", alpha = 0.7) +
+  geom_abline(slope = -1, intercept = 0, linetype = "dotted", color = "gray40", alpha = 0.7) +
+  scale_color_viridis_d(name = "Inner Radius (Ra)") +
+  scale_shape_manual(values = c(16, 17, 15), name = "Shrinkage Step") +
+  labs(
+    title = "Enhanced Similarity Space: Color by Ra, Shape by Step",
+    x = "Low-frequency Similarity (c_low)",
+    y = "Non-low-frequency Similarity (c_nonlow)"
+  ) +
+  theme_minimal() +
+  theme(
+    plot.title = element_text(hjust = 0.5, size = 14, face = "bold"),
+    legend.position = "right"
+  )
+
+print(enhanced_plot)
+
+# Analysis of patterns
+cat("\nPattern Analysis:\n")
+cat("Ra (Inner Radius) Effect:\n")
+for (ra in unique(similarity_df$Ra)) {
+  subset_data <- similarity_df[similarity_df$Ra == ra, ]
+  cat(sprintf("  Ra=%g: Mean c_low=%.3f, Mean c_nonlow=%.3f, Mean S=%.3f\n", 
+              ra, mean(subset_data$c_low), mean(subset_data$c_nonlow), mean(subset_data$S)))
+}
+
+cat("\nStep (Shrinkage Step) Effect:\n")
+for (step in unique(similarity_df$Step)) {
+  subset_data <- similarity_df[similarity_df$Step == step, ]
+  cat(sprintf("  Step=%g: Mean c_low=%.3f, Mean c_nonlow=%.3f, Mean S=%.3f\n", 
+              step, mean(subset_data$c_low), mean(subset_data$c_nonlow), mean(subset_data$S)))
+}
+
+cat("\nSimilarity Space Interpretation:\n")
+cat("- Each point represents similarity between signal_1 (inner circle) and signal_2 (outer ring)\n")
+cat("- Color indicates inner radius (Ra): different colors for different inner radii\n")
+cat("- Shape indicates shrinkage step: circle/triangle/square for different steps\n")
+cat("- Position shows frequency-domain similarity characteristics\n")
+```
+
+## Moving Circles Pattern Analysis
+
+```{r moving-circles-demo, fig.width=12, fig.height=8}
+# Generate moving circles pattern
+cat("Generating moving circles pattern...\n")
+moving_circles_data <- simulate_moving_circles(
+  grid_size = 40,
+  radius_seq = c(6, 10, 14),  # Three different radii
+  n_steps = 5,                # Five movement steps
+  center_distance = 20,       # Initial distance from center
+  radius2_factor = 1.3,       # Second circle is 1.3x larger
+  seed = 789
+)
+
+cat("Moving circles dimensions:", length(moving_circles_data), "patterns\n")
+cat("Pattern names:", head(names(moving_circles_data), 3), "...\n")
+
+# Visualize the moving circles pattern
+moving_viz <- visualize_moving_circles(
+  moving_circles_data,
+  show_subtitle = TRUE
+)
+print(moving_viz + ggtitle("Moving Circles Pattern: Two Circles Approaching Each Other"))
+
+# Run SGWT analysis on one moving circles pattern
+cat("\nRunning SGWT analysis on moving circles pattern...\n")
+
+# Select one pattern for detailed analysis
+selected_pattern <- moving_circles_data[["Ra_10_Step_3"]]  # Middle radius, middle step
+
+# Initialize SGWT object
+SG_moving <- initSGWT(
+  data.in = selected_pattern,
+  x_col = "X", 
+  y_col = "Y", 
+  signals = c("signal_1", "signal_2"),
+  J = 4,
+  kernel_type = "heat"
+)
+
+# Build spectral graph
+SG_moving <- runSpecGraph(SG_moving, k = 12, laplacian_type = "normalized", 
+                         length_eigenvalue = 50, verbose = FALSE)
+
+# Run SGWT transforms
+SG_moving <- runSGWT(SG_moving, verbose = FALSE)
+
+# Calculate similarity between the two moving circles
+similarity_moving <- runSGCC("signal_1", "signal_2", SG = SG_moving, return_parts = TRUE)
+
+cat("\nMoving Circles Pattern Similarity Analysis:\n")
+cat("==========================================\n")
+cat(sprintf("Weighted similarity (S): %.6f\n", similarity_moving$S))
+cat(sprintf("Low-frequency similarity (c_low): %.6f\n", similarity_moving$c_low))
+cat(sprintf("Non-low-frequency similarity (c_nonlow): %.6f\n", similarity_moving$c_nonlow))
+cat(sprintf("Energy weights - Low: %.3f, Non-low: %.3f\n", 
+           similarity_moving$w_low, similarity_moving$w_NL))
+
+cat("\nInterpretation:\n")
+cat("- Moving circles create dynamic spatial patterns with mutual exclusion\n")
+cat("- Signal assignment priority ensures no overlap (signal_1 takes precedence)\n")
+cat("- Similarity reflects spatial relationship between approaching circles\n")
+
+# Visualize the selected pattern
+p_selected <- ggplot(selected_pattern, aes(X, Y, fill = factor(signal_1 + signal_2 * 2))) +
+  geom_tile() + 
+  scale_fill_manual(values = c("0" = "white", "1" = "#16964a", "2" = "#2958a8"), 
+                    name = "Signal", labels = c("Background", "Circle 1", "Circle 2")) +
+  coord_fixed() + theme_void() + 
+  ggtitle("Selected Moving Circles Pattern (Ra=10, Step=3)") +
+  theme(legend.position = "bottom")
+
+print(p_selected)
+```
+
+# Advanced Workflow Features
+
+## Custom Parameters
+
+```{r custom-parameters}
+# Demonstrate advanced parameter customization
+SG_advanced <- initSGWT(
+  data.in = demo_pattern,
+  x_col = "X", y_col = "Y",
+  signals = "signal_1",
+  J = 6,                     # More scales for finer analysis
+  scaling_factor = 1.5,      # Closer scales
+  kernel_type = "heat"       # Heat kernel
+)
+
+SG_advanced <- runSpecGraph(SG_advanced, k = 15, laplacian_type = "randomwalk",length_eigenvalue = 30, verbose = FALSE)
+SG_advanced <- runSGWT(SG_advanced, verbose = FALSE)
+
+cat("Advanced Parameters Results:\n")
+cat("Number of scales:", length(SG_advanced$Parameters$scales), "\n")
+cat("Scales:", paste(round(SG_advanced$Parameters$scales, 4), collapse = ", "), "\n")
+cat("Reconstruction error:", round(SG_advanced$Inverse$signal_1$reconstruction_error, 6), "\n")
+```
+
+## Checkerboard Pattern Analysis
+
+```{r checkerboard-demo, fig.width=12, fig.height=8}
+# Generate checkerboard pattern
+cat("Generating checkerboard pattern...\n")
+checkerboard_data <- simulate_checkerboard(grid_size = 10, tile_size = 1)
+
+cat("Checkerboard dimensions:", nrow(checkerboard_data), "points\n")
+cat("Signal 1 tiles:", sum(checkerboard_data$signal_1), "\n")
+cat("Signal 2 tiles:", sum(checkerboard_data$signal_2), "\n")
+
+# Visualize the checkerboard pattern
+p_checker <- visualize_checkerboard(checkerboard_data, color1 = "black", color2 = "lightgray")
+print(p_checker + ggtitle("Checkerboard Pattern: Alternating Signals"))
+
+# Run SGWT analysis on checkerboard
+cat("\nRunning SGWT analysis on checkerboard pattern...\n")
+
+# Initialize SGWT object
+SG_checker <- initSGWT(
+  data.in = checkerboard_data,
+  x_col = "X", 
+  y_col = "Y", 
+  signals = c("signal_1", "signal_2"),
+  J = 4,
+  kernel_type = "heat"
+)
+
+# Build spectral graph
+SG_checker <- runSpecGraph(SG_checker, k = 12, laplacian_type = "normalized", 
+                          length_eigenvalue = 50, verbose = FALSE)
+
+# Run SGWT transforms
+SG_checker <- runSGWT(SG_checker, verbose = FALSE)
+
+# Calculate similarity between the two checkerboard signals
+similarity_checker <- runSGCC("signal_1", "signal_2", SG = SG_checker, return_parts = TRUE)
+
+cat("\nCheckerboard Pattern Similarity Analysis:\n")
+cat("=====================================\n")
+cat(sprintf("Weighted similarity (S): %.6f\n", similarity_checker$S))
+cat(sprintf("Low-frequency similarity (c_low): %.6f\n", similarity_checker$c_low))
+cat(sprintf("Non-low-frequency similarity (c_nonlow): %.6f\n", similarity_checker$c_nonlow))
+cat(sprintf("Energy weights - Low: %.3f, Non-low: %.3f\n", 
+           similarity_checker$w_low, similarity_checker$w_NL))
+
+cat("\nInterpretation:\n")
+cat("- Checkerboard patterns are spatially complementary (non-overlapping)\n")
+cat("- High-frequency content dominates due to sharp tile boundaries\n")
+cat("- Low similarity values expected due to alternating pattern structure\n")
+```
+
+# Summary
+
+## Key Takeaways
+
+1. **New Object-Oriented Workflow**: Clear separation of initialization, graph building, analysis, and similarity computation
+2. **Flexible Input**: Supports custom column naming for coordinates and signals  
+3. **Multiple Kernels**: Choose from Mexican Hat, Meyer, or Heat kernel families
+4. **Comprehensive Similarity**: Energy-normalized weighted similarity with detailed diagnostics
+5. **Advanced Analysis**: Low-frequency only analysis, cross-object comparison, multiple signal support
+
+## New Workflow Benefits
+
+```r
+# Complete workflow in 5 clear steps:
+SG <- initSGWT(data, signals = c("signal1", "signal2"))           # 1. Initialize
+kband <- checkKband(SG, signals = c("signal1", "signal2"))       # 2. Check k-band (optional)
+SG <- runSpecGraph(SG, k = 12, laplacian_type = "normalized")    # 3. Build graph  
+SG <- runSGWT(SG)                                                 # 4. Run SGWT
+similarity <- runSGCC("signal1", "signal2", SG = SG)             # 5. Compare patterns
+```
+
+## Parameter Guidelines
+
+- **Small datasets (<200 points)**: k=8-12, J=3-4
+- **Medium datasets (200-1000 points)**: k=12-20, J=4-6  
+- **Large datasets (>1000 points)**: k=15-25, J=5-8
+
+## Next Steps
+
+- Explore your own spatial datasets using the demonstrated workflow
+- Experiment with different kernel types and parameters
+- Use comprehensive similarity analysis for comparative studies
+- Refer to function documentation for detailed parameter specifications
+
+---
+
+*BioGSP Package - Biological Graph Signal Processing for Spatial Data Analysis*

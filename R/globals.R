@@ -8,5 +8,6 @@
 utils::globalVariables(c(
   "x", "y", "original", "scaling", "reconstructed", 
   "eigenvalue", "filter_value", "filter_type", "df_hex_combine",
-  "X", "Y", "label"
+  "X", "Y", "label",
+  "name", "Ra", "Step", "signal_1", "signal_2"
 ))

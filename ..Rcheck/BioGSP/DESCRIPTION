@@ -20,6 +20,4 @@ Imports: Matrix, igraph, RANN, RSpectra, ggplot2, patchwork, gridExtra,
 Suggests: remotes, knitr, rmarkdown, ggrepel
 VignetteBuilder: knitr
 Depends: R (>= 3.5.0)
-NeedsCompilation: no
-Packaged: 2025-10-09 01:57:59 UTC; cha224
-Built: R 4.4.2; ; 2025-10-09 01:58:47 UTC; unix
+Built: R 4.4.2; ; 2025-10-09 02:28:42 UTC; unix

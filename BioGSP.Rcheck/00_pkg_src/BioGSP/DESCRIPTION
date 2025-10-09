@@ -21,4 +21,4 @@ Suggests: remotes, knitr, rmarkdown, ggrepel
 VignetteBuilder: knitr
 Depends: R (>= 3.5.0)
 NeedsCompilation: no
-Packaged: 2025-10-09 01:57:59 UTC; cha224
+Packaged: 2025-10-09 02:34:21 UTC; cha224
