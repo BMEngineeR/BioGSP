@@ -1,6 +1,6 @@
 # BioGSP: Biological Graph Signal Processing
 
-[![GitHub](https://img.shields.io/badge/GitHub-BMEngineeR%2FBioGSP-blue)](https://github.com/BMEngineeR/BioGSP) [![CRAN status](https://www.r-pkg.org/badges/version/BioGSP)](https://CRAN.R-project.org/package=BioGSP) [![CRAN checks](https://cranchecks.info/badges/summary/BioGSP)](https://cranchecks.info/pkgs/BioGSP) [![R-CMD-check](https://github.com/BMEngineeR/BioGSP/actions/workflows/R-CMD-check.yaml/badge.svg)](https://github.com/BMEngineeR/BioGSP/actions/workflows/R-CMD-check.yaml)
+[![GitHub](https://img.shields.io/badge/GitHub-BMEngineeR%2FBioGSP-blue)](https://github.com/BMEngineeR/BioGSP) 
 
 ## What is BioGSP? <img src="man/figures/logo.svg" align="right" width="150" alt="BioGSP logo" />
 
