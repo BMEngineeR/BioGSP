@@ -2,8 +2,8 @@
 % Please edit documentation in R/biogsp-package.R
 \docType{package}
 \name{BioGSP-package}
+\alias{BioGSP}
 \alias{BioGSP-package}
-\alias{_PACKAGE}
 \title{BioGSP: Biological Graph Signal Processing for Spatial Data Analysis}
 \description{
 The BioGSP package provides a comprehensive implementation of Graph Signal Processing 

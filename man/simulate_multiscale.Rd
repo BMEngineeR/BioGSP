@@ -26,7 +26,7 @@ simulate_multiscale(
 
 \item{outer_start}{Fixed starting outer radius (default: 40)}
 
-\item{outer_end_factor}{Outer radius shrinks to this factor × Ra (default: 1.2)}
+\item{outer_end_factor}{Outer radius shrinks to this factor * Ra (default: 1.2)}
 
 \item{seed}{Random seed for reproducible center placement (default: 123)}
 

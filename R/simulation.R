@@ -9,7 +9,7 @@
 #' @param n_steps Number of outer radius shrinkage steps (default: 10)
 #' @param n_centers Number of circle centers (default: 1)
 #' @param outer_start Fixed starting outer radius (default: 40)
-#' @param outer_end_factor Outer radius shrinks to this factor × Ra (default: 1.2)
+#' @param outer_end_factor Outer radius shrinks to this factor * Ra (default: 1.2)
 #' @param seed Random seed for reproducible center placement (default: 123)
 #' @param verbose Logical; if TRUE, show progress bar and messages (default: TRUE)
 #'
@@ -37,7 +37,7 @@ simulate_multiscale <- function(
     n_steps = 10,                    # number of outer radius shrinkage steps
     n_centers = 1,                   # number of circle centers
     outer_start = 40,                # fixed starting outer radius
-    outer_end_factor = 1.2,          # outer radius shrinks to 1.2 × Ra
+    outer_end_factor = 1.2,          # outer radius shrinks to 1.2 * Ra
     seed = 123,
     verbose = TRUE
 ) {
@@ -60,7 +60,7 @@ simulate_multiscale <- function(
   iter <- 0
   
   for (Ra in Ra_seq) {
-    # Outer radius shrinks from fixed outer_start to Ra × outer_end_factor
+    # Outer radius shrinks from fixed outer_start to Ra * outer_end_factor
     Rb_seq <- seq(from = outer_start,
                   to   = Ra * outer_end_factor,
                   length.out = n_steps)

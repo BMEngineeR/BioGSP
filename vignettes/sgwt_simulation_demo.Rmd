@@ -18,8 +18,8 @@ vignette: >
 
 ```{r setup, include=FALSE}
 knitr::opts_chunk$set(echo = TRUE, warning = FALSE, message = FALSE, 
-                      fig.width = 5, fig.height = 3.5, dpi = 36,
-                      dev = 'png', dev.args = list(type = 'cairo'))
+                      fig.width = 5, fig.height = 3.5, dpi = 72,
+                      dev = 'png')
 ```
 
 # Introduction
@@ -51,20 +51,10 @@ The new workflow consists of five main steps:
 
 ```{r load-libraries}
 # Load required packages
+library(BioGSP)
 library(ggplot2)
 library(patchwork)
 library(viridis)
-library(Matrix)
-library(igraph)
-library(RANN)
-library(RSpectra)
-
-# Load BioGSP functions
-source('../R/simulation.R')
-source('../R/sgwt_core.R')
-source('../R/sgwt_main.R')
-source('../R/utilities.R')
-source('../R/visualization.R')
 
 # Set random seed for reproducibility
 set.seed(123)
