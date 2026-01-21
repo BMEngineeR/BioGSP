@@ -84,20 +84,24 @@ cat("Signals available:", sum(demo_pattern$signal_1), "inner pixels,", sum(demo_
 ## Visualize Input Pattern
 
 ```{r visualize-pattern, fig.width=7, fig.height=3}
-# Create visualizations for both signals
-p1 <- ggplot(demo_pattern, aes(X, Y, fill = factor(signal_1))) +
-  geom_tile() +
-  scale_fill_manual(values = c("0" = "white", "1" = "#e31a1c"), 
-                    name = "Signal", labels = c("Background", "Inner Circle")) +
-  coord_fixed() + theme_void() + ggtitle("Signal 1: Inner Circles")
+# Single combined visualization (one plot for this section)
+demo_pattern$pattern_type <- ifelse(
+  demo_pattern$signal_1 == 1,
+  "Inner Circle",
+  ifelse(demo_pattern$signal_2 == 1, "Outer Ring", "Background")
+)
 
-p2 <- ggplot(demo_pattern, aes(X, Y, fill = factor(signal_2))) +
+p_input <- ggplot(demo_pattern, aes(X, Y, fill = pattern_type)) +
   geom_tile() +
-  scale_fill_manual(values = c("0" = "white", "1" = "#1f78b4"), 
-                    name = "Signal", labels = c("Background", "Outer Ring")) +
-  coord_fixed() + theme_void() + ggtitle("Signal 2: Outer Rings")
+  scale_fill_manual(
+    values = c("Background" = "white", "Inner Circle" = "#e31a1c", "Outer Ring" = "#1f78b4"),
+    name = "Pattern"
+  ) +
+  coord_fixed() +
+  theme_void() +
+  ggtitle("Input Pattern (Signal 1 + Signal 2)")
 
-print(p1 + p2)
+print(p_input)
 ```
 
 ## Step 1: Initialize SGWT Object
@@ -134,7 +138,7 @@ cat("Number of eigenvalues computed:", length(SG$Graph$eigenvalues), "\n")
 
 ```{r fourier-modes, fig.width=7, fig.height=5}
 # Visualize Fourier modes (eigenvectors) - 5 low and 5 high frequency modes
-fourier_modes <- plot_FM(SG, mode_type = "both", n_modes = 5, ncol = 5)
+fourier_modes <- plot_FM(SG, mode_type = "both", n_modes = 2, ncol = 2)
 
 cat("Fourier Modes Visualization:\n")
 cat("- Low-frequency modes (2-6): Smooth spatial patterns, excluding DC component\n")
@@ -159,9 +163,11 @@ print(SG)
 decomp_plots <- plot_sgwt_decomposition(
   SG = SG,
   signal_name = "signal_1",
-  plot_scales = 1:3,     # Show first 3 scales
-  ncol = 3
+  plot_scales = 1,       # One plot for this section
+  ncol = 1
 )
+
+print(decomp_plots)
 
 ```
 
@@ -263,19 +269,32 @@ SG2 <- runSGWT(SG2, verbose = FALSE)
 # Note: Cross-object similarity comparison removed due to different eigenvalue counts
 # between SG (200 eigenvalues) and SG2 (100 eigenvalues) causing dimension mismatch
 
-# Visualize both patterns for comparison
-p_comp1 <- ggplot(demo_pattern, aes(X, Y, fill = factor(signal_1))) +
-  geom_tile() + scale_fill_manual(values = c("0" = "white", "1" = "#e31a1c")) +
-  coord_fixed() + theme_void() + theme(legend.position = "none") +
+# Visualize both patterns for comparison (single faceted plot for this section)
+pattern_compare <- rbind(
+  data.frame(
+    X = demo_pattern$X,
+    Y = demo_pattern$Y,
+    signal_1 = demo_pattern$signal_1,
+    Pattern = "Pattern A (R_in=5, R_out=10)"
+  ),
+  data.frame(
+    X = pattern_2$X,
+    Y = pattern_2$Y,
+    signal_1 = pattern_2$signal_1,
+    Pattern = "Pattern B (R_in=8, R_out=15)"
+  )
+)
 
-    ggtitle("Pattern A (R_in=5, R_out=10)")
+pattern_compare$Signal <- ifelse(pattern_compare$signal_1 == 1, "Signal", "Background")
 
-p_comp2 <- ggplot(pattern_2, aes(X, Y, fill = factor(signal_1))) +
-  geom_tile() + scale_fill_manual(values = c("0" = "white", "1" = "#1f78b4")) +
-  coord_fixed() + theme_void() + theme(legend.position = "none") +
-  ggtitle("Pattern B (R_in=7, R_out=12)")
-
-print(p_comp1 + p_comp2)
+ggplot(pattern_compare, aes(X, Y, fill = Signal)) +
+  geom_tile() +
+  scale_fill_manual(values = c("Background" = "white", "Signal" = "#377eb8")) +
+  coord_fixed() +
+  facet_wrap(~ Pattern) +
+  theme_void() +
+  theme(legend.position = "none") +
+  ggtitle("Pattern Comparison (signal_1)")
 ```
 
 ## Low-frequency Only Analysis
@@ -336,15 +355,6 @@ patterns_9 <- simulate_multiscale(
 cat("Generated", length(patterns_9), "patterns\n")
 cat("Pattern names:", names(patterns_9), "\n")
 
-# Visualize all 9 patterns first
-pattern_viz <- visualize_multiscale(
-  patterns_9, 
-  Ra_seq = c(3, 6, 9), 
-  n_steps = 3,
-  show_subtitle = TRUE
-)
-print(pattern_viz)
-
 # Create SGWT objects for all 9 patterns and compute similarities
 similarity_results <- list()
 sgwt_objects <- list()
@@ -392,8 +402,6 @@ similarity_df <- data.frame(
   stringsAsFactors = FALSE
 )
 
-print(similarity_df)
-
 # Extract Ra and Step values for better labeling
 similarity_df$Ra <- as.numeric(gsub(".*Ra_([0-9.]+)_Step.*", "\\1", similarity_df$Pattern))
 similarity_df$Step <- as.numeric(gsub(".*Step_([0-9]+)$", "\\1", similarity_df$Pattern))
@@ -411,40 +419,6 @@ similarity_plot <- visualize_similarity_xy(
 )
 
 print(similarity_plot)
-
-# Create enhanced plot with color coding by Ra values
-library(ggplot2)
-plot_data <- data.frame(
-  c_low = similarity_df$c_low,
-  c_nonlow = similarity_df$c_nonlow,
-  Ra = factor(similarity_df$Ra),
-  Step = factor(similarity_df$Step),
-  Label = similarity_df$Label,
-  S = similarity_df$S
-)
-
-enhanced_plot <- ggplot(plot_data, aes(x = c_low, y = c_nonlow, color = Ra, shape = Step)) +
-  geom_point(size = 5, alpha = 0.8) +
-  geom_text(aes(label = Label), vjust = -0.8, hjust = 0.5, size = 3, color = "black") +
-  xlim(-1, 1) + ylim(-1, 1) +
-  geom_hline(yintercept = 0, linetype = "dashed", color = "gray60", alpha = 0.7) +
-  geom_vline(xintercept = 0, linetype = "dashed", color = "gray60", alpha = 0.7) +
-  geom_abline(slope = 1, intercept = 0, linetype = "dotted", color = "gray40", alpha = 0.7) +
-  geom_abline(slope = -1, intercept = 0, linetype = "dotted", color = "gray40", alpha = 0.7) +
-  scale_color_viridis_d(name = "Inner Radius (Ra)") +
-  scale_shape_manual(values = c(16, 17, 15), name = "Shrinkage Step") +
-  labs(
-    title = "Enhanced Similarity Space: Color by Ra, Shape by Step",
-    x = "Low-frequency Similarity (c_low)",
-    y = "Non-low-frequency Similarity (c_nonlow)"
-  ) +
-  theme_minimal() +
-  theme(
-    plot.title = element_text(hjust = 0.5, size = 14, face = "bold"),
-    legend.position = "right"
-  )
-
-print(enhanced_plot)
 
 # Analysis of patterns
 cat("\nPattern Analysis:\n")
