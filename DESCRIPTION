@@ -2,12 +2,14 @@ Package: BioGSP
 Type: Package
 Title: Biological Graph Signal Processing for Spatial Data Analysis
 Version: 1.0.0
-Author: Yuzhou Chang <yuzhou.chang@osumc.edu>
-Maintainer: Yuzhou Chang <yuzhou.chang@osumc.edu>
+Authors@R: person(given = "Yuzhou",
+                  family = "Chang",
+                  role = c("aut", "cre"),
+                  email = "yuzhou.chang@osumc.edu")
 Description: Implementation of Graph Signal Processing (GSP) methods including Spectral 
     Graph Wavelet Transform (SGWT) for analyzing spatial patterns in biological data. 
     Based on Hammond, Vandergheynst, and Gribonval (2011) "Wavelets on Graphs via 
-    Spectral Graph Theory". Provides tools for multi-scale analysis of spatial signals, 
+    Spectral Graph Theory". Provides tools for multi-scale analysis of biology spatial signals, 
     including forward and inverse transforms, energy analysis, and visualization functions 
     tailored for biological applications.
 License: GPL-3

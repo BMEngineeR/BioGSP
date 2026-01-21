@@ -605,8 +605,8 @@ visualize_similarity_xy <- function(similarity_results,
     
     # Add to plot data
     plot_data <- rbind(plot_data, data.frame(
-      c_low = result$c_low,
-      c_nonlow = result$c_nonlow,
+      c_low = result$c_low * result$w_low,
+      c_nonlow = result$c_nonlow * result$w_NL,
       label = if (is.null(names(similarity_results)[i])) paste("Point", i) else names(similarity_results)[i],
       stringsAsFactors = FALSE
     ))
