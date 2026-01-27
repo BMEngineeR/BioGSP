@@ -42,7 +42,7 @@ Combined ggplot object with all pattern visualizations
 Create visualization plots for stripe pattern simulation results
 }
 \examples{
-\dontrun{
+\donttest{
 # Generate and visualize patterns
 sim_data <- simulate_stripe_patterns(
   grid_size = 80,

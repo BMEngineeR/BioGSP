@@ -133,12 +133,21 @@ compute_sgwt_filters <- function(eigenvalues, scales, lmax = NULL, kernel_type =
 #' @export
 #'
 #' @examples
-#' \dontrun{
+#' \donttest{
+#' # Create example data and compute graph
+#' data <- data.frame(x = runif(50), y = runif(50), signal = rnorm(50))
+#' SG <- initSGWT(data, signals = "signal", J = 3)
+#' SG <- runSpecGraph(SG, k = 10)
+#' eigenvectors <- SG$Graph$eigenvectors
+#' eigenvalues <- SG$Graph$eigenvalues
+#' scales <- SG$Parameters$scales
+#' 
 #' # Single signal
+#' signal <- data$signal
 #' result <- sgwt_forward(signal, eigenvectors, eigenvalues, scales)
 #' 
 #' # Multiple signals (batch processing)
-#' signals_matrix <- cbind(signal1, signal2, signal3)
+#' signals_matrix <- cbind(data$signal, data$signal * 2, data$signal * 0.5)
 #' result <- sgwt_forward(signals_matrix, eigenvectors, eigenvalues, scales)
 #' }
 sgwt_forward <- function(signal, eigenvectors, eigenvalues, scales, lmax = NULL, kernel_type = "heat") {
@@ -207,11 +216,23 @@ sgwt_forward <- function(signal, eigenvectors, eigenvalues, scales, lmax = NULL,
 #' @export
 #'
 #' @examples
-#' \dontrun{
-#' # Single signal
+#' \donttest{
+#' # Create example data and perform forward transform
+#' data <- data.frame(x = runif(50), y = runif(50), signal = rnorm(50))
+#' SG <- initSGWT(data, signals = "signal", J = 3)
+#' SG <- runSpecGraph(SG, k = 10)
+#' eigenvectors <- SG$Graph$eigenvectors
+#' eigenvalues <- SG$Graph$eigenvalues
+#' scales <- SG$Parameters$scales
+#' 
+#' # Single signal - forward transform first
+#' original_signal <- data$signal
+#' sgwt_decomp <- sgwt_forward(original_signal, eigenvectors, eigenvalues, scales)
 #' inverse_result <- sgwt_inverse(sgwt_decomp, eigenvectors, original_signal)
 #' 
 #' # Multiple signals (batch processing)
+#' original_signals_matrix <- cbind(data$signal, data$signal * 2)
+#' sgwt_decomp <- sgwt_forward(original_signals_matrix, eigenvectors, eigenvalues, scales)
 #' inverse_result <- sgwt_inverse(sgwt_decomp, eigenvectors, original_signals_matrix)
 #' }
 sgwt_inverse <- function(sgwt_decomp, eigenvectors, original_signal = NULL) {
@@ -320,6 +341,8 @@ compare_kernel_families <- function(x_range = c(0, 3), scale_param = 1, plot_res
   }
   
   if (plot_results && requireNamespace("graphics", quietly = TRUE)) {
+    oldpar <- graphics::par(no.readonly = TRUE)
+    on.exit(graphics::par(oldpar))
     graphics::par(mfrow = c(1, 2))
     
     # Plot scaling functions

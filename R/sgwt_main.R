@@ -15,7 +15,7 @@
 #' @export
 #'
 #' @examples
-#' \dontrun{
+#' \donttest{
 #' # Initialize SGWT object
 #' data <- data.frame(x = runif(100), y = runif(100), 
 #'                   signal1 = rnorm(100), signal2 = rnorm(100))
@@ -83,13 +83,18 @@ initSGWT <- function(data.in, x_col = "x", y_col = "y", signals = NULL,
 #' @export
 #'
 #' @examples
-#' \dontrun{
-#' SG <- initSGWT(data)
+#' \donttest{
+#' # Create example data
+#' data <- data.frame(x = runif(100), y = runif(100), signal = rnorm(100))
+#' SG <- initSGWT(data, signals = "signal")
+#' 
 #' # Uses full length by default
 #' SG <- runSpecGraph(SG, k = 30, laplacian_type = "normalized")  
+#' 
 #' # Or specify custom length
-#' SG <- runSpecGraph(SG, k = 30, laplacian_type = "normalized", 
-#'                    length_eigenvalue = 30)  
+#' SG2 <- initSGWT(data, signals = "signal")
+#' SG2 <- runSpecGraph(SG2, k = 30, laplacian_type = "normalized", 
+#'                     length_eigenvalue = 30)  
 #' }
 runSpecGraph <- function(SG, k = 25, laplacian_type = "normalized", length_eigenvalue = NULL, verbose = TRUE) {
   
@@ -165,11 +170,19 @@ runSpecGraph <- function(SG, k = 25, laplacian_type = "normalized", length_eigen
 #' @export
 #'
 #' @examples
-#' \dontrun{
-#' SG <- initSGWT(data)
-#' SG <- runSpecGraph(SG)
-#' SG <- runSGWT(SG)  # Uses batch processing by default
-#' SG <- runSGWT(SG, use_batch = FALSE)  # Force individual processing
+#' \donttest{
+#' # Create example data
+#' data <- data.frame(x = runif(100), y = runif(100), signal = rnorm(100))
+#' SG <- initSGWT(data, signals = "signal")
+#' SG <- runSpecGraph(SG, k = 15)
+#' 
+#' # Uses batch processing by default
+#' SG <- runSGWT(SG)
+#' 
+#' # Or force individual processing
+#' SG2 <- initSGWT(data, signals = "signal")
+#' SG2 <- runSpecGraph(SG2, k = 15)
+#' SG2 <- runSGWT(SG2, use_batch = FALSE)
 #' }
 runSGWT <- function(SG, use_batch = TRUE, verbose = TRUE) {
   
@@ -303,12 +316,26 @@ runSGWT <- function(SG, use_batch = TRUE, verbose = TRUE) {
 #' @export
 #'
 #' @examples
-#' \dontrun{
+#' \donttest{
+#' # Create example data and compute SGWT
+#' data <- data.frame(x = runif(100), y = runif(100),
+#'                   signal1 = rnorm(100), signal2 = rnorm(100))
+#' SG <- initSGWT(data, signals = c("signal1", "signal2"))
+#' SG <- runSpecGraph(SG, k = 15)
+#' SG <- runSGWT(SG)
+#' 
 #' # Between two signals in same SGWT object
-#' similarity <- runSGCC("signal1", "signal2", SG = SG_object)
+#' similarity <- runSGCC("signal1", "signal2", SG = SG)
+#' print(similarity)
 #' 
 #' # Between two SGWT objects
-#' similarity <- runSGCC(SG_object1, SG_object2)
+#' data2 <- data.frame(x = runif(100), y = runif(100), signal = rnorm(100))
+#' SG2 <- initSGWT(data2, signals = "signal")
+#' SG2 <- runSpecGraph(SG2, k = 15)
+#' SG2 <- runSGWT(SG2)
+#' 
+#' similarity2 <- runSGCC(SG, SG2)
+#' print(similarity2)
 #' }
 runSGCC <- function(signal1, signal2, SG = NULL, eps = 1e-12, validate = TRUE, 
                     return_parts = TRUE, low_only = FALSE) {
@@ -520,6 +547,8 @@ runSGCC <- function(signal1, signal2, SG = NULL, eps = 1e-12, validate = TRUE,
 #'
 #' @param x SGWT object to print
 #' @param ... Additional arguments passed to print methods
+#' 
+#' @return Invisibly returns the input SGWT object. Called for side effects (prints object summary to console).
 #' @export
 print.SGWT <- function(x, ...) {
   cat("SGWT Object\n")
@@ -560,4 +589,6 @@ print.SGWT <- function(x, ...) {
       }
     }
   }
+  
+  invisible(x)
 }

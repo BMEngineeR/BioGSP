@@ -34,7 +34,7 @@ Generate stripe patterns with two parallel stripes separated by a gap.
 Creates rotatable stripe patterns with configurable gap, width, and rotation angle.
 }
 \examples{
-\dontrun{
+\donttest{
 # Generate stripe patterns with default parameters
 patterns <- simulate_stripe_patterns()
 

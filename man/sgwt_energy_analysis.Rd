@@ -20,9 +20,15 @@ using Fourier domain coefficients directly (consistent with Parseval's theorem).
 Excludes DC component for more accurate energy analysis.
 }
 \examples{
-\dontrun{
-# Assuming you have SGWT object
-energy_analysis <- sgwt_energy_analysis(SG_object, signal_name = "signal1")
+\donttest{
+# Create and analyze example data
+data <- data.frame(x = runif(100), y = runif(100), signal1 = rnorm(100))
+SG <- initSGWT(data, signals = "signal1")
+SG <- runSpecGraph(SG, k = 15)
+SG <- runSGWT(SG)
+
+# Analyze energy distribution
+energy_analysis <- sgwt_energy_analysis(SG, signal_name = "signal1")
 print(energy_analysis)
 }
 }

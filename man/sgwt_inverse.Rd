@@ -32,11 +32,23 @@ Returns detailed inverse transform results including low-pass, band-pass approxi
 reconstructed signal(s), and reconstruction error(s).
 }
 \examples{
-\dontrun{
-# Single signal
+\donttest{
+# Create example data and perform forward transform
+data <- data.frame(x = runif(50), y = runif(50), signal = rnorm(50))
+SG <- initSGWT(data, signals = "signal", J = 3)
+SG <- runSpecGraph(SG, k = 10)
+eigenvectors <- SG$Graph$eigenvectors
+eigenvalues <- SG$Graph$eigenvalues
+scales <- SG$Parameters$scales
+
+# Single signal - forward transform first
+original_signal <- data$signal
+sgwt_decomp <- sgwt_forward(original_signal, eigenvectors, eigenvalues, scales)
 inverse_result <- sgwt_inverse(sgwt_decomp, eigenvectors, original_signal)
 
 # Multiple signals (batch processing)
+original_signals_matrix <- cbind(data$signal, data$signal * 2)
+sgwt_decomp <- sgwt_forward(original_signals_matrix, eigenvectors, eigenvalues, scales)
 inverse_result <- sgwt_inverse(sgwt_decomp, eigenvectors, original_signals_matrix)
 }
 }

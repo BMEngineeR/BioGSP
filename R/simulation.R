@@ -18,7 +18,7 @@
 #' @export
 #'
 #' @examples
-#' \dontrun{
+#' \donttest{
 #' # Generate multi-center patterns with default parameters
 #' patterns <- simulate_multiscale()
 #' 
@@ -38,10 +38,10 @@ simulate_multiscale <- function(
     n_centers = 1,                   # number of circle centers
     outer_start = 40,                # fixed starting outer radius
     outer_end_factor = 1.2,          # outer radius shrinks to 1.2 * Ra
-    seed = 123,
+    seed = NULL,
     verbose = TRUE
 ) {
-  set.seed(seed)
+  if (!is.null(seed)) set.seed(seed)
   grid <- expand.grid(X = 1:grid_size, Y = 1:grid_size)
   
   # ---- Define circle centers ----
@@ -115,7 +115,7 @@ simulate_multiscale <- function(
 #' @export
 #'
 #' @examples
-#' \dontrun{
+#' \donttest{
 #' # Generate stripe patterns with default parameters
 #' patterns <- simulate_stripe_patterns()
 #' 
@@ -224,7 +224,7 @@ simulate_stripe_patterns <- function(
 #' @export
 #'
 #' @examples
-#' \dontrun{
+#' \donttest{
 #' # Generate and visualize patterns
 #' sim_data <- simulate_multiscale(
 #'   Ra_seq = seq(2.5, 20, by = 2.5),
@@ -325,7 +325,7 @@ visualize_multiscale <- function(
 #' @export
 #'
 #' @examples
-#' \dontrun{
+#' \donttest{
 #' # Generate multi-center patterns with fixed centers
 #' patterns <- simulate_multiscale_overlap()
 #' 
@@ -347,13 +347,13 @@ simulate_multiscale_overlap <- function(
     n_centers = 3,
     Ra_seq = c(10, 5, 1),   # inner radius sequence
     Rb_seq = c(10, 5, 1),   # outer ring thickness sequence
-    seed = 123,
+    seed = NULL,
     verbose = TRUE
 ) {
   # Create coordinate grid
   grid <- expand.grid(X = 1:grid_size, Y = 1:grid_size)
   
-  set.seed(seed)
+  if (!is.null(seed)) set.seed(seed)
   
   # Define circle centers
   if (n_centers == 1) {
@@ -435,7 +435,7 @@ simulate_multiscale_overlap <- function(
 #' @export
 #'
 #' @examples
-#' \dontrun{
+#' \donttest{
 #' # Generate and visualize patterns
 #' sim_data <- simulate_stripe_patterns(
 #'   grid_size = 80,
@@ -524,7 +524,7 @@ visualize_stripe_patterns <- function(
 #' @export
 #'
 #' @examples
-#' \dontrun{
+#' \donttest{
 #' # Generate moving circles patterns with default parameters
 #' patterns <- simulate_moving_circles()
 #' 
@@ -543,13 +543,13 @@ simulate_moving_circles <- function(
     n_steps         = 10,     # "Movement 1..n_steps"
     center_distance = 30,     # initial horizontal distance from midline for both centers
     radius2_factor  = 1.5,    # circle 2 radius = radius_seq * radius2_factor
-    seed            = 123,
+    seed            = NULL,
     verbose         = TRUE
 ) {
   stopifnot(length(radius_seq) >= 1, n_steps >= 1, grid_size >= 3)
   if (!requireNamespace("dplyr", quietly = TRUE)) stop("Please install 'dplyr'.")
   
-  set.seed(seed)
+  if (!is.null(seed)) set.seed(seed)
   grid <- expand.grid(X = 1:grid_size, Y = 1:grid_size)
   
   # Deterministic movement: two circles move toward the midline horizontally
@@ -624,7 +624,7 @@ simulate_moving_circles <- function(
 #' @export
 #'
 #' @examples
-#' \dontrun{
+#' \donttest{
 #' # Generate and visualize patterns
 #' sim_data <- simulate_moving_circles(
 #'   radius_seq = 6:14,

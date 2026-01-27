@@ -18,11 +18,20 @@ Reconstructed signal in the vertex domain (vector or matrix)
 Compute the Inverse Graph Fourier Transform (IGFT) of spectral coefficients using Laplacian eigenvectors.
 }
 \examples{
-\dontrun{
-# Single signal
+\donttest{
+# Create example data
+data <- data.frame(x = runif(50), y = runif(50), signal = rnorm(50))
+SG <- initSGWT(data, signals = "signal")
+SG <- runSpecGraph(SG, k = 10)
+eigenvectors <- SG$Graph$eigenvectors
+
+# Single signal - use GFT to get Fourier coefficients
+fourier_coeffs <- gft(data$signal, eigenvectors)
 signal_reconstructed <- igft(fourier_coeffs, eigenvectors)
 
 # Multiple signals (batch processing)
+signals_matrix <- cbind(data$signal, data$signal * 2)
+fourier_coeffs_matrix <- gft(signals_matrix, eigenvectors)
 signals_reconstructed <- igft(fourier_coeffs_matrix, eigenvectors)
 }
 }

@@ -38,11 +38,25 @@ using Fourier domain coefficients directly (no vertex domain reconstruction).
 Excludes DC component and uses energy-based weighting consistent with Parseval's theorem.
 }
 \examples{
-\dontrun{
+\donttest{
+# Create example data and compute SGWT
+data <- data.frame(x = runif(100), y = runif(100),
+                  signal1 = rnorm(100), signal2 = rnorm(100))
+SG <- initSGWT(data, signals = c("signal1", "signal2"))
+SG <- runSpecGraph(SG, k = 15)
+SG <- runSGWT(SG)
+
 # Between two signals in same SGWT object
-similarity <- runSGCC("signal1", "signal2", SG = SG_object)
+similarity <- runSGCC("signal1", "signal2", SG = SG)
+print(similarity)
 
 # Between two SGWT objects
-similarity <- runSGCC(SG_object1, SG_object2)
+data2 <- data.frame(x = runif(100), y = runif(100), signal = rnorm(100))
+SG2 <- initSGWT(data2, signals = "signal")
+SG2 <- runSpecGraph(SG2, k = 15)
+SG2 <- runSGWT(SG2)
+
+similarity2 <- runSGCC(SG, SG2)
+print(similarity2)
 }
 }

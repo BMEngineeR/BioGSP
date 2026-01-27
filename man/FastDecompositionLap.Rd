@@ -36,9 +36,9 @@ List with eigenvalues (evalues) and eigenvectors (evectors)
 Perform fast eigendecomposition using RSpectra for large matrices
 }
 \examples{
-\dontrun{
+\donttest{
 # Create a Laplacian matrix and decompose
 L <- matrix(c(2, -1, -1, -1, 2, -1, -1, -1, 2), nrow = 3)
-decomp <- FastDecompositionLap(L, k_eigen = 25)
+decomp <- FastDecompositionLap(L, k_eigen = 2)
 }
 }

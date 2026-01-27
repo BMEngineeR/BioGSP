@@ -9,7 +9,7 @@
 #' @export
 #'
 #' @examples
-#' \dontrun{
+#' \donttest{
 #' W <- matrix(c(0, 1, 1, 1, 0, 1, 1, 1, 0), nrow = 3)
 #' cal_laplacian(W, type = "normalized")
 #' }
@@ -54,10 +54,10 @@ cal_laplacian <- function(W, type = c("unnormalized", "normalized", "randomwalk"
 #' @export
 #'
 #' @examples
-#' \dontrun{
+#' \donttest{
 #' # Create a Laplacian matrix and decompose
 #' L <- matrix(c(2, -1, -1, -1, 2, -1, -1, -1, 2), nrow = 3)
-#' decomp <- FastDecompositionLap(L, k_eigen = 25)
+#' decomp <- FastDecompositionLap(L, k_eigen = 2)
 #' }
 FastDecompositionLap <- function(laplacianMat = NULL, k_eigen = 25, which = "LM", sigma = NULL, opts = list(),
                                  lower = TRUE, ...) {
@@ -100,11 +100,20 @@ gft <- function(signal, U) {
 #' @export
 #'
 #' @examples
-#' \dontrun{
-#' # Single signal
+#' \donttest{
+#' # Create example data
+#' data <- data.frame(x = runif(50), y = runif(50), signal = rnorm(50))
+#' SG <- initSGWT(data, signals = "signal")
+#' SG <- runSpecGraph(SG, k = 10)
+#' eigenvectors <- SG$Graph$eigenvectors
+#' 
+#' # Single signal - use GFT to get Fourier coefficients
+#' fourier_coeffs <- gft(data$signal, eigenvectors)
 #' signal_reconstructed <- igft(fourier_coeffs, eigenvectors)
 #' 
 #' # Multiple signals (batch processing)
+#' signals_matrix <- cbind(data$signal, data$signal * 2)
+#' fourier_coeffs_matrix <- gft(signals_matrix, eigenvectors)
 #' signals_reconstructed <- igft(fourier_coeffs_matrix, eigenvectors)
 #' }
 igft <- function(fourier_coeffs, U) {
@@ -224,52 +233,6 @@ find_knee_point <- function(y, sensitivity = 1) {
 }
 
 
-
-#' Install and load packages
-#'
-#' @description Utility function to install and load packages from CRAN or GitHub
-#'
-#' @param packages Named vector where names are package names and values are source URLs
-#'
-#' @return NULL (side effect: installs and loads packages)
-#' @export
-#' @importFrom utils install.packages
-#'
-#' @examples
-#' \dontrun{
-#' packages <- c("ggplot2" = "ggplot2", "devtools" = "r-lib/devtools")
-#' install_and_load(packages)
-#' }
-install_and_load <- function(packages) {
-  # Ensure that the 'remotes' package is available
-  if (!requireNamespace("remotes", quietly = TRUE)) {
-    install.packages("remotes")
-  }
-
-  # Loop through each package and install from the appropriate source
-  for (pkg in names(packages)) {
-    package_name <- pkg
-    source_url <- packages[pkg]
-
-    # Check if the package is already installed
-    if (!require(package_name, character.only = TRUE, quietly = TRUE)) {
-      # Install from GitHub if URL is provided
-      if (grepl("github", source_url)) {
-        cat(sprintf("Installing %s from GitHub repository %s\n", package_name, source_url))
-        remotes::install_github(source_url)
-      } else {  # Install from CRAN
-        cat(sprintf("Installing package: %s from CRAN\n", package_name))
-        install.packages(package_name)
-      }
-
-      # Load the package
-      library(package_name, character.only = TRUE)
-    } else {
-      cat(sprintf("Package already installed: %s\n", package_name))
-    }
-  }
-}
-
 #' Hello function for SGWT package demonstration
 #'
 #' @description Simple hello function to demonstrate package loading
@@ -312,7 +275,11 @@ hello_sgwt <- function() {
 #' @importFrom igraph graph_from_edgelist as_adjacency_matrix
 #'
 #' @examples
-#' \dontrun{
+#' \donttest{
+#' # Create example data
+#' data <- data.frame(x = runif(100), y = runif(100),
+#'                   signal1 = rnorm(100), signal2 = rnorm(100))
+#' 
 #' # Initialize SGWT object (no need to run runSpecGraph)
 #' SG <- initSGWT(data, signals = c("signal1", "signal2"))
 #' 

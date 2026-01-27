@@ -10,7 +10,7 @@ simulate_moving_circles(
   n_steps = 10,
   center_distance = 30,
   radius2_factor = 1.5,
-  seed = 123,
+  seed = NULL,
   verbose = TRUE
 )
 }
@@ -38,7 +38,7 @@ Creates mutually exclusive signals where overlapping pixels are assigned to sign
 The circles start at fixed horizontal distances from the midline and move toward the center.
 }
 \examples{
-\dontrun{
+\donttest{
 # Generate moving circles patterns with default parameters
 patterns <- simulate_moving_circles()
 

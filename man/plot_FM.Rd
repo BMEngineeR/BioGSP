@@ -25,9 +25,13 @@ Plot low-frequency and high-frequency Fourier modes (eigenvectors)
 from the graph Laplacian eigendecomposition in an SGWT object
 }
 \examples{
-\dontrun{
+\donttest{
+# Create example data
+data <- data.frame(x = runif(100), y = runif(100), signal = rnorm(100))
+
 # Plot both low and high frequency modes
-SG <- initSGWT(data) \%>\% runSpecGraph()
+SG <- initSGWT(data, signals = "signal")
+SG <- runSpecGraph(SG, k = 15)
 plot_FM(SG, mode_type = "both", n_modes = 4)
 
 # Plot only low frequency modes

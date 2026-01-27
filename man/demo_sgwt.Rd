@@ -17,7 +17,7 @@ Demonstration function showing basic SGWT usage with synthetic data
 using the new workflow: initSGWT -> runSpecGraph -> runSGWT
 }
 \examples{
-\dontrun{
+\donttest{
 SG <- demo_sgwt()
 print(SG)
 }

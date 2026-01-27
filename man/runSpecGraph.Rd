@@ -31,12 +31,17 @@ Generate Graph slot information including adjacency matrix,
 Laplacian matrix, eigenvalues, and eigenvectors.
 }
 \examples{
-\dontrun{
-SG <- initSGWT(data)
+\donttest{
+# Create example data
+data <- data.frame(x = runif(100), y = runif(100), signal = rnorm(100))
+SG <- initSGWT(data, signals = "signal")
+
 # Uses full length by default
 SG <- runSpecGraph(SG, k = 30, laplacian_type = "normalized")  
+
 # Or specify custom length
-SG <- runSpecGraph(SG, k = 30, laplacian_type = "normalized", 
-                   length_eigenvalue = 30)  
+SG2 <- initSGWT(data, signals = "signal")
+SG2 <- runSpecGraph(SG2, k = 30, laplacian_type = "normalized", 
+                    length_eigenvalue = 30)  
 }
 }

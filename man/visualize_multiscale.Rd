@@ -45,7 +45,7 @@ ggplot object with faceted visualization
 Visualize the simulated concentric ring patterns from simulate_multiscale
 }
 \examples{
-\dontrun{
+\donttest{
 # Generate and visualize patterns
 sim_data <- simulate_multiscale(
   Ra_seq = seq(2.5, 20, by = 2.5),

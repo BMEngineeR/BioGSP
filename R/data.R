@@ -91,7 +91,7 @@
 #' }
 #' 
 #' # Basic SGWT analysis example
-#' \dontrun{
+#' \donttest{
 #' # Focus on BCL6- B Cell cells in ROI_1 for SGWT analysis
 #' bcl6nb_data <- codex_toy_data[codex_toy_data$Annotation5 == "BCL6- B Cell" & 
 #'                               codex_toy_data$ROI_num == "ROI_1", ]
@@ -119,12 +119,13 @@
 #'   ) %>%
 #'   select(x, y, signal)
 #' 
-#' # Apply SGWT
-#' sgwt_result <- SGWT(data.in = sgwt_data,
-#'                     signal = "signal",
-#'                     k = 8,
-#'                     J = 3,
-#'                     kernel_type = "heat")
+#' # Apply SGWT using new workflow
+#' SG <- initSGWT(sgwt_data, signals = "signal", J = 3, kernel_type = "heat")
+#' SG <- runSpecGraph(SG, k = 8)
+#' SG <- runSGWT(SG)
+#' 
+#' # View results
+#' print(SG)
 #' }
 #'
 #' @keywords datasets spatial CODEX SGWT

@@ -23,9 +23,15 @@ Visualize SGWT decomposition components including original signal,
 scaling function, wavelet coefficients, and reconstructed signal
 }
 \examples{
-\dontrun{
-# Assuming you have SGWT object
-plots <- plot_sgwt_decomposition(SG_object, signal_name = "signal1")
+\donttest{
+# Create and analyze example data
+data <- data.frame(x = runif(100), y = runif(100), signal1 = rnorm(100))
+SG <- initSGWT(data, signals = "signal1")
+SG <- runSpecGraph(SG, k = 15)
+SG <- runSGWT(SG)
+
+# Plot decomposition
+plots <- plot_sgwt_decomposition(SG, signal_name = "signal1")
 print(plots)
 }
 }

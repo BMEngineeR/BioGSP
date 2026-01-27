@@ -11,7 +11,7 @@ simulate_multiscale(
   n_centers = 1,
   outer_start = 40,
   outer_end_factor = 1.2,
-  seed = 123,
+  seed = NULL,
   verbose = TRUE
 )
 }
@@ -41,7 +41,7 @@ Creates patterns with inner circles and outer rings where the outer radius shrin
 from a fixed starting point to a factor of the inner radius across multiple steps.
 }
 \examples{
-\dontrun{
+\donttest{
 # Generate multi-center patterns with default parameters
 patterns <- simulate_multiscale()
 

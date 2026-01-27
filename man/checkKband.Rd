@@ -41,7 +41,11 @@ and high-frequency Fourier coefficients using eigendecomposition and statistical
 Builds graph and computes Laplacian directly from SGWT data.
 }
 \examples{
-\dontrun{
+\donttest{
+# Create example data
+data <- data.frame(x = runif(100), y = runif(100),
+                  signal1 = rnorm(100), signal2 = rnorm(100))
+
 # Initialize SGWT object (no need to run runSpecGraph)
 SG <- initSGWT(data, signals = c("signal1", "signal2"))
 

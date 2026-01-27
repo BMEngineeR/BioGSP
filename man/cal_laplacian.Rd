@@ -18,7 +18,7 @@ Laplacian matrix of the same class as input.
 Compute unnormalized, normalized, or random-walk Laplacian from an adjacency matrix.
 }
 \examples{
-\dontrun{
+\donttest{
 W <- matrix(c(0, 1, 1, 1, 0, 1, 1, 1, 0), nrow = 3)
 cal_laplacian(W, type = "normalized")
 }

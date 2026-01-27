@@ -52,7 +52,7 @@
 #' @aliases BioGSP-package
 #'
 #' @examples
-#' \dontrun{
+#' \donttest{
 #' # Load the package
 #' library(BioGSP)
 #' 
@@ -69,8 +69,8 @@
 #' )
 #' 
 #' # New workflow: Initialize -> Build Graph -> Run SGWT
-#' SG <- initSGWT(data, signals = "signal", k = 8, J = 4, kernel_type = "heat")
-#' SG <- runSpecGraph(SG)
+#' SG <- initSGWT(data, signals = "signal", J = 4, kernel_type = "heat")
+#' SG <- runSpecGraph(SG, k = 8)
 #' SG <- runSGWT(SG)
 #' 
 #' # Analyze results

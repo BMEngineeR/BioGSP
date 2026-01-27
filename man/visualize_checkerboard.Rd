@@ -20,7 +20,7 @@ ggplot object showing the checkerboard pattern
 Create a visualization of checkerboard pattern data
 }
 \examples{
-\dontrun{
+\donttest{
 df <- simulate_checkerboard(grid_size = 6, tile_size = 5)
 p <- visualize_checkerboard(df, color1 = "darkblue", color2 = "lightgray")
 print(p)

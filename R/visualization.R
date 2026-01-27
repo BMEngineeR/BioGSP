@@ -12,9 +12,15 @@
 #' @export
 #'
 #' @examples
-#' \dontrun{
-#' # Assuming you have SGWT object
-#' plots <- plot_sgwt_decomposition(SG_object, signal_name = "signal1")
+#' \donttest{
+#' # Create and analyze example data
+#' data <- data.frame(x = runif(100), y = runif(100), signal1 = rnorm(100))
+#' SG <- initSGWT(data, signals = "signal1")
+#' SG <- runSpecGraph(SG, k = 15)
+#' SG <- runSGWT(SG)
+#' 
+#' # Plot decomposition
+#' plots <- plot_sgwt_decomposition(SG, signal_name = "signal1")
 #' print(plots)
 #' }
 plot_sgwt_decomposition <- function(SG, signal_name = NULL, plot_scales = NULL, ncol = 3) {
@@ -138,9 +144,15 @@ plot_sgwt_decomposition <- function(SG, signal_name = NULL, plot_scales = NULL, 
 #' @export
 #'
 #' @examples
-#' \dontrun{
-#' # Assuming you have SGWT object
-#' energy_analysis <- sgwt_energy_analysis(SG_object, signal_name = "signal1")
+#' \donttest{
+#' # Create and analyze example data
+#' data <- data.frame(x = runif(100), y = runif(100), signal1 = rnorm(100))
+#' SG <- initSGWT(data, signals = "signal1")
+#' SG <- runSpecGraph(SG, k = 15)
+#' SG <- runSGWT(SG)
+#' 
+#' # Analyze energy distribution
+#' energy_analysis <- sgwt_energy_analysis(SG, signal_name = "signal1")
 #' print(energy_analysis)
 #' }
 sgwt_energy_analysis <- function(SG, signal_name = NULL) {
@@ -246,9 +258,13 @@ sgwt_energy_analysis <- function(SG, signal_name = NULL) {
 #' @export
 #'
 #' @examples
-#' \dontrun{
+#' \donttest{
+#' # Create example data
+#' data <- data.frame(x = runif(100), y = runif(100), signal = rnorm(100))
+#' 
 #' # Plot both low and high frequency modes
-#' SG <- initSGWT(data) %>% runSpecGraph()
+#' SG <- initSGWT(data, signals = "signal")
+#' SG <- runSpecGraph(SG, k = 15)
 #' plot_FM(SG, mode_type = "both", n_modes = 4)
 #' 
 #' # Plot only low frequency modes
@@ -287,7 +303,7 @@ plot_FM <- function(SG, mode_type = "both", n_modes = 6, ncol = 3, point_size = 
       ggplot2::scale_color_viridis_c(option = "plasma") +
       ggplot2::labs(
         title = mode_name,
-        subtitle = paste("\u03bb =", round(eigenval, 4))
+        subtitle = paste("lambda =", round(eigenval, 4))
       ) +
       ggplot2::theme_void() +
       ggplot2::theme(
@@ -388,7 +404,7 @@ plot_FM <- function(SG, mode_type = "both", n_modes = 6, ncol = 3, point_size = 
 #' @export
 #'
 #' @examples
-#' \dontrun{
+#' \donttest{
 #' # Generate some example eigenvalues
 #' eigenvals <- seq(0, 2, length.out = 100)
 #' 
@@ -448,7 +464,7 @@ visualize_sgwt_kernels <- function(eigenvalues, scales = NULL, J = 4, scaling_fa
       title = "SGWT Filter Bank: Scaling Function and Wavelet Kernels",
       subtitle = paste("Kernel Type:", kernel_type, "| J =", length(scales), 
                       "| Scaling Factor =", scaling_factor),
-      x = "Eigenvalue (\u03bb)",
+      x = "Eigenvalue (lambda)",
       y = "Filter Response",
       color = "Filter Type"
     ) +
@@ -478,7 +494,7 @@ visualize_sgwt_kernels <- function(eigenvalues, scales = NULL, J = 4, scaling_fa
     ggplot2::geom_histogram(bins = 50, fill = "steelblue", alpha = 0.7, color = "white") +
     ggplot2::labs(
       title = "Eigenvalue Distribution",
-      x = "Eigenvalue (\u03bb)",
+      x = "Eigenvalue (lambda)",
       y = "Count"
     ) +
     ggplot2::theme_minimal() +
@@ -535,28 +551,32 @@ visualize_sgwt_kernels <- function(eigenvalues, scales = NULL, J = 4, scaling_fa
 #' @export
 #'
 #' @examples
-#' \dontrun{
+#' \donttest{
+#' # Create example data and compute SGWT
+#' data <- data.frame(x = runif(100), y = runif(100),
+#'                   signal1 = rnorm(100), signal2 = rnorm(100))
+#' SG <- initSGWT(data, signals = c("signal1", "signal2"))
+#' SG <- runSpecGraph(SG, k = 15)
+#' SG <- runSGWT(SG)
+#' 
 #' # Single similarity result
-#' sim_result <- runSGCC("signal1", "signal2", SG = SG_object)
+#' sim_result <- runSGCC("signal1", "signal2", SG = SG)
 #' plot <- visualize_similarity_xy(sim_result)
 #' print(plot)
 #' 
-#' # Multiple similarity results
+#' # Multiple similarity results (create two different analyses)
+#' data2 <- data.frame(x = runif(100), y = runif(100),
+#'                    signal1 = rnorm(100), signal2 = rnorm(100))
+#' SG2 <- initSGWT(data2, signals = c("signal1", "signal2"))
+#' SG2 <- runSpecGraph(SG2, k = 15)
+#' SG2 <- runSGWT(SG2)
+#' 
 #' sim_results <- list(
-#'   pair1 = runSGCC("signal1", "signal2", SG = SG_object1),
-#'   pair2 = runSGCC("signal1", "signal2", SG = SG_object2)
+#'   pair1 = runSGCC("signal1", "signal2", SG = SG),
+#'   pair2 = runSGCC("signal1", "signal2", SG = SG2)
 #' )
 #' plot <- visualize_similarity_xy(sim_results, show_names = TRUE)
 #' print(plot)
-#' 
-#' # Show both labels and names (for comparison)
-#' plot_both <- visualize_similarity_xy(sim_results, show_labels = TRUE, show_names = TRUE)
-#' print(plot_both)
-#' 
-#' # With many data points (>50), names will be randomly sampled
-#' # install.packages("ggrepel")  # Required for show_names = TRUE
-#' plot_many <- visualize_similarity_xy(many_sim_results, show_names = TRUE)
-#' print(plot_many)
 #' }
 visualize_similarity_xy <- function(similarity_results, 
                                    point_size = 2,
@@ -572,7 +592,7 @@ visualize_similarity_xy <- function(similarity_results,
     stop("ggplot2 package is required for visualization")
   }
   if (show_names && !requireNamespace("ggrepel", quietly = TRUE)) {
-    stop("ggrepel package is required when show_names = TRUE. Please install it with: install.packages('ggrepel')")
+    stop("ggrepel package is required when show_names = TRUE. Please install it from CRAN.")
   }
   
   # Handle single result vs list of results
@@ -662,7 +682,6 @@ visualize_similarity_xy <- function(similarity_results,
     
     if (n_points > 50) {
       # Random sample 50 points for labeling to avoid overcrowding
-      set.seed(123)  # For reproducible sampling
       sample_indices <- sample(seq_len(n_points), size = 50, replace = FALSE)
       label_data <- plot_data[sample_indices, ]
       
@@ -701,7 +720,7 @@ visualize_similarity_xy <- function(similarity_results,
 #' @export
 #'
 #' @examples
-#' \dontrun{
+#' \donttest{
 #' SG <- demo_sgwt()
 #' print(SG)
 #' }
@@ -709,7 +728,6 @@ demo_sgwt <- function(verbose = TRUE) {
   if (verbose) cat("=== SGWT Demo ===\n")
   
   # Generate synthetic spatial data
-  set.seed(123)
   n_points <- 100
   
   # Create a simple 2D grid with some noise
@@ -766,7 +784,7 @@ demo_sgwt <- function(verbose = TRUE) {
 #' @export
 #'
 #' @examples
-#' \dontrun{
+#' \donttest{
 #' # Generate 8x8 checkerboard with 10x10 pixel tiles
 #' df <- simulate_checkerboard(grid_size = 8, tile_size = 10)
 #' p <- visualize_checkerboard(df)
@@ -806,7 +824,7 @@ simulate_checkerboard <- function(
 #' @export
 #'
 #' @examples
-#' \dontrun{
+#' \donttest{
 #' df <- simulate_checkerboard(grid_size = 6, tile_size = 5)
 #' p <- visualize_checkerboard(df, color1 = "darkblue", color2 = "lightgray")
 #' print(p)

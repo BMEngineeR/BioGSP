@@ -39,7 +39,7 @@ ggplot object with faceted visualization
 Visualize the simulated moving circles patterns from simulate_moving_circles
 }
 \examples{
-\dontrun{
+\donttest{
 # Generate and visualize patterns
 sim_data <- simulate_moving_circles(
   radius_seq = 6:14,

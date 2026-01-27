@@ -39,12 +39,21 @@ Handles both single signals (vector) and multiple signals (matrix) efficiently.
 Stores original and filtered Fourier coefficients for analysis.
 }
 \examples{
-\dontrun{
+\donttest{
+# Create example data and compute graph
+data <- data.frame(x = runif(50), y = runif(50), signal = rnorm(50))
+SG <- initSGWT(data, signals = "signal", J = 3)
+SG <- runSpecGraph(SG, k = 10)
+eigenvectors <- SG$Graph$eigenvectors
+eigenvalues <- SG$Graph$eigenvalues
+scales <- SG$Parameters$scales
+
 # Single signal
+signal <- data$signal
 result <- sgwt_forward(signal, eigenvectors, eigenvalues, scales)
 
 # Multiple signals (batch processing)
-signals_matrix <- cbind(signal1, signal2, signal3)
+signals_matrix <- cbind(data$signal, data$signal * 2, data$signal * 0.5)
 result <- sgwt_forward(signals_matrix, eigenvectors, eigenvalues, scales)
 }
 }

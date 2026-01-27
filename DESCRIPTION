@@ -8,10 +8,7 @@ Authors@R: person(given = "Yuzhou",
                   email = "yuzhou.chang@osumc.edu")
 Description: Implementation of Graph Signal Processing (GSP) methods including Spectral 
     Graph Wavelet Transform (SGWT) for analyzing spatial patterns in biological data. 
-    Based on Hammond, Vandergheynst, and Gribonval (2011) "Wavelets on Graphs via 
-    Spectral Graph Theory". Provides tools for multi-scale analysis of biology spatial signals, 
-    including forward and inverse transforms, energy analysis, and visualization functions 
-    tailored for biological applications.
+    Based on Hammond, Vandergheynst, and Gribonval (2011) <doi:10.1016/j.acha.2010.04.005>. Provides tools for multi-scale analysis of biology spatial signals, including forward and inverse transforms, energy analysis, and visualization functions tailored for biological applications. Biological application example is on Stephanie, Yao, Yuzhou (2024) <doi:10.1101/2024.12.20.629650>.
 License: GPL-3
 URL: https://github.com/BMEngineeR/BioGSP
 BugReports: https://github.com/BMEngineeR/BioGSP/issues
@@ -29,7 +26,6 @@ Imports:
     methods,
     dplyr
 Suggests:
-    remotes,
     knitr,
     rmarkdown,
     ggrepel

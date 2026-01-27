@@ -11,6 +11,9 @@
 
 \item{...}{Additional arguments passed to print methods}
 }
+\value{
+Invisibly returns the input SGWT object. Called for side effects (prints object summary to console).
+}
 \description{
 Print method for SGWT objects
 }

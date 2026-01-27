@@ -39,7 +39,7 @@ SGWT object with Data and Parameters slots initialized
 Build an SGWT object with Data and Parameters slots, validate inputs.
 }
 \examples{
-\dontrun{
+\donttest{
 # Initialize SGWT object
 data <- data.frame(x = runif(100), y = runif(100), 
                   signal1 = rnorm(100), signal2 = rnorm(100))

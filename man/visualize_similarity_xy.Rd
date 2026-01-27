@@ -41,27 +41,31 @@ Create a scatter plot with low-frequency similarity (c_low) on x-axis
 and non-low-frequency similarity (c_nonlow) on y-axis from runSGCC results
 }
 \examples{
-\dontrun{
+\donttest{
+# Create example data and compute SGWT
+data <- data.frame(x = runif(100), y = runif(100),
+                  signal1 = rnorm(100), signal2 = rnorm(100))
+SG <- initSGWT(data, signals = c("signal1", "signal2"))
+SG <- runSpecGraph(SG, k = 15)
+SG <- runSGWT(SG)
+
 # Single similarity result
-sim_result <- runSGCC("signal1", "signal2", SG = SG_object)
+sim_result <- runSGCC("signal1", "signal2", SG = SG)
 plot <- visualize_similarity_xy(sim_result)
 print(plot)
 
-# Multiple similarity results
+# Multiple similarity results (create two different analyses)
+data2 <- data.frame(x = runif(100), y = runif(100),
+                   signal1 = rnorm(100), signal2 = rnorm(100))
+SG2 <- initSGWT(data2, signals = c("signal1", "signal2"))
+SG2 <- runSpecGraph(SG2, k = 15)
+SG2 <- runSGWT(SG2)
+
 sim_results <- list(
-  pair1 = runSGCC("signal1", "signal2", SG = SG_object1),
-  pair2 = runSGCC("signal1", "signal2", SG = SG_object2)
+  pair1 = runSGCC("signal1", "signal2", SG = SG),
+  pair2 = runSGCC("signal1", "signal2", SG = SG2)
 )
 plot <- visualize_similarity_xy(sim_results, show_names = TRUE)
 print(plot)
-
-# Show both labels and names (for comparison)
-plot_both <- visualize_similarity_xy(sim_results, show_labels = TRUE, show_names = TRUE)
-print(plot_both)
-
-# With many data points (>50), names will be randomly sampled
-# install.packages("ggrepel")  # Required for show_names = TRUE
-plot_many <- visualize_similarity_xy(many_sim_results, show_names = TRUE)
-print(plot_many)
 }
 }

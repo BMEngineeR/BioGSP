@@ -2,8 +2,8 @@
 % Please edit documentation in R/biogsp-package.R
 \docType{package}
 \name{BioGSP-package}
-\alias{BioGSP}
 \alias{BioGSP-package}
+\alias{_PACKAGE}
 \title{BioGSP: Biological Graph Signal Processing for Spatial Data Analysis}
 \description{
 The BioGSP package provides a comprehensive implementation of Graph Signal Processing 
@@ -51,7 +51,7 @@ The BioGSP package is particularly useful for:
 }
 
 \examples{
-\dontrun{
+\donttest{
 # Load the package
 library(BioGSP)
 
@@ -68,8 +68,8 @@ data <- data.frame(
 )
 
 # New workflow: Initialize -> Build Graph -> Run SGWT
-SG <- initSGWT(data, signals = "signal", k = 8, J = 4, kernel_type = "heat")
-SG <- runSpecGraph(SG)
+SG <- initSGWT(data, signals = "signal", J = 4, kernel_type = "heat")
+SG <- runSpecGraph(SG, k = 8)
 SG <- runSGWT(SG)
 
 # Analyze results

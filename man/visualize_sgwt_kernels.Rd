@@ -40,7 +40,7 @@ Visualize the scaling function and wavelet kernels used in SGWT
 based on the eigenvalue spectrum and selected parameters
 }
 \examples{
-\dontrun{
+\donttest{
 # Generate some example eigenvalues
 eigenvals <- seq(0, 2, length.out = 100)
 

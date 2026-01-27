@@ -18,7 +18,7 @@ Data frame with X, Y coordinates and signal_1, signal_2 patterns
 Generate a checkerboard pattern with alternating signals
 }
 \examples{
-\dontrun{
+\donttest{
 # Generate 8x8 checkerboard with 10x10 pixel tiles
 df <- simulate_checkerboard(grid_size = 8, tile_size = 10)
 p <- visualize_checkerboard(df)

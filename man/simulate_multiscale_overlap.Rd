@@ -9,7 +9,7 @@ simulate_multiscale_overlap(
   n_centers = 3,
   Ra_seq = c(10, 5, 1),
   Rb_seq = c(10, 5, 1),
-  seed = 123,
+  seed = NULL,
   verbose = TRUE
 )
 }
@@ -37,7 +37,7 @@ pattern generation. Creates concentric circle patterns with inner circle A and o
 at various radius combinations.
 }
 \examples{
-\dontrun{
+\donttest{
 # Generate multi-center patterns with fixed centers
 patterns <- simulate_multiscale_overlap()
 

@@ -22,10 +22,18 @@ Uses batch processing for multiple signals when possible for efficiency.
 Assumes Graph slot is populated by runSpecGraph().
 }
 \examples{
-\dontrun{
-SG <- initSGWT(data)
-SG <- runSpecGraph(SG)
-SG <- runSGWT(SG)  # Uses batch processing by default
-SG <- runSGWT(SG, use_batch = FALSE)  # Force individual processing
+\donttest{
+# Create example data
+data <- data.frame(x = runif(100), y = runif(100), signal = rnorm(100))
+SG <- initSGWT(data, signals = "signal")
+SG <- runSpecGraph(SG, k = 15)
+
+# Uses batch processing by default
+SG <- runSGWT(SG)
+
+# Or force individual processing
+SG2 <- initSGWT(data, signals = "signal")
+SG2 <- runSpecGraph(SG2, k = 15)
+SG2 <- runSGWT(SG2, use_batch = FALSE)
 }
 }
