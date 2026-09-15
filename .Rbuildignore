@@ -9,3 +9,4 @@
 ^check_output\.log$
 ^README\.md$
 ^\.lintr$
+^cran-comments\.md$
